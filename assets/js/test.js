@@ -6,7 +6,7 @@
     });
 
     function clicked() {
-        socket.emit('message', 'Toto', 'salut, comment va ?');
+        socket.emit('message', 'Toto ', ' salut, comment va ?');
     }
 
     document.getElementById('clicked').addEventListener('click', clicked);
