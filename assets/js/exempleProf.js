@@ -1,3 +1,5 @@
+// Exemple de main.js client
+
 (function (){
     const socket = io.connect('http://localhost:8080');
 
