@@ -5,6 +5,9 @@ class Jeu{
         this.echiquier = new Plateau();
         //Génération des pièces à faire..
 
+        this.render = new renderCss(this.echiquier.board);
+
+        
     }
 }
 

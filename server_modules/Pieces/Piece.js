@@ -2,6 +2,8 @@ class Piece{
     constructor(couleur){
         console.log('Piece instanciée');
 
+        img = "Vide.png"
+
         //Initialisation des coordonnées (classe a faire ?)
         this.x = -1;
         this.y = -1;
