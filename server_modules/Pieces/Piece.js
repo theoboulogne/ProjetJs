@@ -1,6 +1,7 @@
 class Piece{
-    constructor(couleur){
+    constructor(couleur, nom = "Piece"){
         console.log('Piece instanciée');
+        this.type = nom
 
         //Initialisation des coordonnées (classe a faire ?)
         this.x = -1;
