@@ -26,7 +26,7 @@ io.sockets.on('connection',  (socket) =>{
     io.emit('hello', 'A new connection on our website');
     socket.emit('hello', 'Hello to you');
     socket.on('message', (from, msg)=> {
-        console.log('Irecived a message by' + from + 'telling' + msg)
+        console.log('recived a message by' + from + 'telling' + msg)
     });
 
     socket.on('disconnect', ()=>{
