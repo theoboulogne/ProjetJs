@@ -28,6 +28,9 @@ io.sockets.on('connection',  (socket) =>{
     socket.on('message', (from, msg)=> {
         console.log('recived a message by' + from + 'telling' + msg)
     });
+    socket.on('message', (from, msg)=> {
+        console.log('Irecived a message by' + from + 'telling' + msg)
+    });
 
     socket.on('disconnect', ()=>{
         console.log('Disconnect');

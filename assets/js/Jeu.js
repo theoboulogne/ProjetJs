@@ -12,7 +12,10 @@ class Jeu{
 }
 
 class Joueur{
-    constructor(couleur){
-        // On instancie les pièces du joueur puis on les ajoutes au plateau
+    constructor(){
+        this.pieces = -1; // 16 au debut de la partie
+        this.couleur = -1 // 0 ou 1, blanc/noir
+        this.roi.x = -1; //-1 a l'init puis def en fonction de la couleur,rajouter methode ici avec param ?
+        this.roi.y = -1;
     }
 }
