@@ -1,3 +1,5 @@
+//Exemple de Serveur
+
 const port = 8080;
 
 const express = require('express');
@@ -23,6 +25,9 @@ app.get('/second', (req, res, next) => {
 io.sockets.on('connection',  (socket) =>{
     io.emit('hello', 'A new connection on our website');
     socket.emit('hello', 'Hello to you');
+    socket.on('message', (from, msg)=> {
+        console.log('Irecived a message by' + from + 'telling' + msg)
+    });
     socket.on('message', (from, msg)=> {
         console.log('Irecived a message by' + from + 'telling' + msg)
     });
