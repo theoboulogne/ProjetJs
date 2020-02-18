@@ -3,6 +3,8 @@ class Piece{
         console.log('Piece instanciée');
         this.type = nom
 
+        img = "Vide.png"
+
         //Initialisation des coordonnées (classe a faire ?)
         this.x = -1;
         this.y = -1;

@@ -4,6 +4,9 @@ class Jeu{
         //Génération des events a faire ?
         //Génération de la partie graphique a faire
 
+        this.render = new renderCss(this.echiquier.board);
+
+        
     }
 }
 
