@@ -17,38 +17,32 @@ class Pion extends Piece {
         //(piece qui suit la souris avec l'animation)
 
         if(!this.played) { //si jms jouée
-            if(plateau.board[this.x][(Math.pow(-1,couleur)*(this.y+2))].piece==0){ // passer en methode..
+            if(plateau.vide(this.x,(Math.pow(-1,couleur)*(this.y+2)))) {
                 plateau.playable(this.x,(Math.pow(-1,couleur)*(this.y+2)),this.couleur)
             }
         }
         //déplacement par défault
-        if(plateau.board[this.x][(Math.pow(-1,couleur)*(this.y+1))].piece==0){
+        if(plateau.vide(this.x,(Math.pow(-1,couleur)*(this.y+1)))){
             plateau.playable(this.x,(Math.pow(-1,couleur)*(this.y+1)),this.couleur)
         }
 
-        //prise de piece
-        if(plateau.board[this.x-1][(Math.pow(-1,couleur)*(this.y+1))].piece!=0){
-            plateau.playable(this.x-1,(Math.pow(-1,couleur)*(this.y+1)),this.couleur)
-        }
-        if(plateau.board[this.x+1][(Math.pow(-1,couleur)*(this.y+1))].piece!=0){
-            plateau.playable(this.x+1,(Math.pow(-1,couleur)*(this.y+1)),this.couleur)
+        
+        for(let i=-1; i<2; i+=2) {
+            //prise de piece
+            if(!plateau.vide(this.x + i,(Math.pow(-1,couleur)*(this.y+1)))){
+                plateau.playable(this.x + i,(Math.pow(-1,couleur)*(this.y+1)),this.couleur)
+            }
+            //prise en passant
+            if(plateau.board[this.x + i][this.y].piece.type==this.type){ //regarder la class directement?
+                if(plateau.board[this.x + i][this.y].piece.justplayed){
+                    if(plateau.vide(this.x + i,(Math.pow(-1,couleur)*(this.y+1)))){
+                        plateau.playable(this.x + i,(Math.pow(-1,couleur)*(this.y+1)),this.couleur)
+                    }
+                }
+            }
+
         }
 
-        //prise en passant
-        if(plateau.board[this.x-1][this.y].piece.type==this.type){
-            if(plateau.board[this.x-1][this.y].piece.justplayed){
-                if(plateau.board[this.x-1][(Math.pow(-1,couleur)*(this.y+1))].piece==0){
-                    plateau.playable(this.x-1,(Math.pow(-1,couleur)*(this.y+1)),this.couleur)
-                }
-            }
-        }
-        if(plateau.board[this.x+1][this.y].piece.type==this.type){
-            if(plateau.board[this.x+1][this.y].piece.justplayed){
-                if(plateau.board[this.x+1][(Math.pow(-1,couleur)*(this.y+1))].piece==0){
-                    plateau.playable(this.x+1,(Math.pow(-1,couleur)*(this.y+1)),this.couleur)
-                }
-            }
-        }
     }
 
 

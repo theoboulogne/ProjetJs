@@ -8,7 +8,8 @@ class Piece{
         this.y = -1;
 
         this.color = couleur; // couleur de la pièce
-        this.played = false; // pièce déjà jouée ? (pour le roque, le pion..)
+        this.played = false; // pièce déjà jouée ? (pour le roque, le pion..) mettre que dans les classe ou c'est nécessaire ?
+                                                                            // si oui changer la methode de playable du plateau
     }
     set_Position(board, x, y){ // on déplace une pièce, aucunes vérification n'est effectuée par rapport à la possibilité de jouer 
                                // ou par rapport a l'enregistrement du premier déplacement de la pièce

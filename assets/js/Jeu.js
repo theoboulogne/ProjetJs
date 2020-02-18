@@ -1,18 +1,17 @@
 class Jeu{
     constructor(){
-        this.blancs = Joueur(0)
-        this.noirs = Joueur(1)
         this.echiquier = new Plateau();
-        //Génération des pièces à faire..
+        //Génération des events a faire ?
+        //Génération de la partie graphique a faire
 
     }
 }
 
 class Joueur{
-    constructor(){
-        this.pieces = -1; // 16 au debut de la partie
-        this.couleur = -1 // 0 ou 1, blanc/noir
-        this.roi.x = -1; //-1 a l'init puis def en fonction de la couleur,rajouter methode ici avec param ?
-        this.roi.y = -1;
+    constructor(couleur){
+        this.pieces = 16; // 16 au debut de la partie
+        this.couleur = couleur // 0 ou 1, blanc/noir
+        this.roi.x = 4 - couleur; //position du roi en fonction de la couleur à l'initialisation
+        this.roi.y = couleur * 7;
     }
 }
