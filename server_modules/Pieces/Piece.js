@@ -1,8 +1,8 @@
 class Piece{
     constructor(couleur, nom = "Piece"){
-        console.log('Piece instanciée');
-        this.type = nom
+        console.log(nom + " viens d'être instanciée");
 
+        this.type = nom
         img = "Vide.png"
 
         //Initialisation des coordonnées (classe a faire ?)
@@ -10,14 +10,16 @@ class Piece{
         this.y = -1;
 
         this.color = couleur; // couleur de la pièce
-        this.played = false; // pièce déjà jouée ? (pour le roque, le pion..)
+        this.played = false; // pièce déjà jouée ? (pour le roque, le pion..) mettre que dans les classe ou c'est nécessaire ?
+                                                                            // si oui changer la methode de playable du plateau
     }
-    set_Position(board, x, y){ // on déplace une pièce, aucunes vérification n'est effectuée par rapport à la possibilité de jouer 
-                               // ou par rapport a l'enregistrement du premier déplacement de la pièce
-        if(!(this.x==-1 && this.y==-1)){ // Si coordonnées définies on supprime la pièce de son dernier emplacement
-            board[this.x][this.y].piece = 0;
+    // méthode générale
+    move(x,y, plateau){ //forcer playable avant move..
+        if(plateau.isInBoard(x,y)){
+            if(plateau.board[x][y].playable){
+                plateau.jouer(x, y, this);
+            }
         }
-        board[x][y].piece = this;
     }
 }
 

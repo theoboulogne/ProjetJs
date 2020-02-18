@@ -1,7 +1,12 @@
 class Plateau{
     constructor(){
         console.log('Plateau instanciée');
-        Joueurs[2] = new Joueur[2]
+        this.Joueurs = new Array(2)
+        for(let i =0 ; i<2; i++) this.Joueurs[i] = new Joueur(i);// 0 blanc, 1 noir
+        
+
+        //this.PiecesPrises = new Array(2)
+        //for(let i=0; i<2; i++) this.PiecesPrises[i] = []
 
         this.board = new Array(8)
         for(let i = 0; i<8; i++){
@@ -11,13 +16,30 @@ class Plateau{
             }
         }
 
-        //rajouter methode d'acces a board avec securite de depassement
+        for(let j=0; j<2; j++){
+            for(let i=0; i<8; i++) this.board[i][1 + (j*5)].piece = new Pion(j);
+            for(let i=0; i<2; i++) this.board[i*7][j*7].piece = new Tour(j);
+            for(let i=0; i<2; i++) this.board[1 + (i*5)][j*7].piece = new Cavalier(j);
+            for(let i=0; i<2; i++) this.board[2 + (i*3)][j*7].piece = new Fou(j);
+            this.board[3 + j][j*7].piece = new Reine(j);
+            this.board[4 - j][j*7].piece = new Roi(j); // mettre la coordonnée du roi depuis joueur ?
+        }
 
-        //rajouter un moyen de reset justplayed intelligemment..
+        
 
-        // Ajouter les différentes pièces ( méthode ? ou passer les joueurs en argument du constructeur ? 
-                                        //  ou générer les joueurs dans le plateau directement)
-        // définir les coo du roi dans le joueur a l'initialisation du board
+
+        //rajouter gestion de l'erreur sur getBoard
+
+        //rajouter un moyen de reset justplayed du pion intelligemment.. 
+
+    }
+    isInBoard(x, y){
+        if(x<0||y<0||x>7||y>7) return false;
+        else return true;
+    }
+    getBoard(x,y){
+        if(this.isInBoard(x,y)) return this.board[x][y];
+        else return Case(); // Gestion de l'erreur a faire en fonction de l'utilisation, Case en attendant pour eviter l'erreur
     }
     reset_playable(){
         for(let i = 0; i<8; i++){
@@ -27,6 +49,9 @@ class Plateau{
         }
     }
     playable(x,y, couleur){
+
+        //tester si il y a un echec après que le coup est joué et pas avant..
+
         //rajouter verif de depassement aussi
         if(this.board[this.Joueur[couleur].roi.x][this.Joueur[couleur].roi.y].piece.echec()){ //sur le type ?
             return -1 // erreur a afficher ? (ex:en rouge au lieu de vert) ou alors ne rien return
@@ -39,7 +64,15 @@ class Plateau{
         this.board[x][y].piece = 0;
     }
 
-    jouer(x, y, piece){//rajouter le coup dans l'affichage a faire par la suite
+    vide(x,y){
+        if(this.isInBoard(x,y)){
+            if(this.board[x][y].piece == 0) return true;
+            else return false;
+        }
+        else return null;
+    }
+
+    jouer(x, y, piece){//rajouter le coup dans l'affichage a faire par la suite + sécurité
         if(this.board[x][y]!=0) this.supprimer(x, y)
 
         this.board[piece.x][piece.y]=0;
