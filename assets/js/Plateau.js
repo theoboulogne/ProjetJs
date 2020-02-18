@@ -2,9 +2,7 @@ class Plateau{
     constructor(){
         console.log('Plateau instanciée');
         this.Joueurs = new Array(2)
-        for(let i =0 ; i<2; i++){ // 0 blanc, 1 noir
-            this.Joueurs = new Joueur(i);
-        }
+        for(let i =0 ; i<2; i++) this.Joueurs[i] = new Joueur(i);// 0 blanc, 1 noir
         
 
         //this.PiecesPrises = new Array(2)
@@ -51,6 +49,9 @@ class Plateau{
         }
     }
     playable(x,y, couleur){
+
+        //tester si il y a un echec après que le coup est joué et pas avant..
+
         //rajouter verif de depassement aussi
         if(this.board[this.Joueur[couleur].roi.x][this.Joueur[couleur].roi.y].piece.echec()){ //sur le type ?
             return -1 // erreur a afficher ? (ex:en rouge au lieu de vert) ou alors ne rien return

@@ -1,63 +1,66 @@
-class Roi{
+class Roi extends Piece{
 
-    constructor(x, y, player){
+    constructor(couleur, x, y){
+        super(couleur, "Roi")
+
         this.x = x;
         this.y = y;
-        this.player = player;
     }
 
-    verifier(pieceName,sens){
-        
+    verifierboucle(pieceName,sens, plateau){
         for(let i = 0; i < sens.length; i++){
             let x = this.x + 1*sens[i][0];
-            let y = this.y + 1*sensy[i][1];
-            if (isInBoard(x,y)) while(board[x][y].piece.couleur != this.couleur){
-                if (isInBoard(x,y)) for (let j = 0; j < pieceName.length; j++) if (board[x][y].piece.name == pieceName1) return 1;
-            }
+            let y = this.y + 1*sens[i][1];
 
+                //pas de décallage de x et y ?? a voir
+
+            if (plateau.isInBoard(x,y)) while(plateau.board[x][y].piece.couleur != this.couleur){
+                if (plateau.isInBoard(x,y)) for (let j = 0; j < pieceName.length; j++) if (plateau.board[x][y].piece.type == pieceName[j]) return true;
+            }
         }
+        return false;
     }
 
-    verifier2(pieceName,sens){
-
+    verifiercote(pieceName,sens, plateau){
         for(let i = 1; i <= sens.length; i++){
             let x = this.x + 1*sens[i][0];
             let y = this.y + 1*sensy[i][1];
-            if (isInBoard(x,y)) if(board[x][y].piece.couleur != this.couleur){
-                for (let i = 0; i < pieceName.length; i++) if (board[x][y].piece.name == pieceName1) return 1;
+            if (plateau.isInBoard(x,y)) if(plateau.board[x][y].piece.couleur != this.couleur){
+                for (let j = 0; j < pieceName.length; j++) if (plateau.board[x][y].piece.type == pieceName[j]) return true;
             }
         }
+        return false;
     }
 
-    isEnEcheque(){
-        if (verifier(["reine","fou"],[[1,1],[1,-1],[-1,1],[-1,-1]]) ||
-            verifier(["reine","tour"],[[1,0],[-1,0],[0,1],[0,-1]]) ||
-            verifier2(["pion"],[[1*Math.pow(-1,this.couleur + 1),1*Math.pow(-1,this.couleur + 1)],[1*Math.pow(-1,this.couleur + 1),-1*Math.pow(-1,this.couleur + 1)]]) ||
-            verifier2(["cavalier"],[[2,1],[2,-1],[-2,1],[-2,-1],[1,2],[1,-2],[-1,2],[-1,-2]])) return 1;
-        
-        return 0;
+    echec(plateau){
+        if (verifierboucle(["reine","fou"],[[1,1],[1,-1],[-1,1],[-1,-1]], plateau)) return true;
+        if (verifierboucle(["reine","tour"],[[1,0],[-1,0],[0,1],[0,-1]], plateau)) return true;
+        if (verifiercote(["pion"],[[1*Math.pow(-1,this.couleur + 1),1*Math.pow(-1,this.couleur + 1)],[1*Math.pow(-1,this.couleur + 1),-1*Math.pow(-1,this.couleur + 1)]], plateau)) return true;
+        if (verifiercote(["cavalier"],[[2,1],[2,-1],[-2,1],[-2,-1],[1,2],[1,-2],[-1,2],[-1,-2]], plateau)) return true;
+        return false;
     }
 
-    playable(){
-
-        let X = this.x - 1;
-        let Y = this.y - 1;
-
-        let isPlayable = [];
-
-        for (let i = 0; i < 3; i++){
-            for (let j = 0; j < 3; j++){
-                if(isInBoard(X + i, Y + i)){
-                    
+    playable(plateau){
+        plateau.reset_playable()
+        for (let i = -1; i < 2; i++){
+            for (let j = -1; j < 2; j++){
+                if(plateau.isInBoard(this.x + i, this.y + j)){
+                    plateau.playable(this.x + i, this.y + j, this.couleur);
                 }
             }
         }
     }
 
-    move(x,y){
-        
-    }
+    move(x,y, plateau){ //forcer playable avant move..
+        if(plateau.isInBoard(x,y)){
+            if(plateau.board[x][y].playable){
+                plateau.jouer(x, y, this);
 
+                plateau.Joueurs[this.couleur].roi.x = x;
+                plateau.Joueurs[this.couleur].roi.y = y;
+            }
+        }
+    }
 };
 
 module.exports = Roi;

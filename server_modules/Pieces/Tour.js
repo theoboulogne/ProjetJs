@@ -1,35 +1,22 @@
-class Tour{
-    constructor(player, x, y){
-        console.log('Class instanciée');
+class Tour extends Piece{
+    constructor(couleur, x, y){
+        super(couleur, "Tour")
+
         this.x = x;
         this.y = y;
-        this.player;
     }
 
-    playable() {
-
+    playable(plateau) {
+        plateau.reset_playable()
         scan = [[-1,0][1,0][0,-1][0,1]];
-
-        for (let j=0; j<scan.length; j++){
-            let i = 1;
-            while(inTab((this.x + (scan[j][0] * i)),this.y + (scan[j][1] * i)) && (( this.x + (scan[j][0] * i),this.y + (scan[j][1] * i) ) != couleur) ){
-                if (( board[(this.x + (scan[j][0] * i))][this.y + (scan[j][1] * i)].piece != this.couleur) || (board[(this.x + (scan[j][0] * i))][this.y + (scan[j][1] * i)].piece == 0) ) {
-                    Plateau.playable((this.x + (scan[j][0] * i)),this.y + (scan[j][1] * i),this.couleur)
+        for (let j=0, i=1; j<scan.length; j++){
+            while(plateau.isInBoard((this.x + (scan[j][0] * i)),this.y + (scan[j][1] * i)) && (( this.x + (scan[j][0] * i),this.y + (scan[j][1] * i) ) != this.couleur) ){
+                if (( plateau.board[(this.x + (scan[j][0] * i))][this.y + (scan[j][1] * i)].piece != this.couleur) || (plateau.board[(this.x + (scan[j][0] * i))][this.y + (scan[j][1] * i)].piece == 0) ) {
+                    plateau.playable((this.x + (scan[j][0] * i)),this.y + (scan[j][1] * i),this.couleur)
                 }
                 i++
             }
         }
     }
-
-/*
-    move(x, y) {
-
-        board[x][y] = 
-    }
-
-    delete() {
-
-    }
-*/
 
 }
