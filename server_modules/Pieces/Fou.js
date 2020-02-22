@@ -1,16 +1,13 @@
 class Fou extends Piece{
     constructor(couleur, x, y){
-        super(couleur, "Fou")
-
-        this.x = x;
-        this.y = y;
+        super(couleur, x, y)
     }
 
     playable(plateau) {
         plateau.reset_playable()
-        scan = [[-1,1][1,1][1,-1][1,1]];
+        let scan = [[-1,1],[1,1],[1,-1],[1,1]];
         for (let j = 0, i = 1; j<scan.length; j++){
-            while(plateau.isInBoard((this.x + (scan[j][0] * i)),this.y + (scan[j][1] * i)) && (( this.x + (scan[j][0] * i),this.y + (scan[j][1] * i) ) != couleur) ){
+            while(plateau.isInBoard((this.x + (scan[j][0] * i)),this.y + (scan[j][1] * i)) && (( this.x + (scan[j][0] * i),this.y + (scan[j][1] * i) ) != this.couleur) ){
                 if (( plateau.board[(this.x + (scan[j][0] * i))][this.y + (scan[j][1] * i)].piece != this.couleur) || (plateau.board[(this.x + (scan[j][0] * i))][this.y + (scan[j][1] * i)].piece == 0) ) {
                     plateau.playable((this.x + (scan[j][0] * i)),this.y + (scan[j][1] * i),this.couleur)
                 }

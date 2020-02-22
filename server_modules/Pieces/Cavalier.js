@@ -1,6 +1,7 @@
-class Tour extends Piece{
+class Cavalier extends Piece{
     constructor(couleur, x, y){
         super(couleur, x, y)
+ // TOTALEMENT A FAIRE, CLASSE TEST POUR RENDERCSS
     }
 
     playable(plateau) {

@@ -17,16 +17,19 @@ class Plateau{
         }
 
         for(let j=0; j<2; j++){
-            for(let i=0; i<8; i++) this.board[i][1 + (j*5)].piece = new Pion(j);
-            for(let i=0; i<2; i++) this.board[i*7][j*7].piece = new Tour(j);
-            for(let i=0; i<2; i++) this.board[1 + (i*5)][j*7].piece = new Cavalier(j);
-            for(let i=0; i<2; i++) this.board[2 + (i*3)][j*7].piece = new Fou(j);
-            this.board[3 + j][j*7].piece = new Reine(j);
-            this.board[4 - j][j*7].piece = new Roi(j); // mettre la coordonnée du roi depuis joueur ?
+            for(let i=0; i<8; i++) this.board[i][1 + (j*5)].piece = new Pion(j, i, 1 + (j*5));
+            for(let i=0; i<2; i++) this.board[i*7][j*7].piece = new Tour(j, i*7, j*7);
+            for(let i=0; i<2; i++) this.board[1 + (i*5)][j*7].piece = new Cavalier(j, 1 + (i*5), j*7);
+            for(let i=0; i<2; i++) this.board[2 + (i*3)][j*7].piece = new Fou(j, 2+ (i*3), j*7);
+            this.board[3 + j][j*7].piece = new Reine(j, 3+j, j*7);
+            this.board[4 - j][j*7].piece = new Roi(j, 4-j, j*7); // mettre la coordonnée du roi depuis joueur ?
         }
 
         
 
+        this.select = new Object() // classe coo a faire
+        this.select.x = -1;
+        this.select.y = -1;
 
         //rajouter gestion de l'erreur sur getBoard
 
@@ -39,7 +42,7 @@ class Plateau{
     }
     getBoard(x,y){
         if(this.isInBoard(x,y)) return this.board[x][y];
-        else return Case(); // Gestion de l'erreur a faire en fonction de l'utilisation, Case en attendant pour eviter l'erreur
+        else return new Case(); // Gestion de l'erreur a faire en fonction de l'utilisation, Case en attendant pour eviter l'erreur
     }
     reset_playable(){
         for(let i = 0; i<8; i++){
@@ -51,37 +54,43 @@ class Plateau{
     playable(x,y, couleur){
 
         //tester si il y a un echec après que le coup est joué et pas avant..
-
-        //rajouter verif de depassement aussi
-        if(this.board[this.Joueur[couleur].roi.x][this.Joueur[couleur].roi.y].piece.echec()){ //sur le type ?
-            return -1 // erreur a afficher ? (ex:en rouge au lieu de vert) ou alors ne rien return
+        
+        if(this.isInBoard(x,y)){
+            if(!this.board[this.Joueurs[couleur].roi.x][this.Joueurs[couleur].roi.y].piece.echec(this)){ //sur le type ?
+                this.board[x][y].playable = true; // erreur a afficher sinon ? (ex:en rouge au lieu de vert)
+            }
         }
         
-        this.board[x][y].playable = true;
+        
     }
     supprimer(x,y){
-        this.Joueur[this.board[x][y].piece.couleur].pieces--;
-        this.board[x][y].piece = 0;
+        if(this.isInBoard(x,y)){ // rajouter verif si pas vide
+            this.Joueurs[this.board[x][y].piece.couleur].pieces--;
+            this.board[x][y].piece = 0;
+        }
     }
 
-    vide(x,y){
+    check_vide(x,y){
         if(this.isInBoard(x,y)){
             if(this.board[x][y].piece == 0) return true;
-            else return false;
         }
-        else return null;
+        return false;
+    }
+    check_piece(x,y){
+        if(this.isInBoard(x,y)){
+            if(this.board[x][y].piece != 0) return true;
+        }
+        return false;
     }
 
     jouer(x, y, piece){//rajouter le coup dans l'affichage a faire par la suite + sécurité
-        if(this.board[x][y]!=0) this.supprimer(x, y)
+        if(this.board[x][y].piece!=0) this.supprimer(x, y)
 
-        this.board[piece.x][piece.y]=0;
+        this.board[piece.x][piece.y].piece=0; //rajouter dans une methode ?
         piece.played = true
         piece.x = x
         piece.y = y
         this.board[x][y].piece = piece
-
-        this.reset_playable();
     }
 }
 
