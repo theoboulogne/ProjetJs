@@ -1,5 +1,3 @@
-const Piece = require('./Piece');
-
 class Roi extends Piece{
     constructor(couleur, x, y){
         super(couleur, x, y)
@@ -75,6 +73,3 @@ class Roi extends Piece{
         }
     }
 };
-
-
-module.exports = Roi;

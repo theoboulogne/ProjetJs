@@ -1,5 +1,3 @@
-const Piece = require('./Piece');
-
 class Pion extends Piece {
     constructor(couleur, x, y){
         super(couleur, x, y)
@@ -72,5 +70,3 @@ class Pion extends Piece {
         }
     }
 }
-
-module.exports = Pion;

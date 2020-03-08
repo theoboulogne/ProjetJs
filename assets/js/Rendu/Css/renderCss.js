@@ -1,3 +1,5 @@
+//Ne fonctionne plus avec les classes client car pas de methode, a modif..
+
 class renderCss{
     constructor(plateau){
         for(let j=0; j<8; j++){
@@ -22,6 +24,16 @@ class renderCss{
 
 
 function click(x, y, plateau){
+
+    /*
+     si pas ton tour:
+    attendre cout coté serveur,
+    continuer actualisation graphique (timer, menu..)
+
+
+     si ton tour :
+    */
+
     if (plateau.select.x==-1 && plateau.board[x][y].piece!=0){
         plateau.select.x = x;
         plateau.select.y = y;
@@ -29,12 +41,19 @@ function click(x, y, plateau){
     }
     else{
         if(plateau.board[x][y].playable){
+
+            //Effectuer la vérification du playable coté serveur en plus
+
             plateau.board[plateau.select.x][plateau.select.y].piece.move(x, y, plateau)
         }
         plateau.reset_playable();
         plateau.select.x = -1;
         plateau.select.y = -1;
     }
+
+
+    // Actualisation de la map à chaque cout
+    //changer par le changement des cases nécessaire uniquement par la suite lors du passage en graphique threejs
     
     for(let j=0; j<8; j++){
         for(let i=0; i<8; i++){

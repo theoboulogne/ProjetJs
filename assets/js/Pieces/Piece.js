@@ -10,7 +10,7 @@ class Piece{
 
         //Coté serveur
         this.deplacements = new Array()
-        let deplacement = Object() // classe coo a faire ?
+        let deplacement = Object()
         deplacement.x = x;
         deplacement.y = y;
         this.deplacements.push(deplacement)
@@ -24,5 +24,3 @@ class Piece{
         }
     }
 }
-
-module.exports = Piece;

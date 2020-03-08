@@ -1,3 +1,5 @@
+const Piece = require('./Piece');
+
 class Fou extends Piece{
     constructor(couleur, x, y){
         super(couleur, x, y)
@@ -9,7 +11,7 @@ class Fou extends Piece{
         for (let j = 0, i = 1; j<scan.length; j++){
             while(plateau.isInBoard((this.x + (scan[j][0] * i)),this.y + (scan[j][1] * i)) && (( this.x + (scan[j][0] * i),this.y + (scan[j][1] * i) ) != this.couleur) ){
                 if (( plateau.board[(this.x + (scan[j][0] * i))][this.y + (scan[j][1] * i)].piece != this.couleur) || (plateau.board[(this.x + (scan[j][0] * i))][this.y + (scan[j][1] * i)].piece == 0) ) {
-                    plateau.playable((this.x + (scan[j][0] * i)),this.y + (scan[j][1] * i),this.couleur)
+                    plateau.playable((this.x + (scan[j][0] * i)),this.y + (scan[j][1] * i),this.couleur, this)
                 }
                 i++
             }
@@ -18,4 +20,4 @@ class Fou extends Piece{
 
 }
 
-//module.exports = Class;
+module.exports = Fou;
