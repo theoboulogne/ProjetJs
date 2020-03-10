@@ -9,7 +9,7 @@ var valeurPieces = [
 //pion
 function direction_libre(piece, board){
     if(piece.constructor.name=='Pion'){//module par piece ?
-        for(let i=piece.y+Math.pow(-1,piece.couleur); i<8&&i>0; i+=Math.pow(-1,piece.couleur)){
+        for(let i=piece.y+Math.pow(-1,piece.couleur); i<8 && i>0; i+=Math.pow(-1,piece.couleur)){
             if(piece.couleur==board[i].piece.couleur&&piece.constructor.name==board[i].piece.constructor.name){
                 return 2;
             }
@@ -40,10 +40,33 @@ function Prise(piecePrise){
         return valeur;
 }
 
+function verifier(pieceName,sens, x, y, couleur){
+         
+    for(let i = 0; i < sens.length; i++){
+        x += 1*sens[i][0];
+        y += 1*sensy[i][1];
+        if (isInBoard(x,y)) while(board[x][y].piece.couleur != couleur){
+            if (isInBoard(x,y)) for (let j = 0; j < pieceName.length; j++) if (board[x][y].piece.name == pieceName[j]) return 1;
+        }
+
+    }
+}
+
+function verifier2(pieceName,sens, x, y, couleur){
+
+    for(let i = 1; i <= sens.length; i++){
+        x += 1*sens[i][0];
+        y += 1*sensy[i][1];
+        if (isInBoard(x,y)) if(board[x][y].piece.couleur != couleur){
+            for (let i = 0; i < pieceName.length; i++) if (board[x][y].piece.name == pieceName1) return 1;
+        }
+    }
+}
+
 function Menace(piece, piecePrise){
     if(0!=piecePrise){
         let valeur = 0
-        //                           methode de echec a récupérer et mettre la couleur en argument + récupérer la liste ennemi menaçant et allie qui protegent
+        //methode de echec a récupérer et mettre la couleur en argument + récupérer la liste ennemi menaçant et allie qui protegent
 
         //si notre piece peut être prise
         if(true){ // si echec a mettre
