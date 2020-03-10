@@ -40,27 +40,44 @@ function Prise(piecePrise){
         return valeur;
 }
 
-function verifier(pieceName,sens, x, y, couleur){
-         
-    for(let i = 0; i < sens.length; i++){
-        x += 1*sens[i][0];
-        y += 1*sensy[i][1];
-        if (isInBoard(x,y)) while(board[x][y].piece.couleur != couleur){
-            if (isInBoard(x,y)) for (let j = 0; j < pieceName.length; j++) if (board[x][y].piece.name == pieceName[j]) return 1;
-        }
+function verifierboucle(pieceName,sens, x, y, couleur, piecesDangeureuses, piecesAlliées, plateau){
 
+    for(let i = 0; i < sens.length; i++){
+        x += sens[i][0];
+        y += sens[i][1];
+        let boucle = true;
+
+        if (plateau.isInBoard(x,y)) while(boucle){
+            if(plateau.check_piece(x,y)){
+                for (let j = 0; j < pieceName.length; j++) if (plateau.board[x][y].piece.constructor.name == pieceName[j]){ 
+                    if(plateau.board[x][y].piece.couleur == couleur) piecesAlliées.push(plateau.board[x][y].piece);
+                    else piecesDangeureuses.push(plateau.board[x][y].piece);
+                    boucle = false;
+                }
+            }
+            x += sens[i][0]
+            y += sens[i][1]
+            if(!plateau.isInBoard(x,y)) boucle = false;
+        }
     }
+    return 1;
 }
 
-function verifier2(pieceName,sens, x, y, couleur){
+function verifiercote(pieceName,sens, plateau, x, y, couleur, piecesDangeureuses, piecesAlliées){
 
-    for(let i = 1; i <= sens.length; i++){
-        x += 1*sens[i][0];
-        y += 1*sensy[i][1];
-        if (isInBoard(x,y)) if(board[x][y].piece.couleur != couleur){
-            for (let i = 0; i < pieceName.length; i++) if (board[x][y].piece.name == pieceName1) return 1;
+    for(let i = 0; i < sens.length; i++){
+        x += sens[i][0];
+        y += sens[i][1];
+
+        if(plateau.check_piece(x,y)){
+            for (let j = 0; j < pieceName.length; j++) if (plateau.board[x][y].piece.constructor.name == pieceName[j]){
+                if(plateau.board[x][y].piece.couleur != couleur) piecesAlliées.push(plateau.board[x][y].piece);
+                else piecesDangeureuses.push(plateau.board[x][y].piece);
+            }
         }
+        
     }
+    return 1;
 }
 
 function Menace(piece, piecePrise){
