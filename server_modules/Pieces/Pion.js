@@ -32,7 +32,9 @@ class Pion extends Piece {
             //prise de piece
             if(plateau.isInBoard(this.x + i,this.y+(Math.pow(-1,this.couleur)*(1)))){
                 if(plateau.check_piece(this.x + i,this.y+(Math.pow(-1,this.couleur)*(1)))){
-                    plateau.playable(this.x + i,this.y+(Math.pow(-1,this.couleur)*(1)),this.couleur, this)
+                    if(plateau.board[this.x + i][this.y+(Math.pow(-1,this.couleur)*(1))].piece.couleur != this.couleur){
+                        plateau.playable(this.x + i,this.y+(Math.pow(-1,this.couleur)*(1)),this.couleur)
+                    }
                 }
             }
             //prise en passant

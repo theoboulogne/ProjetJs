@@ -58,11 +58,17 @@ class Roi extends Piece{
         for (let i = -1; i < 2; i++){
             for (let j = -1; j < 2; j++){
                 if(plateau.isInBoard(this.x + i, this.y + j)){
-                    if(!(i == 0 && j == 0)) plateau.playable(this.x + i, this.y + j, this.couleur, this);
+                    if(plateau.board[this.x + i][this.y + j].piece == 0){
+                        if(!(i == 0 && j == 0)) plateau.playable(this.x + i, this.y + j, this.couleur);
+                    }
+                    else if (plateau.board[this.x + i][this.y + j].piece.couleur != this.couleur){
+                        if(!(i == 0 && j == 0)) plateau.playable(this.x + i, this.y + j, this.couleur);
+                    }
                 }
             }
         }
     }
+
 
     move(x,y, plateau){ //forcer playable avant move..
         if(plateau.isInBoard(x,y)){

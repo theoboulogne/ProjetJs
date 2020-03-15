@@ -6,14 +6,18 @@ class Cavalier extends Piece{
     }
 
     playable(plateau) {
-        plateau.reset_playable()
-        let scan = [[-1,0],[1,0],[0,-1],[0,1]];
-        for (let j=0, i=1; j<scan.length; j++){
-            while(plateau.isInBoard((this.x + (scan[j][0] * i)),this.y + (scan[j][1] * i)) && (( this.x + (scan[j][0] * i),this.y + (scan[j][1] * i) ) != this.couleur) ){
-                if (( plateau.board[(this.x + (scan[j][0] * i))][this.y + (scan[j][1] * i)].piece != this.couleur) || (plateau.board[(this.x + (scan[j][0] * i))][this.y + (scan[j][1] * i)].piece == 0) ) {
-                    plateau.playable((this.x + (scan[j][0] * i)),this.y + (scan[j][1] * i),this.couleur, this)
+        plateau.reset_playable();
+        let scan = [[2,1],[2,-1],[-2,1],[-2,-1],[1,2],[1,-2],[-1,2],[-1,-2]];
+        for (let j=0; j<scan.length; j++){
+            if(plateau.isInBoard(this.x + (scan[j][0]),this.y + (scan[j][1]))){
+                if (plateau.board[(this.x + (scan[j][0]))][this.y + (scan[j][1])].piece == 0) {
+                    plateau.playable((this.x + (scan[j][0] )),this.y + (scan[j][1] ),this.couleur);
                 }
-                i++
+                else {
+                    if (plateau.board[(this.x + (scan[j][0]))][this.y + (scan[j][1])].piece.couleur != this.couleur){
+                        plateau.playable((this.x + (scan[j][0])),this.y + (scan[j][1]),this.couleur);
+                    }  
+                }
             }
         }
     }
