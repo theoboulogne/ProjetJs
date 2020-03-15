@@ -27,7 +27,7 @@ game = this;
 io.sockets.on('connection',  (socket) =>{
     
     console.log('Debut Connection Client (coté serveur)')
-    console.log(socket)
+    //console.log(socket)
     //console.log(game.echiquiers)
     //console.log(game.JoueursSockets)
         //Connection 
@@ -54,6 +54,8 @@ io.sockets.on('connection',  (socket) =>{
 
     //playable a rajouter
     //--> tout changer en coordonéees
+
+    
 
 
 
@@ -85,22 +87,22 @@ io.sockets.on('connection',  (socket) =>{
         }
         //sinon renvoyer erreur pour que le client corrige son erreur
     });
-    socket.on('disconnect', (socket)=>{
+    socket.on('disconnect', ()=>{
         let i = 0
         console.log('socket')
-        console.log(socket)
+        console.log(this)
         console.log('enregistré')
         console.log(game.JoueursSockets[0][0])
+        console.log('iosockets')
+        console.log(io.sockets)
         while(game.JoueursSockets[i][0]!=socket) i++;
 
         let j = i;
         //parcourir joueursocket retirer après ce plateau
-
         if((i%2)!=0) i--; // on se met sur le premier joueur
         //split de 2 a faire
         //suppression de l'échiquier correspondant aussi
-        
-
+    
         console.log('Fin de la partie..');
     });
 
