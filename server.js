@@ -47,6 +47,14 @@ io.sockets.on('connection',  (socket) =>{
     //on envoi la couleur pour détecter si on lance la partie ou non 
     //(1 on lance car 2 joueurs)
 
+    if(game.echiquiers[game.echiquiers.length-1].Joueurs.length >= 1) {
+        console.log('start')
+        //game.JoueursSockets[game.JoueursSockets.length-2][0].emit('start');
+        socket.emit('start')
+    }
+
+
+
     //Définition des envois au serveur pour la partie
 
 

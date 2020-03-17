@@ -1,7 +1,6 @@
 class Plateau{
     constructor(){
         console.log('Plateau instanciée');
-
         //Coté Client
         this.Nbtour = 0;
         this.board = new Array(8)

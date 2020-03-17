@@ -4,6 +4,7 @@ class Jeu{
 
         //connection serveur a faire..
         this.play = false;
+        
         //Génération des events a faire ?
         //Génération de la partie graphique a faire
 
@@ -18,7 +19,22 @@ class Jeu{
             console.log('Event - start')
             this.play = true;
             this.echiquier = new Plateau();
-            for(let i=0; i<2; i++) this.echiquier.Joueurs.push(new Joueur(i)); // déplacer dans la classe Plateau coté front ??
+            // déplacer dans la classe Plateau coté front ??
+
+            let tmpl = []
+            for(let i=0; i<8; i++){
+                for(let j=0; j<8; j++){
+                    if(this.echiquier.board[i][j].piece!=0){
+                        tmpl.push(this.echiquier.board[i][j].piece)
+                    }
+                }
+            }
+            let tmpRendu = []
+            for(let i=0; i<tmpl.length;i++){
+                tmpRendu.push({name:tmpl[i].constructor.name, couleur:tmpl[i].couleur, x:tmpl[i].x, y:tmpl[i].y})
+            }
+            
+            this.rendu = new RenduThreeJs(tmpRendu);
         });
         socket.on('playable', (piece,playables) => { //tableau de playable, passer en coordonnées ?
             console.log('Event - playable')
