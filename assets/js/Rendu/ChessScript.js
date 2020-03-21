@@ -21,42 +21,51 @@ class RenduThreeJs{
         };
 
         var models = [
-            {name: "Bishop"},
-            {name: "CNC_Mill"},
-            {name: "ConveverBelt_OBJ"},
-            {name: "diesel_generator"},
-            {name: "futuristic.heater.low"},
-            {name: "King"},
-            {name: "Knight"},
-            {name: "Mixer01O"},
-            {name: "Pawn"},
-            {name: "Queen"},
-            {name: "Rook"},
-            {name: "SA_LD_Generatoe"},
-            {name: "Vent2"},
+            {name: "Pion"},
+            {name: "Fou"},
+            {name: "Cavalier"},
+            {name: "Tour"},
+            {name: "Reine"},
+            {name: "Roi"},
         ];
         var pieces = [];
         console.log(Pieces)
         //loadPieces(Pieces);
 
-        for(let i=0; i<Pieces.length; i++){
-            objLoader.load("../models/" + Pieces[i].name + ".obj", function(object) {
+        var test;
+        for(let i=0; i<models.length; i++){
+            objLoader.load("../models/" + models[i].name + ".obj", function(object) {
                 object.traverse( function ( child ) {
-                    if (child instanceof THREE.Mesh) {
-                        if(Pieces[i].couleur) child.material = new THREE.MeshLambertMaterial({color: 0x555555});
-                        else child.material = new THREE.MeshLambertMaterial({color: 0xFFFFFF});
-                        child.position.set(-1.75 + (0.5 * Pieces[i].y),-1.75 + (0.5 * Pieces[i].x),0); // -1.2 -> -0.7 -> -0.25 -> 0.2 -> 0.65 | -1.62 -> -1.15 -> -0.7 -> -0.24 -> 0.23
-                        child.scale.set(.025, .025, .025);
-                        child.rotation.z = -.1;
-                        child.rotation.x = 1.6;
-                        child.rotation.y = 1.7;
-                        scene.add(child);
-                        //animatePawn(pawn);
+                    if (child instanceof THREE.Mesh) { // retirer le if ?
                     }
                 });
+
+                let ATraiter = []
+                for(let j=0; j<Pieces.length; j++){
+                    if(Pieces[j].name == models[i].name) ATraiter.push(Pieces[j]);
+                }
+
+                for(let j=0; j<ATraiter.length; j++){
+                    let tmpobj = object.clone();
+
+                    // on définit la couleur
+                    if(ATraiter[j].couleur) tmpobj.material = new THREE.MeshLambertMaterial({color: 0x555555});
+                    else tmpobj.material = new THREE.MeshLambertMaterial({color: 0xFFFFFF});
+
+                    // la position / taille / orientation
+                    tmpobj.position.set(-1.75 + (0.5 * ATraiter[j].y),-1.75 + (0.5 * ATraiter[j].x),0); // -1.2 -> -0.7 -> -0.25 -> 0.2 -> 0.65 | -1.62 -> -1.15 -> -0.7 -> -0.24 -> 0.23
+                    tmpobj.scale.set(.025, .025, .025);
+                    tmpobj.rotation.z = -.1;
+                    tmpobj.rotation.x = 1.6;
+                    tmpobj.rotation.y = 1.7;
+
+                    //On enregistre pour la détection de click
+                    pieces.push(tmpobj);
+                    //Puis on l'affiche
+                    scene.add(tmpobj);
+                }
             });
         }
-
 
         var boardTexture = new THREE.ImageUtils.loadTexture("../../textures/board-pattern.png");
         boardTexture.repeat.set(4,4);
@@ -109,8 +118,30 @@ class RenduThreeJs{
         }
         render();
 
-        var TweenUp = function(piece) {
+        
+        
 
+        renderer.domElement.addEventListener("click", onclick, false);
+        var selectedObject;
+        var raycaster = new THREE.Raycaster();
+
+        function onclick(event) {
+            console.log('click detecté')
+            var mouse = new THREE.Vector2();
+            mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+            mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+            raycaster.setFromCamera(mouse, camera);
+            var intersects = raycaster.intersectObjects(pieces, true); //array
+            if (intersects.length > 0) {
+                selectedObject = intersects[0]; // 40 * le déplacement,
+                                                // z correspond à x, x -> y, y -> z
+                //animatePiece(selectedObject.object);
+                console.log(selectedObject);
+            }
+        }
+        
+        var TweenUp = function(piece) {
+            console.log('piece up')
             var position = piece.position;
             var target = {z: position.z + .6};
             var tween = new TWEEN.Tween(piece.position).to(target, 1000);
@@ -123,6 +154,7 @@ class RenduThreeJs{
         };
 
         var TweenDown = function(piece) {
+            console.log('piece down')
             var position = piece.position;
             var target = {z: position.z};
             var tween = new TWEEN.Tween(piece.position).to(target, 1000);
@@ -155,7 +187,7 @@ class RenduThreeJs{
 
         function animatePiece(piece) {
             var tweenUp = TweenUp(piece);
-            var tweenOneUp = TweenSpacesDiagonal(piece, 3, 3);
+            var tweenOneUp = TweenSpacesDiagonal(piece, 10, 10);
             var tweenDown = TweenDown(piece);
             tweenUp.chain(tweenOneUp);
             tweenOneUp.chain(tweenDown);
