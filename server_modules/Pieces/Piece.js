@@ -1,20 +1,22 @@
 class Piece{
-    constructor(couleur, nom = "Piece"){
-        console.log(nom + " viens d'être instanciée");
+    constructor(couleur, x, y){
+        if(couleur) console.log('Nouvelle pièce : ' + this.constructor.name + ' Noir')
+        else console.log('Nouvelle pièce : ' + this.constructor.name + ' Blanc')
 
-        this.type = nom
-        img = "Vide.png"
+        //Coté client
+        this.x = x;//Initialisation des coordonnées (classe a faire ?)
+        this.y = y;
+        this.couleur = couleur; // couleur de la pièce
 
-        //Initialisation des coordonnées (classe a faire ?)
-        this.x = -1;
-        this.y = -1;
-
-        this.color = couleur; // couleur de la pièce
-        this.played = false; // pièce déjà jouée ? (pour le roque, le pion..) mettre que dans les classe ou c'est nécessaire ?
-                                                                            // si oui changer la methode de playable du plateau
+        //Coté serveur
+        this.deplacements = new Array()
+        let deplacement = Object() // classe coo a faire ?
+        deplacement.x = x;
+        deplacement.y = y;
+        this.deplacements.push(deplacement)
     }
     // méthode générale
-    move(x,y, plateau){ //forcer playable avant move..
+    move(x,y, plateau){ //toujours forcer playable avant move..
         if(plateau.isInBoard(x,y)){
             if(plateau.board[x][y].playable){
                 plateau.jouer(x, y, this);
@@ -23,5 +25,4 @@ class Piece{
     }
 }
 
-// à modifier ? voir l'exemple du prof..
-//module.exports = Class;
+module.exports = Piece;

@@ -1,15 +1,12 @@
+const Piece = require('./Piece');
+
 class Pion extends Piece {
     constructor(couleur, x, y){
-        super(couleur, "Pion")
-
-        this.x = x;
-        this.y = y;
-
-        justplayed = false;
+        super(couleur, x, y)
     }
 
     playable(plateau){
-        plateau.reset_playable()
+        //plateau.reset_playable() à forcer
 
         //optimisation avec boucle de direction a faire..
 
@@ -17,28 +14,38 @@ class Pion extends Piece {
 
         // forcer le canmove lors du click sur la piece et jouer au relachement du click 
         //(piece qui suit la souris avec l'animation)
-
-        if(!this.played) { //si jms jouée
-            if(plateau.vide(this.x,(Math.pow(-1,couleur)*(this.y+2)))) {
-                plateau.playable(this.x,(Math.pow(-1,couleur)*(this.y+2)),this.couleur)
+        if(this.deplacements.length == 1) { //si jms jouée
+            if(plateau.isInBoard(this.x,this.y+(Math.pow(-1,this.couleur)*(2)))){
+                if(plateau.check_vide(this.x,this.y+(Math.pow(-1,this.couleur)*(2)))) {
+                    plateau.playable(this.x,this.y+(Math.pow(-1,this.couleur)*(2)),this.couleur, this)
+                }
             }
         }
         //déplacement par défault
-        if(plateau.vide(this.x,(Math.pow(-1,couleur)*(this.y+1)))){
-            plateau.playable(this.x,(Math.pow(-1,couleur)*(this.y+1)),this.couleur)
+        if(plateau.isInBoard(this.x,this.y+(Math.pow(-1,this.couleur)*(1)))){
+            if(plateau.check_vide(this.x,this.y+(Math.pow(-1,this.couleur)*(1)))){
+                plateau.playable(this.x,this.y+(Math.pow(-1,this.couleur)*(1)),this.couleur, this)
+            }
         }
-
         
         for(let i=-1; i<2; i+=2) {
             //prise de piece
-            if(!plateau.vide(this.x + i,(Math.pow(-1,couleur)*(this.y+1)))){
-                plateau.playable(this.x + i,(Math.pow(-1,couleur)*(this.y+1)),this.couleur)
+            if(plateau.isInBoard(this.x + i,this.y+(Math.pow(-1,this.couleur)*(1)))){
+                if(plateau.check_piece(this.x + i,this.y+(Math.pow(-1,this.couleur)*(1)))){
+                    if(plateau.board[this.x + i][this.y+(Math.pow(-1,this.couleur)*(1))].piece.couleur != this.couleur){
+                        plateau.playable(this.x + i,this.y+(Math.pow(-1,this.couleur)*(1)),this.couleur)
+                    }
+                }
             }
             //prise en passant
-            if(plateau.board[this.x + i][this.y].piece.type==this.type){ //regarder la class directement?
-                if(plateau.board[this.x + i][this.y].piece.justplayed){
-                    if(plateau.vide(this.x + i,(Math.pow(-1,couleur)*(this.y+1)))){
-                        plateau.playable(this.x + i,(Math.pow(-1,couleur)*(this.y+1)),this.couleur)
+            if(plateau.isInBoard(this.x + i, this.y)){
+                if(plateau.getBoard(this.x + i,this.y).piece.constructor.name==this.constructor.name){ //regarder la class directement?
+                    if(plateau.getBoard(this.x+i,this.y).piece.deplacements.length == 2 && this.y == plateau.getBoard(this.x+i,this.y).piece.deplacements[1].y){
+                        if(plateau.isInBoard(this.x + i,this.y+(Math.pow(-1,this.couleur)*(1)))){
+                            if(plateau.check_vide(this.x + i,this.y+(Math.pow(-1,this.couleur)*(1)))){
+                                plateau.playable(this.x + i,this.y+(Math.pow(-1,this.couleur)*(1)),this.couleur, this)
+                            }
+                        }
                     }
                 }
             }
@@ -51,20 +58,21 @@ class Pion extends Piece {
     move(x,y,plateau){
         if(plateau.isInBoard(x,y)){
             if(plateau.board[x][y].playable){
-                if((x == this.x)&&(y == this.y+(Math.pow(-1,couleur)*2))) this.justplayed = true;
-
-                for(let i=-1; i<2; i+=2){ // on supprime la piece en cas de prise en passant
-                    if(plateau.board[this.x+i][this.y].piece.type==this.type){
-                        if(plateau.board[this.x+i][this.y].piece.justplayed){
-                            if(plateau.board[this.x+i][(Math.pow(-1,couleur)+this.y)].piece==0){
-                                plateau.supprimer(this.x+i, this.y)
+                for(let i=-1; i<2; i+=2){ // on supprime la piece en cas de prise en passant,
+                    if(plateau.getBoard(this.x+i,this.y).piece.constructor.name==this.constructor.name){
+                        if(x==this.x+i && y==this.y+(Math.pow(-1,this.couleur))){
+                            if(plateau.getBoard(this.x+i,this.y).piece.deplacements.length == 2 && this.y == plateau.getBoard(this.x+i,this.y).piece.deplacements[1].y){
+                                if(plateau.getBoard(this.x+i,(Math.pow(-1,this.couleur)+this.y)).piece==0){
+                                    plateau.supprimer(this.x+i, this.y)
+                                }
                             }
                         }
                     }
                 }
-                
                 plateau.jouer(x, y, this); // rajouter le changement de piece sur la derniere ligne
             }
         }
     }
 }
+
+module.exports = Pion;
