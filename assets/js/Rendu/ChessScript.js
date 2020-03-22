@@ -1,7 +1,3 @@
-/**
- * Created by justinmiller on 4/2/15.
- */
-
 class RenduThreeJs{
     constructor(Pieces){
         var scene = new THREE.Scene();
