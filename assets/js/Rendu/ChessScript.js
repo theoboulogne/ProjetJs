@@ -42,7 +42,7 @@ class RenduThreeJs{
 
                 let ATraiter = []
                 for(let j=0; j<Pieces.length; j++){
-                    if(Pieces[j].name == models[i].name) ATraiter.push(Pieces[j]);
+                    if(Pieces[j].name == models[i].name) ATraiter.push(Pieces[j]); // push les indices pour réduire les couts ?
                 }
 
                 for(let j=0; j<ATraiter.length; j++){
