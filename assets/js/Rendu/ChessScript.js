@@ -33,38 +33,40 @@ class RenduThreeJs{
         //loadPieces(Pieces);
 
         var test;
-        for(let i=0; i<models.length; i++){
-            objLoader.load("../models/" + models[i].name + ".obj", function(object) {
-                object.traverse( function ( child ) {
-                    if (child instanceof THREE.Mesh) { // retirer le if ?
+        for(let k=0; k<2; k++){
+            
+            for(let i=0; i<models.length; i++){
+                objLoader.load("../models/" + models[i].name + ".obj", function(object) {
+                    object.traverse( function ( child ) {
+                        if (child instanceof THREE.Mesh) {
+                            // on définit la couleur
+                            if(k) child.material = new THREE.MeshLambertMaterial({color: 0x555555});
+                            else child.material = new THREE.MeshLambertMaterial({color: 0xFFFFFF});
+                        }
+                    });
+
+                    let ATraiter = []
+                    for(let j=0; j<Pieces.length; j++){
+                        if(Pieces[j].name == models[i].name && Pieces[j].couleur == k) ATraiter.push(Pieces[j]); // push les indices pour réduire les couts ?
+                    }
+
+                    for(let j=0; j<ATraiter.length; j++){
+                        let tmpobj = object.clone();
+
+                        // la position / taille / orientation
+                        tmpobj.position.set(-1.75 + (0.5 * ATraiter[j].y),-1.75 + (0.5 * ATraiter[j].x),0); // -1.2 -> -0.7 -> -0.25 -> 0.2 -> 0.65 | -1.62 -> -1.15 -> -0.7 -> -0.24 -> 0.23
+                        tmpobj.scale.set(.025, .025, .025);
+                        //$$tmpobj.rotation.z = -.1;
+                        tmpobj.rotation.x = 1.6;
+                        //tmpobj.rotation.y = 1.7;
+
+                        //On enregistre pour la détection de click
+                        pieces.push(tmpobj);
+                        //Puis on l'affiche
+                        scene.add(tmpobj);
                     }
                 });
-
-                let ATraiter = []
-                for(let j=0; j<Pieces.length; j++){
-                    if(Pieces[j].name == models[i].name) ATraiter.push(Pieces[j]); // push les indices pour réduire les couts ?
-                }
-
-                for(let j=0; j<ATraiter.length; j++){
-                    let tmpobj = object.clone();
-
-                    // on définit la couleur
-                    if(ATraiter[j].couleur) tmpobj.material = new THREE.MeshLambertMaterial({color: 0x555555});
-                    else tmpobj.material = new THREE.MeshLambertMaterial({color: 0xFFFFFF});
-
-                    // la position / taille / orientation
-                    tmpobj.position.set(-1.75 + (0.5 * ATraiter[j].y),-1.75 + (0.5 * ATraiter[j].x),0); // -1.2 -> -0.7 -> -0.25 -> 0.2 -> 0.65 | -1.62 -> -1.15 -> -0.7 -> -0.24 -> 0.23
-                    tmpobj.scale.set(.025, .025, .025);
-                    tmpobj.rotation.z = -.1;
-                    tmpobj.rotation.x = 1.6;
-                    tmpobj.rotation.y = 1.7;
-
-                    //On enregistre pour la détection de click
-                    pieces.push(tmpobj);
-                    //Puis on l'affiche
-                    scene.add(tmpobj);
-                }
-            });
+            }
         }
 
         var boardTexture = new THREE.ImageUtils.loadTexture("../../textures/board-pattern.png");
@@ -135,7 +137,7 @@ class RenduThreeJs{
             if (intersects.length > 0) {
                 selectedObject = intersects[0]; // 40 * le déplacement,
                                                 // z correspond à x, x -> y, y -> z
-                //animatePiece(selectedObject.object);
+                animatePiece(selectedObject.object);
                 console.log(selectedObject);
             }
         }
@@ -143,11 +145,11 @@ class RenduThreeJs{
         var TweenUp = function(piece) {
             console.log('piece up')
             var position = piece.position;
-            var target = {z: position.z + .6};
+            var target = {y: position.y + 40};
             var tween = new TWEEN.Tween(piece.position).to(target, 1000);
 
             tween.onUpdate(function() {
-                piece.position.z = position.z;
+                piece.position.y = position.y;
             });
 
             return tween;
@@ -156,10 +158,10 @@ class RenduThreeJs{
         var TweenDown = function(piece) {
             console.log('piece down')
             var position = piece.position;
-            var target = {z: position.z};
+            var target = {y: position.y};
             var tween = new TWEEN.Tween(piece.position).to(target, 1000);
             tween.onUpdate(function() {
-                piece.position.z = position.z;
+                piece.position.y = position.y;
             });
             return tween;
         };
@@ -174,12 +176,12 @@ class RenduThreeJs{
             return tween;
         };
 
-        var TweenSpacesDiagonal = function(piece, spacesX, spacesY) {
+        var TweenSpacesDiagonal = function(piece, spacesX, spacesZ) {
             var position = piece.position;
-            var target = {y: position.y + tile.translate*spacesY, x: position.x +tile.translate*spacesX};
+            var target = {z: position.z + tile.translate*spacesZ, x: position.x +tile.translate*spacesX};
             var tween = new TWEEN.Tween(piece.position).to(target, 3000);
             tween.onUpdate(function() {
-                piece.position.y = position.y;
+                piece.position.z = position.z;
                 piece.position.x = position.x;
             });
             return tween;
@@ -187,7 +189,7 @@ class RenduThreeJs{
 
         function animatePiece(piece) {
             var tweenUp = TweenUp(piece);
-            var tweenOneUp = TweenSpacesDiagonal(piece, 10, 10);
+            var tweenOneUp = TweenSpacesDiagonal(piece, 295, 0);
             var tweenDown = TweenDown(piece);
             tweenUp.chain(tweenOneUp);
             tweenOneUp.chain(tweenDown);

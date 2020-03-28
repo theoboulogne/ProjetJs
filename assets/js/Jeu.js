@@ -2,25 +2,44 @@
 class Jeu{
     constructor(){
 
-        //connection serveur a faire..
+
+        //Dans le menu :
+        // demander le pseudo du joueur pour l'enregistrement des scores
+
+
+
+
+
         this.play = false;
-        
-        //Génération des events a faire ?
-        //Génération de la partie graphique a faire
+    
 
         //connection server
         const socket = io.connect('http://localhost:800');
         socket.on('repconnection', (couleur) => {
             console.log('Event - repconnection')
-            this.couleur = couleur;
-            //this.render = new renderCss(this.echiquier); // ---> a modifier avec les nouvelles classes pour fonctionner avec le serveur
-        });
-        socket.on('start', () => {
-            console.log('Event - start')
-            this.play = true;
-            this.echiquier = new Plateau();
-            // déplacer dans la classe Plateau coté front ??
 
+            //Coté Gestion du jeu
+            this.couleur = couleur;
+
+            //Coté UI:
+            // indiquer l'attente d'un autre joueur
+        });
+        socket.on('start', (plateau) => {
+            console.log('Event - start')
+
+            //Coté Gestion du Jeu
+            this.play = true; // on lance le jeu (retirer si non utilisé)
+            this.echiquier = plateau;
+
+            //Coté ThreeJS
+            // Lancer le rendu graphique
+
+            //Coté UI
+            // Lancer l'affichage de l'UI
+
+
+
+            /*  TEST RENDU THREEJS
             let tmpl = []
             for(let i=0; i<8; i++){
                 for(let j=0; j<8; j++){
@@ -33,27 +52,71 @@ class Jeu{
             for(let i=0; i<tmpl.length;i++){
                 tmpRendu.push({name:tmpl[i].constructor.name, couleur:tmpl[i].couleur, x:tmpl[i].x, y:tmpl[i].y})
             }
-            
+            console.log(tmpRendu[0])
             this.rendu = new RenduThreeJs(tmpRendu);
+            */
+
+
         });
-        socket.on('playable', (piece,playables) => { //tableau de playable, passer en coordonnées ?
+        socket.on('playable', (plateau) => {
             console.log('Event - playable')
-            //Rajouter tout les playables dans l'affichage graphique du board en fonction de la pièce
+
+            this.echiquier = plateau;
+
+            //Coté threejs :
+            // Afficher les couts jouable (autre couleur ?) + piece selectionnée
+
+            //Coté Gestion du jeu
+            // implémenter l'utilisation de selected pour envoyer move ou playable au click en fonction
+
+            
+//si pas de playable trouver un moyen de reset selected dans plateau (coté serveur ou client ?)
+
         });
-        socket.on('move', (piece,x,y,suppr) => { // piece et deplacer en x,y
+        socket.on('move', (plateau,deplacement,piece_prise) => { // piece et deplacer en x,y
             console.log('Event - move')
-            //lancer l'animation
-            //si suppr different de 0 le retirer du board
-            // board(x,y) = board[piece.x,piece.y]
-            //changer les coordonnées de x,y avec le déplacement
+
+            //Coté threejs :
+            //suppr les playable, deplacer la pièce et retirer la pièce prise en simultané
+
+            //Coté Gestion du jeu
+            // effectuer le déplacement de la pièce, supprimer la piece si !=0, enregist
+
+            //Coté UI
+            // Récupérer les couts joués et les pièces prises et actualiser l'ui en conséquence
+
+            //Idée : Gérer la récupération de la 'piece_prise' coté client  ????
         });
-        socket.on('reset', (echiquierReset) => {
+        socket.on('reset', (echiquierReset, couleurReset) => {
             console.log('Event - reset')
-            //Parcourir tout le tableau, 
-            //instancier toutes les pièces avec les classes client 
-            //Actualiser l'affichage
+            
+            //Coté Gestion du jeu
+            this.couleur = couleurReset;
+            this.echiquier = echiquierReset;
+            
+            // Coté Threejs
+            // Changer l'affichage en conséquence
+
+            //Coté UI
+            // montrer une alerte au joueur pour indiquer qu'il y a une erreur ??
         });
-        
+        socket.on('endGame', (couleurGagnant) => {
+
+            //Coté gestion du Jeu :
+            // enregistrer la partie dans la BDD
+
+            //Coté UI :
+            // afficher un message indiquant si gagné ou perdu
+            // puis au click :
+            //  rediriger vers menu
+        });
+        socket.on('disconnect', () => {
+
+            //Coté UI:
+            // Afficher un message indiquant la fin de la partie pour déconnection 
+            // puis au click :
+            //  rediriger vers le menu afin de reset la connection
+        });
         
     }
 }
@@ -63,5 +126,3 @@ class Jeu{
 	let game = new Jeu();
 })();
 
-
-//si pas de playable trouver un moyen de reset selected dans plateau

@@ -26,13 +26,15 @@ class Plateau{
             for(let i=0; i<2; i++) this.board[i*7][j*7].piece = new Tour(j, i*7, j*7);
             for(let i=0; i<2; i++) this.board[1 + (i*5)][j*7].piece = new Cavalier(j, 1 + (i*5), j*7);
             for(let i=0; i<2; i++) this.board[2 + (i*3)][j*7].piece = new Fou(j, 2+ (i*3), j*7);
-            this.board[3 + j][j*7].piece = new Reine(j, 3+j, j*7);
-            this.board[4 - j][j*7].piece = new Roi(j, 4-j, j*7); // mettre la coordonnée du roi depuis joueur ?
+            this.board[4][j*7].piece = new Reine(j, 4, j*7);
+            this.board[3][j*7].piece = new Roi(j, 3, j*7); // mettre la coordonnée du roi depuis joueur ?
         }
 
         //Coté Serveur
         this.Joueurs = new Array()
         this.couts = new Array()
+
+        //select du playable a implémenter pour la sécurité
         this.select = new Object() // classe coo a faire
         this.select.x = -1;
         this.select.y = -1;
@@ -155,10 +157,6 @@ class Plateau{
     }
     cancel_jouer(x,y){
         this.Nbtour--;
-
-        console.log(this.couts)
-        console.log(this.Nbtour)
-
 
         this.couts[this.Nbtour].x = this.couts[this.Nbtour].deplacements[this.couts[this.Nbtour].deplacements.length-2].x
         this.couts[this.Nbtour].y = this.couts[this.Nbtour].deplacements[this.couts[this.Nbtour].deplacements.length-2].y
