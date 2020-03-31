@@ -177,7 +177,7 @@ class Plateau{
     }
 
     echecEtMat(couleur){
-        if(this.board[this.joueur[couleur].roi.x][this.joueur[couleur].roi.y].piece.echec(this)){
+        if(this.board[this.Joueurs[couleur].roi.x][this.Joueurs[couleur].roi.y].piece.echec(this)){
             for(let j = 0; j < 8; j++){
                 for(let k = 0; k < 8; k++){
                     if(this.board[j][k].piece.couleur == couleur){
@@ -194,6 +194,7 @@ class Plateau{
             }
             return true;
         }
+        return false;
     }
 }
 
