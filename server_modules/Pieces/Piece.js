@@ -1,23 +1,28 @@
 class Piece{
-    constructor(couleur, nom = "Piece"){
-        console.log('Piece instanciée');
-        this.type = nom
+    constructor(couleur, x, y){
+        if(couleur) console.log('Nouvelle pièce : ' + this.constructor.name + ' Noir')
+        else console.log('Nouvelle pièce : ' + this.constructor.name + ' Blanc')
 
-        //Initialisation des coordonnées (classe a faire ?)
-        this.x = -1;
-        this.y = -1;
+        //Coté client
+        this.x = x;//Initialisation des coordonnées (classe a faire ?)
+        this.y = y;
+        this.couleur = couleur; // couleur de la pièce
 
-        this.color = couleur; // couleur de la pièce
-        this.played = false; // pièce déjà jouée ? (pour le roque, le pion..)
+        //Coté serveur
+        this.deplacements = new Array()
+        let deplacement = Object() // classe coo a faire ?
+        deplacement.x = x;
+        deplacement.y = y;
+        this.deplacements.push(deplacement)
     }
-    set_Position(board, x, y){ // on déplace une pièce, aucunes vérification n'est effectuée par rapport à la possibilité de jouer 
-                               // ou par rapport a l'enregistrement du premier déplacement de la pièce
-        if(!(this.x==-1 && this.y==-1)){ // Si coordonnées définies on supprime la pièce de son dernier emplacement
-            board[this.x][this.y].piece = 0;
+    // méthode générale
+    move(x,y, plateau){ //toujours forcer playable avant move..
+        if(plateau.isInBoard(x,y)){
+            if(plateau.board[x][y].playable){
+                plateau.jouer(x, y, this);
+            }
         }
-        board[x][y].piece = this;
     }
 }
 
-// à modifier ? voir l'exemple du prof..
-//module.exports = Class;
+module.exports = Piece;
