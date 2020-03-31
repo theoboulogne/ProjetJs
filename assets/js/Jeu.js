@@ -81,7 +81,16 @@ class Jeu{
 
             //Coté Gestion du jeu
             // implémenter l'utilisation de selected pour envoyer move ou playable au click en fonction
-
+            let compteur = 0
+            for(let i = 0; i < 8; i++){
+                for(let j = 0; j < 8; j++){
+                    if(this.echiquier.board[i][j].playable == false) compteur++;
+                }
+            }
+            if(compteur == 64){
+                this.echiquier.select.x = -1;
+                this.echiquier.select.y = -1;
+            }
             
 //si pas de playable trouver un moyen de reset selected dans plateau (coté serveur ou client ?)
 
