@@ -51,6 +51,7 @@ io.sockets.on('connection',  (socket) =>{
         }
         if(check){
             for(let i=0; i<2; i++){ // on start le dernier echiquier si les deux joueurs sont tjr connectés
+                console.log(game.echiquiers[game.echiquiers.length-1].Joueurs[i])
                 io.sockets.sockets[game.echiquiers[game.echiquiers.length-1].Joueurs[i].id].emit('start', game.echiquiers[game.echiquiers.length-1]);
             }
         }
