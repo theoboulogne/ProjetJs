@@ -72,6 +72,20 @@ io.sockets.on('connection',  (socket) =>{
 
         if ((couleurSocket) == (game.echiquiers[indiceEchiquier].Nbtour%2) && game.echiquiers[indiceEchiquier].board[piece.x][piece.y].piece == piece){ // si son tour et pas d'erreur
             game.echiquiers[indiceEchiquier].board[piece.x][piece.y].piece.playable(game.echiquiers[indiceEchiquier]);
+            game.echiquiers[indiceEchiquier].select.x = piece.x;
+            game.echiquiers[indiceEchiquier].select.y = piece.y;
+
+            let compteur = 0;
+            for(let i = 0; i < 8; i++){
+                for(let j = 0; j < 8; j++){
+                    if(game.echiquiers[indiceEchiquier].board[i][j].playable == false) compteur++;
+                }
+            }
+            if(compteur == 64){
+                game.echiquiers[indiceEchiquier].select.x = -1;
+                game.echiquiers[indiceEchiquier].select.y = -1;
+            }
+
             socket.emit('playable', game.echiquiers[indiceEchiquier]);
         }
         else socket.emit('reset', game.echiquiers[indiceEchiquier], couleurSocket);
@@ -91,33 +105,44 @@ io.sockets.on('connection',  (socket) =>{
         }
 
         if ((couleurSocket) == (game.echiquiers[indiceEchiquier].Nbtour%2)){ // si son tour alors :
-            game.echiquiers[indiceEchiquier].board[deplacement.piece.x][deplacement.piece.y].piece.playable(game.echiquiers[indiceEchiquier])
-            if(game.echiquiers[indiceEchiquier].board[deplacement.x][deplacement.y].playable){    
-                
-                let plateau = clone(game.echiquiers[indiceEchiquier]);
-                game.echiquiers[indiceEchiquier].board[deplacement.piece.x][deplacement.piece.y].piece.move(deplacement.x,deplacement.y,game.echiquiers[indiceEchiquier])
+            if(deplacement.x == game.echiquiers[indiceEchiquier].select.x && deplacement.y == game.echiquiers[indiceEchiquier].select.y){
+                if(game.echiquiers[indiceEchiquier].board[deplacement.x][deplacement.y].playable){    
+                    
+                    game.echiquiers[indiceEchiquier].select.x = -1;
+                    game.echiquiers[indiceEchiquier].select.y = -1;
 
-    //regarder la bonne couleur a faire au lieu de la boucle
-                let piece_prise = 0
-                for(let i=0; i<2; i++) if(this.Joueurs[i].pieces_prises[this.Joueurs[i].pieces_prises.length - 1].Nbtour == Nbtour-1){ 
-                    piece_prise = this.Joueurs[i].pieces_prises[this.Joueurs[i].pieces_prises.length - 1].piece;
+                    let plateau = clone(game.echiquiers[indiceEchiquier]);
+                    game.echiquiers[indiceEchiquier].board[deplacement.piece.x][deplacement.piece.y].piece.move(deplacement.x,deplacement.y,game.echiquiers[indiceEchiquier])
+
+        //regarder la bonne couleur a faire au lieu de la boucle
+                    let piece_prise = 0
+                    for(let i=0; i<2; i++) if(this.Joueurs[i].pieces_prises[this.Joueurs[i].pieces_prises.length - 1].Nbtour == Nbtour-1){ 
+                        piece_prise = this.Joueurs[i].pieces_prises[this.Joueurs[i].pieces_prises.length - 1].piece;
+                    }
+
+                    plateau.reset_playable();
+                    //reinitialiser select plateau
+                    for(let i=0; i<2; i++){ // on envoi le déplacement a tout le monde
+                        io.sockets.sockets[game.echiquiers[indiceEchiquier].Joueurs[couleurSocket].id].emit('move', plateau, deplacement, piece_prise);
+        //afficher/gérer la piece supprimée coté client ??
+                    }
+
+        //check si echec et mat et envoyer le message si c'est le cas 
+        //                                      -------------------------->    (pour quelle couleur ?)
+                    let CouleurGagnant = 0;
+                    for(let i = 0; i < 2; i++){
+                        if(plateau.echecEtMat((plateau.Nbtour + i) % 2)){
+                            CouleurGagnant = (plateau.Nbtour + i) % 2;
+                        }
+                    }
+
+                    if(true) for(let i=0; i<2; i++) socket.emit('endGame', CouleurGagnant)
+
                 }
-
-                plateau.reset_playable();
-                for(let i=0; i<2; i++){ // on envoi le déplacement a tout le monde
-                    io.sockets.sockets[game.echiquiers[indiceEchiquier].Joueurs[couleurSocket].id].emit('move', plateau, deplacement, piece_prise);
-    //afficher/gérer la piece supprimée coté client ??
+                else{
+                    game.echiquiers[echiquierNb].reset_playable(); // on reset avant de l'envoyer
+                    socket.emit('reset', game.echiquiers[indiceEchiquier], couleurSocket);
                 }
-
-    //check si echec et mat et envoyer le message si c'est le cas 
-    //                                      -------------------------->    (pour quelle couleur ?)
-                let CouleurGagnant = 0;
-                if(true) for(let i=0; i<2; i++) socket.emit('endGame', CouleurGagnant)
-
-            }
-            else{
-                game.echiquiers[echiquierNb].reset_playable(); // on reset avant de l'envoyer
-                socket.emit('reset', game.echiquiers[indiceEchiquier], couleurSocket);
             }
         }
         else{
