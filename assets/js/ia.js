@@ -38,6 +38,7 @@ function Prise(piecePrise){
         //prise de la piece
         for(let i=0; i<valeurPieces; i++){if(valeurPieces[i].name == piecePrise.constructor.name) valeur += valeurPieces[i].valeur;};
         return valeur;
+    }
 }
 
 function verifierboucle(pieceName,sens, x, y, couleur, piecesDangeureuses, piecesAlliées, plateau){
@@ -71,7 +72,7 @@ function verifiercote(pieceName,sens, plateau, x, y, couleur, piecesDangeureuses
 
         if(plateau.check_piece(x,y)){
             for (let j = 0; j < pieceName.length; j++) if (plateau.board[x][y].piece.constructor.name == pieceName[j]){
-                if(plateau.board[x][y].piece.couleur != couleur) piecesAlliées.push(plateau.board[x][y].piece);
+                if(plateau.board[x][y].piece.couleur == couleur) piecesAlliées.push(plateau.board[x][y].piece);
                 else piecesDangeureuses.push(plateau.board[x][y].piece);
             }
         }
@@ -80,10 +81,23 @@ function verifiercote(pieceName,sens, plateau, x, y, couleur, piecesDangeureuses
     return 1;
 }
 
+function fontion(a,b){
+    if(a.valeur > b.valeur) return 1;
+    else return 0;
+}
+
 function Menace(piece, piecePrise){
     if(0!=piecePrise){
+
         let valeur = 0
-        //methode de echec a récupérer et mettre la couleur en argument + récupérer la liste ennemi menaçant et allie qui protegent
+
+        piecesDangeureuses = [];
+        piecesAlliées = [];
+
+        verifierboucle(["reine","fou"],[[1,1],[1,-1],[-1,1],[-1,-1]],piece.x,piece.y,piece.couleur,piecesDangeureuses,piecesAlliées,plateau);
+        verifierboucle(["reine","tour"],[[1,0],[-1,0],[0,1],[0,-1]],piece.x,piece.y,piece.couleur,piecesDangeureuses,piecesAlliées,plateau);
+        verifiercote(["pion"],[[1*Math.pow(-1,this.couleur + 1),1*Math.pow(-1,this.couleur + 1)],[1*Math.pow(-1,this.couleur + 1),-1*Math.pow(-1,this.couleur + 1)]],plateau,piece.x,piece.y,piece.couleur,piecesDangeureuses,piecesAlliées);
+        verifiercote(["cavalier"],[[2,1],[2,-1],[-2,1],[-2,-1],[1,2],[1,-2],[-1,2],[-1,-2]],plateau,piece.x,piece.y,piece.couleur,piecesDangeureuses,piecesAlliées);
 
         //si notre piece peut être prise
         if(true){ // si echec a mettre
@@ -91,21 +105,27 @@ function Menace(piece, piecePrise){
 
             //Privilégier de continuer tant que nballie>nbennemi, ajouter dans le tableau à renvoyer directement ?
 
-/*                 A coder :
+            /*                 A coder :
 
             classer ennemi en fonction de la valeur des pieces
                 tant que Nbennemi > Nballie 
                     retirer Nbennemi le plus fort
             pareil en inversant la condition et en retirant Nballie le plus fort , methode a faire ?
+            */
             
+            piecesDangeureuses.sort(fonction());
+            while (piecesDangeureuses.length() > piecesAlliées.length()){
+                piecesDangeureuses.pop();
+            }
 
-
+            /*
             listeennemival = listeennemi*valeur de chaque(boucle a faire) 
             pareil pour listeallieval
 
             valeur += listeallieval-listeennemival
 
-*/
+            */
+        }
             
     }
 }
