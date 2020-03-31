@@ -7,7 +7,10 @@ class Jeu{
         // demander le pseudo du joueur pour l'enregistrement des scores
 
 
+        function click(x, y){
 
+            
+        }
 
 
         this.play = false;
