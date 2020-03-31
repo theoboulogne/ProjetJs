@@ -8,8 +8,16 @@ class Jeu{
 
 
         function click(x, y){
-
-            
+            if(plateau.select.x == -1){
+                if(plateau.board[x][y].piece != 0){
+                    plateau.select.x = x;
+                    plateau.select.y = y;
+                }
+            }
+            else{
+                plateau.select.x = -1;
+                plateau.select.y = -1;
+            }
         }
 
 
