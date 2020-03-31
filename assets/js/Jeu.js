@@ -7,7 +7,10 @@ class Jeu{
         // demander le pseudo du joueur pour l'enregistrement des scores
 
 
+        function click(x, y){
 
+            
+        }
 
 
         this.play = false;
@@ -31,6 +34,8 @@ class Jeu{
             this.play = true; // on lance le jeu (retirer si non utilisé)
             this.echiquier = plateau;
 
+            console.log(this.echiquier)
+
             //Coté ThreeJS
             // Lancer le rendu graphique
 
@@ -39,7 +44,7 @@ class Jeu{
 
 
 
-            /*  TEST RENDU THREEJS
+            //  TEST RENDU THREEJS
             let tmpl = []
             for(let i=0; i<8; i++){
                 for(let j=0; j<8; j++){
@@ -50,11 +55,11 @@ class Jeu{
             }
             let tmpRendu = []
             for(let i=0; i<tmpl.length;i++){
-                tmpRendu.push({name:tmpl[i].constructor.name, couleur:tmpl[i].couleur, x:tmpl[i].x, y:tmpl[i].y})
+                tmpRendu.push({name:tmpl[i].nom, couleur:tmpl[i].couleur, x:tmpl[i].x, y:tmpl[i].y})
             }
             console.log(tmpRendu[0])
             this.rendu = new RenduThreeJs(tmpRendu);
-            */
+            
 
 
         });
