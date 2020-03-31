@@ -125,13 +125,13 @@ io.sockets.on('connection',  (socket) =>{
             socket.emit('reset', game.echiquiers[indiceEchiquier], couleurSocket);
         }
     });
-    socket.on('disconnect', ()=>{ // si le joueur demande une déconnection
+    socket.on('disconnect', ()=>{ // si le joueur demande une déconnection   A REFAIRE
         for(let i=0; i<game.echiquiers.length; i++){
             for(let j=0; j<game.echiquiers[i].Joueurs.length; j++){
                 if(game.echiquiers[i].Joueurs[j].id == socket.id){ // si le bon id
                     for(let k=0; k<game.echiquiers[i].Joueurs.length; k++){
-                        io.sockets.sockets[game.echiquiers[i].Joueurs[k].id].emit('disconnect'); // on change de page et on deconnecte les joueurs
-                        io.sockets.sockets[game.echiquiers[i].Joueurs[k].id].disconnect();
+                        //io.sockets.sockets[game.echiquiers[i].Joueurs[k].id].emit('disconnect'); // on change de page et on deconnecte les joueurs
+                        //io.sockets.sockets[game.echiquiers[i].Joueurs[k].id].disconnect();
                     }
                     game.echiquiers.splice(i, 1); // on retire l'échiquier
                 }

@@ -8,6 +8,7 @@ class Jeu{
 
 
         function click(x, y){
+            
 
             
         }
