@@ -88,7 +88,6 @@ class Plateau{
         return tmpbool;     
     }
 
-
     playable(x,y, couleur, piece){
         if(this.isInBoard(x,y)){
             if(this.board[x][y].piece != 0) {
@@ -99,6 +98,7 @@ class Plateau{
         
         
     }
+
     supprimer(x,y){
         if(this.isInBoard(x,y)){ // rajouter verif si pas vide
             let piece_prise = new Object();
@@ -174,6 +174,26 @@ class Plateau{
 
         this.cancel_supprimer(this.Nbtour, (this.couts[this.Nbtour].couleur+1)%2)
         this.couts.splice(this.couts, 1)
+    }
+
+    echecEtMat(couleur){
+        if(this.board[this.joueur[couleur].roi.x][this.joueur[couleur].roi.y].piece.echec(this)){
+            for(let j = 0; j < 8; j++){
+                for(let k = 0; k < 8; k++){
+                    if(this.board[j][k].piece.couleur == couleur){
+                        this.board[j][k].piece.playable(this);
+                        for(let l = 0; l < 8; l++){
+                            for(let m = 0; m < 8; m++){
+                                if(this.board[l][m].playable()){
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return true;
+        }
     }
 }
 

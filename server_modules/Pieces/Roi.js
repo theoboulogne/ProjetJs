@@ -1,22 +1,5 @@
 const Piece = require('./Piece');
 
-<<<<<<< HEAD
-    constructor(x, y, player){
-        this.x = x;
-        this.y = y;
-        this.player = player;
-        this.hasMoved = 0;
-    }
-
-    verifier(pieceName,sens, x, y){
-         
-        for(let i = 0; i < sens.length; i++){
-            x += 1*sens[i][0];
-            y += 1*sensy[i][1];
-            if (isInBoard(x,y)) while(board[x][y].piece.couleur != this.couleur){
-                if (isInBoard(x,y)) for (let j = 0; j < pieceName.length; j++) if (board[x][y].piece.name == pieceName[j]) return 1;
-            }
-=======
 class Roi extends Piece{
     constructor(couleur, x, y){
         super(couleur, x, y)
@@ -27,7 +10,6 @@ class Roi extends Piece{
             let x = this.x + sens[i][0];
             let y = this.y + sens[i][1];
             let boucle = true;
->>>>>>> Théo
 
             if (plateau.isInBoard(x,y)) while(boucle){
                 if(plateau.check_piece(x,y)){
@@ -42,15 +24,6 @@ class Roi extends Piece{
         return false;
     }
 
-<<<<<<< HEAD
-    verifier2(pieceName,sens, x, y){
-
-        for(let i = 1; i <= sens.length; i++){
-            x += 1*sens[i][0];
-            y += 1*sensy[i][1];
-            if (isInBoard(x,y)) if(board[x][y].piece.couleur != this.couleur){
-                for (let i = 0; i < pieceName.length; i++) if (board[x][y].piece.name == pieceName1) return 1;
-=======
     verifiercote(pieceName,sens, plateau){
         for(let i = 0; i < sens.length; i++){
             let x = this.x + sens[i][0];
@@ -60,27 +33,15 @@ class Roi extends Piece{
                  if(plateau.board[x][y].piece.couleur != this.couleur){
                     for (let j = 0; j < pieceName.length; j++) if (plateau.board[x][y].piece.constructor.name == pieceName[j]) return true;
                 }
->>>>>>> Théo
             }
             
         }
         return false;
     }
 
-<<<<<<< HEAD
-    isEnEcheque(x,y){
-        if (verifier(["reine","fou"],[[1,1],[1,-1],[-1,1],[-1,-1]],x,y) ||
-            verifier(["reine","tour"],[[1,0],[-1,0],[0,1],[0,-1]],x,y) ||
-            verifier2(["pion"],[[1*Math.pow(-1,this.couleur + 1),1*Math.pow(-1,this.couleur + 1)],[1*Math.pow(-1,this.couleur + 1),-1*Math.pow(-1,this.couleur + 1)]],x,y) ||
-            verifier2(["cavalier"],[[2,1],[2,-1],[-2,1],[-2,-1],[1,2],[1,-2],[-1,2],[-1,-2]],x,y)) return 1;
-        
-        return 0;
-    }
-=======
     echec(plateau){
 
 //Voir pour changer piecename par une condition avec des |
->>>>>>> Théo
 
 //erreurs..
 
@@ -92,15 +53,6 @@ class Roi extends Piece{
         return false;
     }
 
-<<<<<<< HEAD
-        for (let i = 0; i < 3; i++){
-            for (let j = 0; j < 3; j++){
-                if(isInBoard(X + i, Y + i)){
-                    if(!this.isEnEcheque(X + i, Y + i)){
-                        if(X + i != this.x & Y + i != this.y){
-                            isPlayable.push((X + i, Y + i));
-                        }
-=======
     playable(plateau){
         plateau.reset_playable()
         for (let i = -1; i < 2; i++){
@@ -111,7 +63,6 @@ class Roi extends Piece{
                     }
                     else if (plateau.board[this.x + i][this.y + j].piece.couleur != this.couleur){
                         if(!(i == 0 && j == 0)) plateau.playable(this.x + i, this.y + j, this.couleur);
->>>>>>> Théo
                     }
                 }
             }
@@ -147,14 +98,6 @@ class Roi extends Piece{
         }
     }
 
-<<<<<<< HEAD
-    move(x,y){
-        this.x = x;
-        this.y = y;
-        if (this.hasMoved == 0) this.hasMoved = 1;
-    }
-=======
->>>>>>> Théo
 
     move(x,y, plateau){ //forcer playable avant move..
         if(plateau.isInBoard(x,y)){
