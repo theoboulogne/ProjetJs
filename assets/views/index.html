@@ -1,4 +1,5 @@
 <head>
+    <link rel="stylesheet" href="../css/jeu.css">
     <style>
         body { margin: 0; }
         canvas { width: 100%; height: 100% }
@@ -6,24 +7,46 @@
 </head>
 <body>
 
-<script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r71/three.min.js"></script>
-<script src="/socket.io/socket.io.js"></script>
+    <div class="affichage_piont_mangé" id="affichage_piont_mangé">
+        <h1 class="ecriture">Pionts mangés :</h1>
+        <div id = "pieces">
+            
+        </div>
+    </div>
+    
+    <div class="affichage_couts" id="affichage_couts">
+        <div class="couts_blanc" >
+            <h2 class="ecriture">Couts blanc:</h2>
+            <div id = "couts_blanc">
+            
+            </div>
+        </div> 
+        <div class="couts_noir" >
+            <h2 class="ecriture">Couts noir:</h2>
+            <div id = "couts_noir">
 
-<script type="application/javascript" src="../js/Rendu/OBJLoader.js"></script>
-<script type='text/javascript' src='../js/Rendu/tween.js'></script>
-<script type="application/javascript" src="../js/Rendu/ChessScript.js"></script>
+            </div>
+        </div>
+    </div>
+        
+    <script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r71/three.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
 
-<script src="../js/Pieces/Piece.js"></script>
-<script src="../js/Pieces/Roi.js"></script>
-<script src="../js/Pieces/Pion.js"></script>
-<script src="../js/Pieces/Fou.js"></script>
-<script src="../js/Pieces/Reine.js"></script>
-<script src="../js/Pieces/Tour.js"></script>
-<script src="../js/Pieces/Cavalier.js"></script>
+    <script type="application/javascript" src="../js/Rendu/OBJLoader.js"></script>
+    <script type='text/javascript' src='../js/Rendu/tween.js'></script>
+    <script type="application/javascript" src="../js/Rendu/ChessScript.js"></script>
 
-<script src="../js/Plateau/Case.js"></script>
-<script src="../js/Plateau/Plateau.js"></script>
+    <script src="../js/Pieces/Piece.js"></script>
+    <script src="../js/Pieces/Roi.js"></script>
+    <script src="../js/Pieces/Pion.js"></script>
+    <script src="../js/Pieces/Fou.js"></script>
+    <script src="../js/Pieces/Reine.js"></script>
+    <script src="../js/Pieces/Tour.js"></script>
+    <script src="../js/Pieces/Cavalier.js"></script>
 
-<script src="../js/Jeu.js"></script>
+    <script src="../js/Plateau/Case.js"></script>
+    <script src="../js/Plateau/Plateau.js"></script>
+
+    <script src="../js/Jeu.js"></script>
 
 </body>

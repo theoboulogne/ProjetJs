@@ -58,6 +58,53 @@ class Jeu{
     }
 }
 
+test = new Array()
+test.push("reine-noir")
+test.push("reine-noir")
+test.push("reine-noir")
+test.push("reine-noir")
+test.push("reine-noir")
+test.push("reine-noir")
+
+couts = new Array()
+couts.push('B3')
+couts.push('H4')
+couts.push('B8')
+
+
+document.getElementById('pieces').innerHTML = "";
+for(let i = 0; i < test.length; i++){
+    let img = document.createElement("img");
+    img.src = "../textures/piece-chess/"+test[i]+".png";
+    let src = document.getElementById("pieces");
+    src.appendChild(img);
+    img.className = "image";
+}
+
+
+
+document.getElementById('couts_blanc').innerHTML = "";
+document.getElementById('couts_noir').innerHTML = "";
+for(let i = 0; i < couts.length; i++){
+    if(i % 2 == 1){
+        let div = document.getElementById("couts_blanc");
+        let cout = document.createElement("h2");
+        cout.setAttribute("class","ecriture");
+        var texte = document.createTextNode(couts[i]);
+        div.append(cout);
+        cout.appendChild(texte);
+    }
+    if(i % 2 == 0){
+        let div = document.getElementById("couts_noir");
+        let cout = document.createElement("h2");
+        cout.setAttribute("class","ecriture");
+        var texte = document.createTextNode(couts[i]);
+        div.append(cout);
+        cout.appendChild(texte);
+    }
+}
+
+
 
 (function() {
 	let game = new Jeu();

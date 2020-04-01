@@ -1,0 +1,53 @@
+.affichage_piont_mangé{
+    height : 40%;
+    width : 20%;
+    position: relative;
+    z-index: 1;
+    height: 0;
+    margin-bottom: 0;
+    margin-top: 0;
+}
+.affichage_couts{
+    height : 40%;
+    width : 20%;
+    position: relative;
+    z-index: 2;
+    height: 0;
+    margin-bottom: 0;
+    margin-top: 0;
+    margin-left: 80%;
+}
+.couts_blanc{
+    height : 40%;
+    width : 50%;
+    position: relative;
+    z-index: 2;
+    height: 0;
+    margin-bottom: 0;
+    margin-top: 0;
+    margin-left: 0%;
+}
+.couts_noir{
+    height : 40%;
+    width : 50%;
+    position: relative;
+    z-index: 2;
+    height: 0;
+    margin-bottom: 0;
+    margin-top: 0;
+    margin-left: 50%;
+}
+.ecriture{
+    color: beige;
+}
+h1{
+    font-size: 2vw;
+}
+h2{
+    font-size: 1vw;
+    color: beige;
+}
+.image{
+  width: 20%;
+  height: auto;
+}
