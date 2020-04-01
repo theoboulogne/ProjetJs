@@ -7,20 +7,6 @@ class Jeu{
         // demander le pseudo du joueur pour l'enregistrement des scores
 
 
-        function click(x, y){
-            if(plateau.select.x == -1){
-                if(plateau.board[x][y].piece != 0){
-                    plateau.select.x = x;
-                    plateau.select.y = y;
-                }
-            }
-            else{
-                plateau.select.x = -1;
-                plateau.select.y = -1;
-            }
-        }
-
-
         this.play = false;
     
 
@@ -29,25 +15,26 @@ class Jeu{
         socket.on('repconnection', (couleur) => {
             console.log('Event - repconnection')
 
-            //Coté Gestion du jeu
+        //Coté Gestion du jeu
             this.couleur = couleur;
 
-            //Coté UI:
+        //Coté UI:
             // indiquer l'attente d'un autre joueur
         });
         socket.on('start', (plateau) => {
             console.log('Event - start')
+            console.log(plateau)
 
-            //Coté Gestion du Jeu
+        //Coté Gestion du Jeu
             this.play = true; // on lance le jeu (retirer si non utilisé)
             this.echiquier = plateau;
 
             console.log(this.echiquier)
 
-            //Coté ThreeJS
+        //Coté ThreeJS
             // Lancer le rendu graphique
 
-            //Coté UI
+        //Coté UI
             // Lancer l'affichage de l'UI
 
 
@@ -76,10 +63,10 @@ class Jeu{
 
             this.echiquier = plateau;
 
-            //Coté threejs :
+        //Coté threejs :
             // Afficher les couts jouable (autre couleur ?) + piece selectionnée
 
-            //Coté Gestion du jeu
+        //Coté Gestion du jeu
             // implémenter l'utilisation de selected pour envoyer move ou playable au click en fonction
             
             
@@ -89,62 +76,63 @@ class Jeu{
         socket.on('move', (plateau,deplacement,piece_prise) => { // piece et deplacer en x,y
             console.log('Event - move')
 
-            //Coté threejs :
+            this.echiquier = plateau;
+
+        //Coté threejs :
             //suppr les playable, deplacer la pièce et retirer la pièce prise en simultané
 
-            //Coté Gestion du jeu
-            // supprimer la piece si !=0
-            if(piece_prise != 0){
-                plateau.board[piece_prise.x][piece_prise.y].piece = 0;
-                plateau.Joueurs[piece_prise.couleur].pieces_prises.push(piece_prise);
+        //Coté Gestion du jeu (Voir pour intégrer le roque à faire)
+
+            //On supprime la pièce si nécessaire
+            if(piece_prise != 0){ 
+                this.echiquier.board[piece_prise.x][piece_prise.y].piece = 0;
+                this.echiquier.Joueurs[piece_prise.couleur].pieces_prises.push(piece_prise);
             }
 
-            // effectuer le déplacement de la pièce
-            plateau.board[deplacement.piece.x][deplacement.piece.y] = 0;
+            //Déplacement dans le board de la pièce
+            this.echiquier.board[deplacement.x][deplacement.y].piece = this.echiquier.board[deplacement.piece.x][deplacement.piece.y];
+            this.echiquier.board[deplacement.piece.x][deplacement.piece.y] = 0;
 
-            plateau.board[deplacement.x][deplacement.y].piece = deplacement.piece;
-
+            //Changement des Coo de la pièce
             plateau.board[deplacement.x][deplacement.y].piece.x = deplacement.x;
             plateau.board[deplacement.x][deplacement.y].piece.y = deplacement.y;
 
-            //  enregist
+            //Enregistrement des couts pour l'affichage
             plateau.couts.push(plateau.board[deplacement.x][deplacement.y].piece);
+
+            //On augmente le nombre de tour pour indiquer que l'on change de joueur et pour l'affichage des couts
             plateau.Nbtour++;
 
-            //Coté UI
+        //Coté UI
             // Récupérer les couts joués et les pièces prises et actualiser l'ui en conséquence
 
-            //Idée : Gérer la récupération de la 'piece_prise' coté client  ????
         });
         socket.on('reset', (echiquierReset, couleurReset) => {
             console.log('Event - reset')
             
-            //Coté Gestion du jeu
+        //Coté Gestion du jeu
             this.couleur = couleurReset;
             this.echiquier = echiquierReset;
             
-            // Coté Threejs
+        // Coté Threejs
             // Changer l'affichage en conséquence
 
-            //Coté UI
+        //Coté UI
             // montrer une alerte au joueur pour indiquer qu'il y a une erreur ??
         });
         socket.on('endGame', (couleurGagnant) => {
 
-            //Coté gestion du Jeu :
+        //Coté gestion du Jeu :
             // enregistrer la partie dans la BDD
 
-            //Coté UI :
+        //Coté UI :
             // afficher un message indiquant si gagné ou perdu
             // puis au click :
             //  rediriger vers menu
         });
-        socket.on('disconnect', () => {
-
-            //Coté UI:
-            // Afficher un message indiquant la fin de la partie pour déconnection 
-            // puis au click :
-            //  rediriger vers le menu afin de reset la connection
+        socket.on('menu', () => {
+            console.log('Redirection vers le menu')
+            window.location.href = "/menu"
         });
         
     }

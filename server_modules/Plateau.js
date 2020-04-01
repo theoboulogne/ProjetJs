@@ -155,6 +155,8 @@ class Plateau{
         this.board[x][y].piece = piece
 
         this.Nbtour++;
+        
+        this.reset_playable();
     }
     
     cancel_jouer(x,y){
