@@ -63,8 +63,8 @@ class RenduThreeJs{
                 });
             }
         }
- 
-        
+
+       
         var boardTexture = new THREE.ImageUtils.loadTexture("../../textures/board-pattern.png");
         boardTexture.repeat.set(4,4);
         boardTexture.wrapS = THREE.RepeatWrapping;
@@ -107,12 +107,7 @@ class RenduThreeJs{
         camera.rotation.y = ( 60* (Math.PI / 180))
         camera.rotation.z = ( 90* (Math.PI / 180))
         camera.position.z = 3;
- 
-        function roundDecimal(nombre, precision){
-            var precision = precision || 2;
-            var tmp = Math.pow(10, precision);
-            return Math.round( nombre*tmp )/tmp;
-        }
+
 
         function render() {
             requestAnimationFrame( render );
@@ -120,34 +115,87 @@ class RenduThreeJs{
             renderer.render( scene, camera );
         }
         render();
+
+        // Cases jouables
+        var geometry = new THREE.BoxGeometry( 0.5, 0.5, 0.1 );
+        var material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
+        var playableCase = new THREE.Mesh( geometry, material );
+        var playableCases = [];
+        
+        function playable(X, Y) {
+            playableCase.position.set( (X-4)/2 + 0.25, (Y-4)/2 + 0.25, 0 );
+            let tmpPlayableCase = playableCase.clone();
+            playableCases.push(tmpPlayableCase)
+            scene.add( tmpPlayableCase );
+        };
+
+        playable(6,5);
+        playable(7,5);
+        playable(4,5);
+        playable(7,7);
+        playable(0,0);
     
         renderer.domElement.addEventListener("click", onclick, false);
-        var selectedObject;
         var raycaster = new THREE.Raycaster();
- 
-        function onclick(event) {
+
+        function clickOnCase(playableCases) {
             var mouse = new THREE.Vector2();
             mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
             mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-
+    
             raycaster.setFromCamera(mouse, camera);
-            var intersects = raycaster.intersectObjects(pieces, true); //array
-            if (intersects.length > 0) {
-                selectedObject = intersects[0]; // 40 * le déplacement,
-                                                // z correspond à x, x -> y, y -> z
-                                                
-                animatePiece(selectedObject.object, 140, 0);
+            return raycaster.intersectObjects(playableCases, true); //array
+        }
+ 
+        // clic sur piece ou case jouable
+        function onclick(event) {
+
+            var selectedPiece;
+            var selectedCase;
+            var intersectPiece = clickOnCase(pieces)
+            var intersectCase = clickOnCase(playableCases);
+
+            if (intersectPiece.length > 0) {
+                selectedPiece = intersectPiece[0];
+                     
+                animatePiece(selectedPiece.object, 7, 7);
                 
-                let X = Math.trunc(2*(selectedObject.point.x + 2));
-                let Y = Math.trunc(2*(selectedObject.point.y + 2));
+                let X = Math.trunc(2*(selectedPiece.point.x + 2));
+                let Y = Math.trunc(2*(selectedPiece.point.y + 2));
 
                 console.log(" ");
                 console.log("X");
                 console.log(X);
                 console.log("Y");
                 console.log(Y);
+                //removeObject(Pieces);
+            }
+
+            if (intersectCase.length > 0) {
+                selectedCase = intersectCase[0]
+                                     
+                let X = Math.trunc(2*(selectedCase.point.x + 2));
+                let Y = Math.trunc(2*(selectedCase.point.y + 2));
+
+                console.log(" ");
+                console.log("X");
+                console.log(X);
+                console.log("Y");
+                console.log(Y);
+                removeObject(playableCases);
             }
         }
+
+
+        function removeObject(array) {
+                for (let i = 0; i < array.length; i++) {
+                    scene.remove(array[i]);
+                }
+                array.length = 0;
+        }
+        
+
+
        
         var TweenUp = function(piece) {
             console.log('piece up')
@@ -195,7 +243,7 @@ class RenduThreeJs{
  
         function animatePiece(piece, X, Y) {
             var tweenUp = TweenUp(piece);
-            var tweenOneUp = TweenSpacesDiagonal(piece, X, Y);
+            var tweenOneUp = TweenSpacesDiagonal(piece, X*42, Y*42);
             var tweenDown = TweenDown(piece);
             tweenUp.chain(tweenOneUp);
             tweenOneUp.chain(tweenDown);
