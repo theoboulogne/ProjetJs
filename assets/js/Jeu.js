@@ -6,6 +6,21 @@ class Jeu{
         //Dans le menu :
         // demander le pseudo du joueur pour l'enregistrement des scores
 
+
+        function click(x, y){
+            if(plateau.select.x == -1){
+                if(plateau.board[x][y].piece != 0){
+                    plateau.select.x = x;
+                    plateau.select.y = y;
+                }
+            }
+            else{
+                plateau.select.x = -1;
+                plateau.select.y = -1;
+            }
+        }
+
+
         this.play = false;
     
 
@@ -67,9 +82,9 @@ class Jeu{
 
             //Coté Gestion du jeu
             // implémenter l'utilisation de selected pour envoyer move ou playable au click en fonction
-
             
-//si pas de playable trouver un moyen de reset selected dans plateau (coté serveur ou client ?)
+            
+            //si pas de playable trouver un moyen de reset selected dans plateau (coté serveur ou client ?)
 
         });
         socket.on('move', (plateau,deplacement,piece_prise) => { // piece et deplacer en x,y
@@ -79,7 +94,23 @@ class Jeu{
             //suppr les playable, deplacer la pièce et retirer la pièce prise en simultané
 
             //Coté Gestion du jeu
-            // effectuer le déplacement de la pièce, supprimer la piece si !=0, enregist
+            // supprimer la piece si !=0
+            if(piece_prise != 0){
+                plateau.board[piece_prise.x][piece_prise.y].piece = 0;
+                plateau.Joueurs[piece_prise.couleur].pieces_prises.push(piece_prise);
+            }
+
+            // effectuer le déplacement de la pièce
+            plateau.board[deplacement.piece.x][deplacement.piece.y] = 0;
+
+            plateau.board[deplacement.x][deplacement.y].piece = deplacement.piece;
+
+            plateau.board[deplacement.x][deplacement.y].piece.x = deplacement.x;
+            plateau.board[deplacement.x][deplacement.y].piece.y = deplacement.y;
+
+            //  enregist
+            plateau.couts.push(plateau.board[deplacement.x][deplacement.y].piece);
+            plateau.Nbtour++;
 
             //Coté UI
             // Récupérer les couts joués et les pièces prises et actualiser l'ui en conséquence

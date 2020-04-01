@@ -67,6 +67,35 @@ class Roi extends Piece{
                 }
             }
         }
+
+        return (isPlayable);
+    }
+
+    roque(){
+        if(this.hasMoved == 0){
+            if(bord[this.x - 4][this.y].piece.constructor.name == 'Tour' && bord[this.x - 4][this.y].piece.couleur == this.couleur){
+                if(bord[this.x - 4][this.y].piece.played == 0){
+                    let i = 1;
+                    while (i < 4 && !this.isEnEcheque(this.x - i,y) && (board[this.x - i][this.y].piece == 0)){
+                        i++;
+                    }
+                    if (i == 4){
+                        return ([this.x - 4, this.x, this.y]);
+                    }
+                }
+            }
+            if(bord[this.x + 3][this.y].piece.constructor.name == 'Tour' && bord[this.x + 3][this.y].piece.couleur == this.couleur){
+                if(bord[this.x + 3][this.y].piece.played == 0){
+                    let i = 1;
+                    while (i < 3 && !this.isEnEcheque(this.x + i,y) && (board[this.x + i][this.y].piece == 0)){
+                        i++;
+                    }
+                    if (i == 3){
+                        return ([this.x + 3, this.x, this.y]);
+                    }
+                 }
+            }
+        }
     }
 
 
