@@ -110,6 +110,7 @@ class Plateau{
             this.board[x][y].piece = 0;
         }
     }
+
     cancel_supprimer(Nbtour, couleur){ // en fonction du nombre de tour pour la prise en passant..
         if(this.Joueurs[couleur].pieces_prises.length > 0){
             let x = this.Joueurs[couleur].pieces_prises[this.Joueurs[couleur].pieces_prises.length - 1].piece.x
@@ -155,6 +156,7 @@ class Plateau{
 
         this.Nbtour++;
     }
+    
     cancel_jouer(x,y){
         this.Nbtour--;
 

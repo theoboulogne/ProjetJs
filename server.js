@@ -115,7 +115,7 @@ io.sockets.on('connection',  (socket) =>{
                     game.echiquiers[indiceEchiquier].board[deplacement.piece.x][deplacement.piece.y].piece.move(deplacement.x,deplacement.y,game.echiquiers[indiceEchiquier])
 
                     let piece_prise = 0
-                    if(tgame.echiquiers[indiceEchiquier].Joueurs[Nbtour%2].pieces_prises[tgame.echiquiers[indiceEchiquier].Joueurs[Nbtour%2].pieces_prises.length - 1].Nbtour == Nbtour-1){ 
+                    if(game.echiquiers[indiceEchiquier].Joueurs[Nbtour%2].pieces_prises[tgame.echiquiers[indiceEchiquier].Joueurs[Nbtour%2].pieces_prises.length - 1].Nbtour == Nbtour-1){ 
                         piece_prise = game.echiquiers[indiceEchiquier].Joueurs[i].pieces_prises[game.echiquiers[indiceEchiquier].Joueurs[i].pieces_prises.length - 1].piece;
                     }
 
