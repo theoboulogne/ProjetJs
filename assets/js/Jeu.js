@@ -6,14 +6,6 @@ class Jeu{
         //Dans le menu :
         // demander le pseudo du joueur pour l'enregistrement des scores
 
-
-        function click(x, y){
-            
-
-            
-        }
-
-
         this.play = false;
     
 
@@ -30,6 +22,7 @@ class Jeu{
         });
         socket.on('start', (plateau) => {
             console.log('Event - start')
+            console.log(plateau)
 
             //Coté Gestion du Jeu
             this.play = true; // on lance le jeu (retirer si non utilisé)
@@ -116,12 +109,9 @@ class Jeu{
             // puis au click :
             //  rediriger vers menu
         });
-        socket.on('disconnect', () => {
-
-            //Coté UI:
-            // Afficher un message indiquant la fin de la partie pour déconnection 
-            // puis au click :
-            //  rediriger vers le menu afin de reset la connection
+        socket.on('menu', () => {
+            console.log('Redirection vers le menu')
+            window.location.href = "/menu"
         });
         
     }

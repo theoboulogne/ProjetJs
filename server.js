@@ -12,10 +12,13 @@ const io =  require('socket.io')(server);
 const Plateau = require('./server_modules/Plateau');
 const Joueur = require('./server_modules/Joueur');
 
-//Renvoi vers le fichier index client
+//Renvoi vers le fichier index client                           REDIRECTION A CHANGER APRES CREATION DU MENU
 app.use(express.static(__dirname + '/assets/'));
 app.get('/', (req, res, next) => {
-    res.sendFile(__dirname + '/assets/views/index.html')
+    res.sendFile(__dirname + '/assets/views/jeu.html')
+});
+app.get('/menu', (req, res, next) => {
+    res.sendFile(__dirname + '/assets/views/menu.html')
 });
 
 //On enregistre nos plateaux et nos joueurs avec leur socket
@@ -41,19 +44,9 @@ io.sockets.on('connection',  (socket) =>{
     //Gestion du lancement de la partie
     if(game.echiquiers[game.echiquiers.length-1].Joueurs.length == 2) {
         console.log('start')
-        let check = true; 
-        // on vérifie que le premier joueur ne s'est pas déconnecté, si c'est le cas on déconnecte la socket actuelle
-        if(io.sockets.sockets[game.echiquiers[game.echiquiers.length-1].Joueurs[0].id]==undefined){
-            check = false;
-            game.echiquiers.pop();
-            socket.emit('disconnect')
-            socket.disconnect();
-        }
-        if(check){
-            for(let i=0; i<2; i++){ // on start le dernier echiquier si les deux joueurs sont tjr connectés
-                console.log(game.echiquiers[game.echiquiers.length-1].Joueurs[i])
-                io.sockets.sockets[game.echiquiers[game.echiquiers.length-1].Joueurs[i].id].emit('start', game.echiquiers[game.echiquiers.length-1]);
-            }
+        for(let i=0; i<2; i++){ // on start le dernier echiquier si les deux joueurs sont tjr connectés
+            console.log(game.echiquiers[game.echiquiers.length-1].Joueurs[i])
+            io.sockets.sockets[game.echiquiers[game.echiquiers.length-1].Joueurs[i].id].emit('start', game.echiquiers[game.echiquiers.length-1]);
         }
     }
 
@@ -114,6 +107,7 @@ io.sockets.on('connection',  (socket) =>{
                 let CouleurGagnant = 0;
                 if(true) for(let i=0; i<2; i++) socket.emit('endGame', CouleurGagnant)
 
+
             }
             else{
                 game.echiquiers[echiquierNb].reset_playable(); // on reset avant de l'envoyer
@@ -125,19 +119,27 @@ io.sockets.on('connection',  (socket) =>{
             socket.emit('reset', game.echiquiers[indiceEchiquier], couleurSocket);
         }
     });
-    socket.on('disconnect', ()=>{ // si le joueur demande une déconnection   A REFAIRE
+    socket.on('disconnect', ()=>{ // si le joueur demande une déconnection
+        let indiceEchiquier = undefined;
+        let couleurSocket;
         for(let i=0; i<game.echiquiers.length; i++){
             for(let j=0; j<game.echiquiers[i].Joueurs.length; j++){
                 if(game.echiquiers[i].Joueurs[j].id == socket.id){ // si le bon id
-                    for(let k=0; k<game.echiquiers[i].Joueurs.length; k++){
-                        //io.sockets.sockets[game.echiquiers[i].Joueurs[k].id].emit('disconnect'); // on change de page et on deconnecte les joueurs
-                        //io.sockets.sockets[game.echiquiers[i].Joueurs[k].id].disconnect();
-                    }
-                    game.echiquiers.splice(i, 1); // on retire l'échiquier
+                    indiceEchiquier = i;
+                    couleurSocket = j;
                 }
             }
         }
-        console.log("Déconnection d'un joueur + suppression du plateau correspondant");
+
+        if(indiceEchiquier != undefined) { // si le plateau existe toujours alors on redirige
+            for(let j=0; j<game.echiquiers[indiceEchiquier].Joueurs.length; j++){
+                if(game.echiquiers[indiceEchiquier].Joueurs[j].id != socket.id){
+                    io.sockets.sockets[game.echiquiers[indiceEchiquier].Joueurs[j].id].emit('menu'); // on change de page 
+                }
+            }
+            game.echiquiers.splice(indiceEchiquier, 1); // on retire l'échiquier
+            console.log("Déconnection d'un joueur + suppression du plateau correspondant");
+        }
     });
 
     console.log('Fin Connection Client (coté serveur)')
