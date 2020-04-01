@@ -1,5 +1,25 @@
 //Serveur - Echec
 
+//Base de donee
+var mysql = require('mysql');
+
+var con = mysql.createConnection({
+  host: "localhost:800",
+  user: "Projet_JS",
+  password: null,
+  database: "test"
+});
+
+con.connect(function(err) {
+    if (err) throw err;
+    console.log("Connected!");
+    var sql = "INSERT INTO `partie`(`pseudoGagnant`, `pseudoPerdant`) VALUES ([value-1],[value-2])";
+    con.query(sql, function (err, result) {
+      if (err) throw err;
+      console.log("1 record inserted");
+    });
+});
+
 //Constantes
 
 const port = 800;
@@ -22,6 +42,12 @@ app.get('/', (req, res, next) => {
 this.echiquiers = new Array();
 let game = this;
 
+connection.connect(function(err) {
+    if(err){
+        console.log(err.code);
+        console.log(err.fatal);
+    }
+});
 
 io.sockets.on('connection',  (socket) =>{
     
@@ -72,13 +98,10 @@ io.sockets.on('connection',  (socket) =>{
 
         if ((couleurSocket) == (game.echiquiers[indiceEchiquier].Nbtour%2) && game.echiquiers[indiceEchiquier].board[piece.x][piece.y].piece == piece){ // si son tour et pas d'erreur
             game.echiquiers[indiceEchiquier].board[piece.x][piece.y].piece.playable(game.echiquiers[indiceEchiquier]);
-            game.echiquiers[indiceEchiquier].select.x = piece.x;
-            game.echiquiers[indiceEchiquier].select.y = piece.y;
-
-            let compteur = 0;
+            
             for(let i = 0; i < 8; i++){
                 for(let j = 0; j < 8; j++){
-                    if(game.echiquiers[indiceEchiquier].board[i][j].playable == false) compteur++;
+                    if(game.echiquiers[indiceEchiquier].board[i][j].playable == true) compteur++;
                 }
             }
             if(compteur == 64){
@@ -115,7 +138,7 @@ io.sockets.on('connection',  (socket) =>{
                     game.echiquiers[indiceEchiquier].board[deplacement.piece.x][deplacement.piece.y].piece.move(deplacement.x,deplacement.y,game.echiquiers[indiceEchiquier])
 
                     let piece_prise = 0
-                    if(game.echiquiers[indiceEchiquier].Joueurs[Nbtour%2].pieces_prises[tgame.echiquiers[indiceEchiquier].Joueurs[Nbtour%2].pieces_prises.length - 1].Nbtour == Nbtour-1){ 
+                    if(game.echiquiers[indiceEchiquier].Joueurs[Nbtour%2].pieces_prises[game.echiquiers[indiceEchiquier].Joueurs[Nbtour%2].pieces_prises.length - 1].Nbtour == Nbtour-1){ 
                         piece_prise = game.echiquiers[indiceEchiquier].Joueurs[i].pieces_prises[game.echiquiers[indiceEchiquier].Joueurs[i].pieces_prises.length - 1].piece;
                     }
 
@@ -129,7 +152,17 @@ io.sockets.on('connection',  (socket) =>{
         //                                      -------------------------->    (pour quelle couleur ?)
                     
                     if(plateau.echecEtMat(plateau.Nbtour % 2)){
+                        
+                        /*connection.connect(function(err) {
+                            if(err){
+                                console.log(err.code);
+                                console.log(err.fatal);
+                            }
+                        });*/
+
                         for(let i=0; i<2; i++) io.sockets.sockets[game.echiquiers[indiceEchiquier].Joueurs[i].id].emit('endGame', couleurSocket);
+
+                        //connection.end(function(){});
                     }
                 }
                 else{
