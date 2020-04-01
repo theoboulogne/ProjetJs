@@ -86,12 +86,6 @@ io.sockets.on('connection',  (socket) =>{
 
         if ((couleurSocket) == (game.echiquiers[indiceEchiquier].Nbtour%2) && game.echiquiers[indiceEchiquier].board[piece.x][piece.y].piece == piece){ // si son tour et pas d'erreur
             game.echiquiers[indiceEchiquier].board[piece.x][piece.y].piece.playable(game.echiquiers[indiceEchiquier]);
-<<<<<<< HEAD
-            
-            for(let i = 0; i < 8; i++){
-                for(let j = 0; j < 8; j++){
-                    if(game.echiquiers[indiceEchiquier].board[i][j].playable == true) compteur++;
-=======
             for(let i = 0; i < 8; i++){
                 for(let j = 0; j < 8; j++){
                     if(game.echiquiers[indiceEchiquier].board[i][j].playable) {
@@ -99,7 +93,6 @@ io.sockets.on('connection',  (socket) =>{
                         game.echiquiers[indiceEchiquier].select.y = piece.y;
 
                     }
->>>>>>> Théo
                 }
             }
             socket.emit('playable', game.echiquiers[indiceEchiquier]);
@@ -136,40 +129,6 @@ io.sockets.on('connection',  (socket) =>{
             let plateau = clone(game.echiquiers[indiceEchiquier]); 
             game.echiquiers[indiceEchiquier].board[deplacement.piece.x][deplacement.piece.y].piece.move(deplacement.x,deplacement.y,game.echiquiers[indiceEchiquier])
 
-<<<<<<< HEAD
-                    let piece_prise = 0
-                    if(game.echiquiers[indiceEchiquier].Joueurs[Nbtour%2].pieces_prises[game.echiquiers[indiceEchiquier].Joueurs[Nbtour%2].pieces_prises.length - 1].Nbtour == Nbtour-1){ 
-                        piece_prise = game.echiquiers[indiceEchiquier].Joueurs[i].pieces_prises[game.echiquiers[indiceEchiquier].Joueurs[i].pieces_prises.length - 1].piece;
-                    }
-
-                    plateau.reset_playable();
-                    for(let i=0; i<2; i++){ // on envoi le déplacement a tout le monde
-                        io.sockets.sockets[game.echiquiers[indiceEchiquier].Joueurs[couleurSocket].id].emit('move', plateau, deplacement, piece_prise);
-                    //afficher/gérer la piece supprimée coté client ??
-                    }
-
-        //check si echec et mat et envoyer le message si c'est le cas 
-        //                                      -------------------------->    (pour quelle couleur ?)
-                    
-                    if(plateau.echecEtMat(plateau.Nbtour % 2)){
-                        
-                        /*connection.connect(function(err) {
-                            if(err){
-                                console.log(err.code);
-                                console.log(err.fatal);
-                            }
-                        });*/
-
-                        for(let i=0; i<2; i++) io.sockets.sockets[game.echiquiers[indiceEchiquier].Joueurs[i].id].emit('endGame', couleurSocket);
-
-                        //connection.end(function(){});
-                    }
-                }
-                else{
-                    game.echiquiers[echiquierNb].reset_playable(); // on reset avant de l'envoyer
-                    socket.emit('reset', game.echiquiers[indiceEchiquier], couleurSocket);
-                }
-=======
             let piece_prise = 0 //On détecte la pièce prise
             if(game.echiquiers[indiceEchiquier].Joueurs[couleurSocket].pieces_prises[game.echiquiers[indiceEchiquier].Joueurs[couleurSocket].pieces_prises.length - 1].Nbtour == Nbtour-1){ 
                 piece_prise = game.echiquiers[indiceEchiquier].Joueurs[couleurSocket].pieces_prises[game.echiquiers[indiceEchiquier].Joueurs[couleurSocket].pieces_prises.length - 1].piece;
@@ -183,7 +142,6 @@ io.sockets.on('connection',  (socket) =>{
             if(game.echiquiers[indiceEchiquier].echecEtMat(couleurSocket)){//Detection fin de partie
                 console.log('Echec et Mat')
                 for(let i=0; i<2; i++) io.sockets.sockets[game.echiquiers[indiceEchiquier].Joueurs[i].id].emit('endGame', couleurSocket);
->>>>>>> Théo
             }
         }
         else{
