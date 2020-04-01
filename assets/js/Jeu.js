@@ -83,7 +83,7 @@ class Jeu{
             // implémenter l'utilisation de selected pour envoyer move ou playable au click en fonction
             
             
-//si pas de playable trouver un moyen de reset selected dans plateau (coté serveur ou client ?)
+            //si pas de playable trouver un moyen de reset selected dans plateau (coté serveur ou client ?)
 
         });
         socket.on('move', (plateau,deplacement,piece_prise) => { // piece et deplacer en x,y
