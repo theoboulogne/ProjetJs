@@ -114,14 +114,12 @@ io.sockets.on('connection',  (socket) =>{
                     let plateau = clone(game.echiquiers[indiceEchiquier]);
                     game.echiquiers[indiceEchiquier].board[deplacement.piece.x][deplacement.piece.y].piece.move(deplacement.x,deplacement.y,game.echiquiers[indiceEchiquier])
 
-        //regarder la bonne couleur a faire au lieu de la boucle
                     let piece_prise = 0
-                    for(let i=0; i<2; i++) if(this.Joueurs[i].pieces_prises[this.Joueurs[i].pieces_prises.length - 1].Nbtour == Nbtour-1){ 
+                    if(this.Joueurs[Nbtour%2].pieces_prises[this.Joueurs[Nbtour%2].pieces_prises.length - 1].Nbtour == Nbtour-1){ 
                         piece_prise = this.Joueurs[i].pieces_prises[this.Joueurs[i].pieces_prises.length - 1].piece;
                     }
 
                     plateau.reset_playable();
-                    //reinitialiser select plateau
                     for(let i=0; i<2; i++){ // on envoi le déplacement a tout le monde
                         io.sockets.sockets[game.echiquiers[indiceEchiquier].Joueurs[couleurSocket].id].emit('move', plateau, deplacement, piece_prise);
         //afficher/gérer la piece supprimée coté client ??
