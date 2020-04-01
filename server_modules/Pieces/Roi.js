@@ -43,8 +43,6 @@ class Roi extends Piece{
 
 //Voir pour changer piecename par une condition avec des |
 
-//erreurs..
-
         if (this.verifierboucle(["Reine","Fou"],[[1,1],[1,-1],[-1,1],[-1,-1]], plateau)) return true;
         if (this.verifierboucle(["Reine","Tour"],[[1,0],[-1,0],[0,1],[0,-1]], plateau)) return true;
         if (this.verifiercote(["Pion"],[[1*Math.pow(-1,this.couleur + 1),1*Math.pow(-1,this.couleur + 1)],[1*Math.pow(-1,this.couleur + 1),-1*Math.pow(-1,this.couleur + 1)]], plateau)) return true;
@@ -71,38 +69,36 @@ class Roi extends Piece{
         return (isPlayable);
     }
 
-    roque(){
-        if(this.hasMoved == 0){
-            if(bord[this.x - 4][this.y].piece.constructor.name == 'Tour' && bord[this.x - 4][this.y].piece.couleur == this.couleur){
-                if(bord[this.x - 4][this.y].piece.played == 0){
+    roque(plateau){
+        let renvoi = []
+        if(this.deplacements.length == 0){
+            if(plateau.board[this.x - 4][this.y].piece.constructor.name == 'Tour' && plateau.board[this.x - 4][this.y].piece.couleur == this.couleur){
+                if(plateau.board[this.x - 4][this.y].piece.deplacements.length == 0){
                     let i = 1;
-                    while (i < 4 && !this.isEnEcheque(this.x - i,y) && (board[this.x - i][this.y].piece == 0)){
-                        i++;
-                    }
+                    while (i < 4 && !this.isEnEcheque(this.x - i,y) && (plateau.board[this.x - i][this.y].piece == 0)) i++;
                     if (i == 4){
-                        return ([this.x - 4, this.x, this.y]);
+                        renvoi.push([this.x - 4, this.x, this.y]);
                     }
                 }
             }
-            if(bord[this.x + 3][this.y].piece.constructor.name == 'Tour' && bord[this.x + 3][this.y].piece.couleur == this.couleur){
-                if(bord[this.x + 3][this.y].piece.played == 0){
+            if(plateau.board[this.x + 3][this.y].piece.constructor.name == 'Tour' && plateau.board[this.x + 3][this.y].piece.couleur == this.couleur){
+                if(plateau.board[this.x + 3][this.y].piece.deplacements.length == 0){
                     let i = 1;
-                    while (i < 3 && !this.isEnEcheque(this.x + i,y) && (board[this.x + i][this.y].piece == 0)){
-                        i++;
-                    }
+                    while (i < 3 && !this.isEnEcheque(this.x + i,y) && (board[this.x + i][this.y].piece == 0)) i++;
                     if (i == 3){
-                        return ([this.x + 3, this.x, this.y]);
+                        renvoi.push([this.x + 3, this.x, this.y]);
                     }
                  }
             }
         }
+        return renvoi;
     }
 
 
-    move(x,y, plateau){ //forcer playable avant move..
+    move(x,y, plateau){ 
         if(plateau.isInBoard(x,y)){
             if(plateau.board[x][y].playable){
-                plateau.jouer(x, y, this);
+                plateau.jouer(x, y, this); // appeler méthode du parent ?
 
                 plateau.Joueurs[this.couleur].roi.x = x;
                 plateau.Joueurs[this.couleur].roi.y = y;
