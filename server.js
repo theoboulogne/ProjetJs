@@ -122,20 +122,15 @@ io.sockets.on('connection',  (socket) =>{
                     plateau.reset_playable();
                     for(let i=0; i<2; i++){ // on envoi le déplacement a tout le monde
                         io.sockets.sockets[game.echiquiers[indiceEchiquier].Joueurs[couleurSocket].id].emit('move', plateau, deplacement, piece_prise);
-        //afficher/gérer la piece supprimée coté client ??
+                    //afficher/gérer la piece supprimée coté client ??
                     }
 
         //check si echec et mat et envoyer le message si c'est le cas 
         //                                      -------------------------->    (pour quelle couleur ?)
-                    let CouleurGagnant = 0;
-                    for(let i = 0; i < 2; i++){
-                        if(plateau.echecEtMat((plateau.Nbtour + i) % 2)){
-                            CouleurGagnant = (plateau.Nbtour + i) % 2;
-                        }
+                    
+                    if(plateau.echecEtMat(plateau.Nbtour % 2)){
+                        for(let i=0; i<2; i++) io.sockets.sockets[game.echiquiers[indiceEchiquier].Joueurs[i].id].emit('endGame', couleurSocket);
                     }
-
-                    if(true) for(let i=0; i<2; i++) socket.emit('endGame', CouleurGagnant)
-
                 }
                 else{
                     game.echiquiers[echiquierNb].reset_playable(); // on reset avant de l'envoyer
