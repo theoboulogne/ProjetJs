@@ -22,9 +22,9 @@ class RenduThreeJs{
         let objLoader = new THREE.OBJLoader();
             // Cases jouables
         this.playableCases = [];
-        this.playableCase = new THREE.Mesh( new THREE.BoxGeometry( 0.5, 0.5, 0.1 ), 
-                                            new THREE.MeshBasicMaterial( {color: 0x00ff00} ) );
-                        //Pièces
+        this.playableCase = new THREE.Mesh( new THREE.BoxGeometry( 0.5, 0.5, 0.07 ), 
+                                            new THREE.MeshBasicMaterial( {color: 0x00ff00, opacity: 0.7, transparent: true} ) );
+        //Pièces
         this.pieces = [];
         this.models = [ // définition des nom de modèles en dur
             {nom:"Pion", obj:undefined},
@@ -60,45 +60,10 @@ class RenduThreeJs{
         
         //Test de case playable, fonction qui prend un board a faire
 
-        //this.setPlayable(6,5);
-        //this.setPlayable(7,5);
-        //this.setPlayable(4,5);
-        //this.setPlayable(7,7);
-        //this.setPlayable(0,0);
-
-        //Rendu.setPlayables(board);
+        this.setPlayable(6,5,0);
 
         //Gestion de la détection des clicks (Events)
         this.raycaster = new THREE.Raycaster();
-
-        /*function onclick(event) {
-
-            if(Rendu.pieces.length>0){
-
-                let intersectPiece = Rendu.getClickModels(event, Rendu.pieces)
-                let intersectCase = Rendu.getClickModels(event, Rendu.playableCases);
-
-                if (intersectPiece.length > 0) {
-                    let selectedPiece = intersectPiece[0];
-                    
-                    let Coo = Rendu.getCooSelected(selectedPiece);
-                    console.log("X : " + (Coo.x).toString() + ", Y : " + (Coo.y).toString());
-                    
-                    Rendu.animateSelectedPiece(selectedPiece.object, 2, 2); // test deplacement
-                }
-
-                if (intersectCase.length > 0) {
-                    let selectedCase = intersectCase[0]
-
-                    let Coo = Rendu.getCooSelected(selectedCase);
-
-                    Rendu.removeObjects(Rendu.playableCases);
-                    
-                    console.log("X : " + (Coo.x).toString() + ", Y : " + (Coo.y).toString());
-                }
-            } 
-            else Rendu.loadBoardPieces(board)
-        }*/
     }
 
 
@@ -137,8 +102,8 @@ class RenduThreeJs{
         tweenUp.start();
     }
 
-    movePiece(X, Y, newX, newY) {
-        Rendu.animateSelectedPiece(selectedPiece.object, newX-X, newY-Y);
+    movePiece(piece, newX, newY) {
+        Rendu.animateSelectedPiece(selectedPiece.object, newX-piece.x, newY-piece.y);
     }
 
     getPiece(Coo){
