@@ -6,6 +6,9 @@ class Jeu{
         //Dans le menu :
         // demander le pseudo du joueur pour l'enregistrement des scores
 
+        function onClick(event){
+
+        }
 
         this.play = false;
     
@@ -20,8 +23,13 @@ class Jeu{
 
         //Coté UI:
             // indiquer l'attente d'un autre joueur
+
+        //Coté ThreeJs
+            this.rendu = new RenduThreeJs();
         });
         socket.on('start', (plateau) => {
+
+
             console.log('Event - start')
             console.log(plateau)
 
@@ -32,6 +40,11 @@ class Jeu{
             console.log(this.echiquier)
 
         //Coté ThreeJS
+            while(this.rendu.models.length != 6);
+            
+            this.Rendu.loadBoardPieces(this.echiquier.board);
+            document.body.lastChild.addEventListener("click", onClick, false);
+
             // Lancer le rendu graphique
 
         //Coté UI
@@ -40,20 +53,7 @@ class Jeu{
 
 
             //  TEST RENDU THREEJS
-            let tmpl = []
-            for(let i=0; i<8; i++){
-                for(let j=0; j<8; j++){
-                    if(this.echiquier.board[i][j].piece!=0){
-                        tmpl.push(this.echiquier.board[i][j].piece)
-                    }
-                }
-            }
-            let tmpRendu = []
-            for(let i=0; i<tmpl.length;i++){
-                tmpRendu.push({name:tmpl[i].nom, couleur:tmpl[i].couleur, x:tmpl[i].x, y:tmpl[i].y})
-            }
-            console.log(tmpRendu[0])
-            this.rendu = new RenduThreeJs(tmpRendu);
+            this.rendu = new RenduThreeJs(this.echiquier.board);
             
 
 
@@ -130,10 +130,10 @@ class Jeu{
             // puis au click :
             //  rediriger vers menu
         });
-        socket.on('menu', () => {
+        /*socket.on('menu', () => {
             console.log('Redirection vers le menu')
             window.location.href = "/menu"
-        });
+        });*/
         
     }
 }
