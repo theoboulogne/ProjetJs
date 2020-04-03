@@ -55,12 +55,11 @@ class Plateau{
         }
     }
 
-    check_echec(x, y, couleur, piece){ // couleur optionnelle ?
+    check_echec(x, y, piece){ // couleur optionnelle ?
         let tmpbool = false;
-        console.log(piece)
-        if(piece.constructor.name == "Pion"){
+        if(piece.nom == "Pion"){
             for(let i=-1; i<2; i+=2){ // on supprime la piece en cas de prise en passant,
-                if(this.getBoard(piece.x+i,piece.y).piece!=0 )if(this.getBoard(piece.x+i,piece.y).piece.constructor.name==piece.constructor.name){
+                if(this.getBoard(piece.x+i,piece.y).piece!=0 )if(this.getBoard(piece.x+i,piece.y).piece.nom==piece.nom){
                     if(this.getBoard(piece.x+i,piece.y).piece.deplacements.length == 2 && piece.y == this.getBoard(piece.x+i,piece.y).piece.deplacements[1].y){
                         if(this.getBoard(piece.x+i,(Math.pow(-1,piece.couleur)+piece.y)).piece==0){
                             this.supprimer(piece.x+i, piece.y)
@@ -70,30 +69,25 @@ class Plateau{
             }
         }
         
-        if(piece.constructor.name=="Roi"){
-            this.Joueurs[couleur].roi.x = x;
-            this.Joueurs[couleur].roi.y = y;
+        if(piece.nom=="Roi"){
+            this.Joueurs[piece.couleur].roi.x = x;
+            this.Joueurs[piece.couleur].roi.y = y;
         }
         
         this.jouer(x,y,piece);
 
-
-
-        console.log(piece)
-        console.log(this.Joueurs)
-        if(this.board[this.Joueurs[couleur].roi.x][this.Joueurs[couleur].roi.y].piece.echec(this)) tmpbool = true;
+        if(this.board[this.Joueurs[piece.couleur].roi.x][this.Joueurs[piece.couleur].roi.y].piece.echec(this)) tmpbool = true;
         this.cancel_jouer(x,y);
         
-        console.log(tmpbool)
         return tmpbool;     
     }
 
-    playable(x,y, couleur, piece){
+    playable(x,y, piece){
         if(this.isInBoard(x,y)){
             if(this.board[x][y].piece != 0) {
-                if(this.board[x][y].piece.couleur == couleur) return;
+                if(this.board[x][y].piece.couleur == piece.couleur) return;
             }
-            if(!this.check_echec(x,y,couleur,piece)) this.board[x][y].playable = true; // erreur a afficher sinon ? (ex:en rouge au lieu de vert)
+            if(!this.check_echec(x,y,piece)) this.board[x][y].playable = true; // erreur a afficher sinon ? (ex:en rouge au lieu de vert)
         }
         
         
@@ -138,7 +132,6 @@ class Plateau{
     }
 
     jouer(x, y, piece){//rajouter le coup dans l'affichage a faire par la suite + sécurité
-    console.log('jouer')
         if(this.board[x][y].piece!=0) this.supprimer(x, y)
         
         let deplacement = new Object(); // class coo a faire..
@@ -167,7 +160,7 @@ class Plateau{
         this.couts[this.Nbtour].deplacements.splice(this.couts[this.Nbtour].deplacements.length - 1, 1);
         
 
-        if(this.couts[this.Nbtour].constructor.name=="Roi"){
+        if(this.couts[this.Nbtour].nom=="Roi"){
             this.Joueurs[this.couts[this.Nbtour].couleur].roi.x = this.couts[this.Nbtour].x;
             this.Joueurs[this.couts[this.Nbtour].couleur].roi.y = this.couts[this.Nbtour].y;
         }

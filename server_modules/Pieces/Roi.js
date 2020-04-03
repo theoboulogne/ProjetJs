@@ -14,7 +14,7 @@ class Roi extends Piece{
             if (plateau.isInBoard(x,y)) while(boucle){
                 if(plateau.check_piece(x,y)){
                     if(plateau.board[x][y].piece.couleur == this.couleur) boucle = false;
-                    else for (let j = 0; j < pieceName.length; j++) if (plateau.board[x][y].piece.constructor.name == pieceName[j]) return true;
+                    else for (let j = 0; j < pieceName.length; j++) if (plateau.board[x][y].piece.nom == pieceName[j]) return true;
                 }
                 x += sens[i][0]
                 y += sens[i][1]
@@ -31,7 +31,7 @@ class Roi extends Piece{
 
             if(plateau.check_piece(x,y)){
                  if(plateau.board[x][y].piece.couleur != this.couleur){
-                    for (let j = 0; j < pieceName.length; j++) if (plateau.board[x][y].piece.constructor.name == pieceName[j]) return true;
+                    for (let j = 0; j < pieceName.length; j++) if (plateau.board[x][y].piece.nom == pieceName[j]) return true;
                 }
             }
             
@@ -57,22 +57,20 @@ class Roi extends Piece{
             for (let j = -1; j < 2; j++){
                 if(plateau.isInBoard(this.x + i, this.y + j)){
                     if(plateau.board[this.x + i][this.y + j].piece == 0){
-                        if(!(i == 0 && j == 0)) plateau.playable(this.x + i, this.y + j, this.couleur);
+                        if(!(i == 0 && j == 0)) plateau.playable(this.x + i, this.y + j, this);
                     }
                     else if (plateau.board[this.x + i][this.y + j].piece.couleur != this.couleur){
-                        if(!(i == 0 && j == 0)) plateau.playable(this.x + i, this.y + j, this.couleur);
+                        if(!(i == 0 && j == 0)) plateau.playable(this.x + i, this.y + j, this);
                     }
                 }
             }
         }
-
-        return (isPlayable);
     }
 
     roque(plateau){
         let renvoi = []
         if(this.deplacements.length == 0){
-            if(plateau.board[this.x - 4][this.y].piece.constructor.name == 'Tour' && plateau.board[this.x - 4][this.y].piece.couleur == this.couleur){
+            if(plateau.board[this.x - 4][this.y].piece.nom == 'Tour' && plateau.board[this.x - 4][this.y].piece.couleur == this.couleur){
                 if(plateau.board[this.x - 4][this.y].piece.deplacements.length == 0){
                     let i = 1;
                     while (i < 4 && !this.isEnEcheque(this.x - i,y) && (plateau.board[this.x - i][this.y].piece == 0)) i++;
@@ -81,7 +79,7 @@ class Roi extends Piece{
                     }
                 }
             }
-            if(plateau.board[this.x + 3][this.y].piece.constructor.name == 'Tour' && plateau.board[this.x + 3][this.y].piece.couleur == this.couleur){
+            if(plateau.board[this.x + 3][this.y].piece.nom == 'Tour' && plateau.board[this.x + 3][this.y].piece.couleur == this.couleur){
                 if(plateau.board[this.x + 3][this.y].piece.deplacements.length == 0){
                     let i = 1;
                     while (i < 3 && !this.isEnEcheque(this.x + i,y) && (board[this.x + i][this.y].piece == 0)) i++;

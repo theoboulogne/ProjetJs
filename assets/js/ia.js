@@ -8,9 +8,9 @@ var valeurPieces = [
 ]
 //pion
 function direction_libre(piece, board){
-    if(piece.constructor.name=='Pion'){//module par piece ?
+    if(piece.nom=='Pion'){//module par piece ?
         for(let i=piece.y+Math.pow(-1,piece.couleur); i<8 && i>0; i+=Math.pow(-1,piece.couleur)){
-            if(piece.couleur==board[i].piece.couleur&&piece.constructor.name==board[i].piece.constructor.name){
+            if(piece.couleur==board[i].piece.couleur&&piece.nom==board[i].piece.nom){
                 return 2;
             }
         }
@@ -18,7 +18,7 @@ function direction_libre(piece, board){
     return 0;
 }
 function avancement(piece){
-    if(piece.constructor.name=='Pion'){//module par piece ?
+    if(piece.nom=='Pion'){//module par piece ?
         return 0.5*(Math.abs(piece.y-(1+(piece.couleur*5))));
     }
 }
@@ -36,7 +36,7 @@ function Prise(piecePrise){
     if(0!=piecePrise){
         let valeur = 0
         //prise de la piece
-        for(let i=0; i<valeurPieces; i++){if(valeurPieces[i].name == piecePrise.constructor.name) valeur += valeurPieces[i].valeur;};
+        for(let i=0; i<valeurPieces; i++){if(valeurPieces[i].name == piecePrise.nom) valeur += valeurPieces[i].valeur;};
         return valeur;
     }
 }
@@ -50,7 +50,7 @@ function verifierboucle(pieceName,sens, x, y, couleur, piecesDangeureuses, piece
 
         if (plateau.isInBoard(x,y)) while(boucle){
             if(plateau.check_piece(x,y)){
-                for (let j = 0; j < pieceName.length; j++) if (plateau.board[x][y].piece.constructor.name == pieceName[j]){ 
+                for (let j = 0; j < pieceName.length; j++) if (plateau.board[x][y].piece.nom == pieceName[j]){ 
                     if(plateau.board[x][y].piece.couleur == couleur) piecesAlliées.push(plateau.board[x][y].piece);
                     else piecesDangeureuses.push(plateau.board[x][y].piece);
                     boucle = false;
@@ -71,7 +71,7 @@ function verifiercote(pieceName,sens, plateau, x, y, couleur, piecesDangeureuses
         y += sens[i][1];
 
         if(plateau.check_piece(x,y)){
-            for (let j = 0; j < pieceName.length; j++) if (plateau.board[x][y].piece.constructor.name == pieceName[j]){
+            for (let j = 0; j < pieceName.length; j++) if (plateau.board[x][y].piece.nom == pieceName[j]){
                 if(plateau.board[x][y].piece.couleur == couleur) piecesAlliées.push(plateau.board[x][y].piece);
                 else piecesDangeureuses.push(plateau.board[x][y].piece);
             }
@@ -101,7 +101,7 @@ function Menace(piece, piecePrise){
 
         //si notre piece peut être prise
         if(true){ // si echec a mettre
-            for(let i=0; i<valeurPieces; i++){if(valeurPieces[i].name == piece.constructor.name) valeur -= valeurPieces[i].valeur;};
+            for(let i=0; i<valeurPieces; i++){if(valeurPieces[i].name == piece.nom) valeur -= valeurPieces[i].valeur;};
 
             //Privilégier de continuer tant que nballie>nbennemi, ajouter dans le tableau à renvoyer directement ?
 
@@ -133,7 +133,7 @@ function Menace(piece, piecePrise){
 function valeur_ia(piece, plateau, piecePrise){ // val par defaut de pieceprise  a mettre
     let valeur = 0
     
-    for(let i=0; i<valeurPieces; i++){if(valeurPieces[i].name == piece.constructor.name) valeur += valeurPieces[i].valeur;};
+    for(let i=0; i<valeurPieces; i++){if(valeurPieces[i].name == piece.nom) valeur += valeurPieces[i].valeur;};
 
     valeur += direction_libre(piece, plateau.board)
     valeur += avancement(piece)

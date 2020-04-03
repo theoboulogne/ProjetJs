@@ -27,17 +27,16 @@ class RenduThreeJs{
                         //Pièces
         this.pieces = [];
         this.models = [ // définition des nom de modèles en dur
-            "Pion",
-            "Fou",
-            "Cavalier",
-            "Tour",
-            "Reine",
-            "Roi"
+            {nom:"Pion", obj:undefined},
+            {nom:"Fou", obj:undefined},
+            {nom:"Cavalier", obj:undefined},
+            {nom:"Tour", obj:undefined},
+            {nom:"Reine", obj:undefined},
+            {nom:"Roi", obj:undefined}
         ];
-        this.modelsObj = []
         for(let i=0; i<this.models.length; i++){
-            objLoader.load("../models/" + this.models[i] + ".obj", function(object) {
-                Rendu.modelsObj.push(object);
+            objLoader.load("../models/" + this.models[i].nom + ".obj", function(object) {
+                Rendu.models[i].obj = (object);
             });
         }
             //Board
@@ -167,7 +166,7 @@ class RenduThreeJs{
 
     setPlayable(X, Y) {
         let tmpPlayableCase = this.playableCase.clone();
-        tmpPlayableCase.position.set( (X-4)/2 + 0.25, (Y-4)/2 + 0.25, 0 );
+        tmpPlayableCase.position.set( (Y-4)/2 + 0.25, (X-4)/2 + 0.25, 0 );
         this.playableCases.push(tmpPlayableCase) // on enregistre pour pouvoir les retirer
         this.scene.add( tmpPlayableCase );
     };
@@ -243,6 +242,7 @@ class RenduThreeJs{
 
 
     loadBoardPieces(board){
+        
         this.LoadPieces(this.getBoardPieces(board))
     }
     
@@ -259,9 +259,9 @@ class RenduThreeJs{
     }
 
     LoadPieces(Pieces){
-        for(let i=0; i<this.modelsObj.length; i++){
+        for(let i=0; i<this.models.length; i++){
             for(let couleur=0; couleur<2; couleur++){
-                let obj = (this.modelsObj[i]).clone()
+                let obj = (this.models[i].obj).clone()
                 obj.traverse( function ( child ) {
                     if (child instanceof THREE.Mesh) {
                         // on définit la couleur
@@ -271,7 +271,7 @@ class RenduThreeJs{
                 });
  
                 for(let j=0; j<Pieces.length; j++){
-                    if(Pieces[j].nom == this.models[i] && Pieces[j].couleur == couleur) {
+                    if(Pieces[j].nom == this.models[i].nom && Pieces[j].couleur == couleur) {
                         let tmpobj = (obj).clone();
  
                         // la position / taille / orientation

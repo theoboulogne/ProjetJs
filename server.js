@@ -58,7 +58,7 @@ io.sockets.on('connection',  (socket) =>{
             }
         }
 
-        if ((couleurSocket) == (game.echiquiers[indiceEchiquier].Nbtour%2) && game.echiquiers[indiceEchiquier].board[piece.x][piece.y].piece == piece){ // si son tour et pas d'erreur
+        if ((couleurSocket) == (game.echiquiers[indiceEchiquier].Nbtour%2) && game.echiquiers[indiceEchiquier].board[piece.x][piece.y].piece.nom == piece.nom){ // si son tour et pas d'erreur
             game.echiquiers[indiceEchiquier].board[piece.x][piece.y].piece.playable(game.echiquiers[indiceEchiquier]);
             for(let i = 0; i < 8; i++){
                 for(let j = 0; j < 8; j++){

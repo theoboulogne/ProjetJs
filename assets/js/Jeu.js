@@ -6,34 +6,45 @@ class Jeu{
         //Dans le menu :
         // demander le pseudo du joueur pour l'enregistrement des scores
 
-        function onclick(event) {
-
-            if(this.echiquier.Nbtour%2 == this.couleur){//si son tour
-                if(this.echiquier.select === {x:-1, y:-1}){ //Récup case de la piece pour dmd playable
-                    let intersectPiece = this.rendu.getClickModels(event, this.rendu.pieces);
+        function onClick(event) {
+            console.log('click')
+            if(Game.echiquier.Nbtour%2 == Game.couleur){//si son tour
+                console.log('bon-tour')
+                console.log(Game.echiquier)
+                if(Game.echiquier.select.x == -1 &&  Game.echiquier.select.y == -1){ //Récup case de la piece pour dmd playable
+                    console.log('dmd-playable')
+                    let intersectPiece = Game.rendu.getClickModels(event, Game.rendu.pieces);
                     if(intersectPiece.length){
-                        let Coo = this.rendu.getCooSelected(intersectPiece[0]);
-                        if(this.echiquier.board[Coo.x][Coo.y].piece != 0) {
-                            socket.emit('playable', this.echiquier.board[Coo.x][Coo.y].piece);
+                        let Coo = Game.rendu.getCooSelected(intersectPiece[0]);
+                        if(Game.echiquier.board[Coo.x][Coo.y].piece != 0) {
+                            console.log('emit playable')
+                            console.log(Game)
+                            console.log(Coo)
+                            console.log(Game.echiquier.board[Coo.x][Coo.y].piece)
+                            socket.emit('playable', Game.echiquier.board[Coo.x][Coo.y].piece);
                         }
                     }
                 }else { // Retirer playable et lancer move si sur case playable
-                    let intersectCase = this.rendu.getClickModels(event, this.rendu.playableCases);
+                    console.log('disable-playable')
+                    let intersectCase = Game.rendu.getClickModels(event, Game.rendu.playableCases);
                     if(intersectCase.length){
-                        let Coo = this.rendu.getCooSelected(intersectCase[0]);
-                        if(this.echiquier.board[Coo.x][Coo.y].playable) {
-                            socket.emit('move', {piece:this.echiquier.board[this.echiquier.select.x][this.echiquier.select.y].piece, 
+                        console.log('dmd-move')
+                        let Coo = Game.rendu.getCooSelected(intersectCase[0]);
+                        if(Game.echiquier.board[Coo.x][Coo.y].playable) {
+                            socket.emit('move', {piece:Game.echiquier.board[Game.echiquier.select.x][Game.echiquier.select.y].piece, 
                                                  x:Coo.x, 
                                                  y:Coo.y});
                         }
                     }
-                    else this.echiquier.select = {x:-1, y:-1}
-                    this.rendu.removeObjects(this.rendu.playableCases); 
+                    else Game.echiquier.select = {x:-1, y:-1}
+                    Game.rendu.removeObjects(Game.rendu.playableCases); 
                 }
             }
+            console.log('end-click')
         }
 
-        this.play = false; // retirer ??????????????????????
+
+        let Game = this;
     
 
         //connection server
@@ -51,13 +62,8 @@ class Jeu{
         });
         socket.on('start', (plateau) => {
             console.log('Event - start')
-            console.log(plateau)
-
         //Coté Gestion du Jeu
-            this.play = true; // on lance le jeu (retirer si non utilisé)
             this.echiquier = plateau;
-
-            console.log(this.echiquier)
 
         //Coté ThreeJS
             // Lancer le rendu graphique
@@ -67,13 +73,14 @@ class Jeu{
 
 
             //  TEST RENDU THREEJS
-            let Rendu = this.rendu;
-
+            let i, check;
             let loadCheck = setInterval(function() {
-                if (Rendu.pieces.length>=6) {
+                check = true;
+                for(i=0; i<Game.rendu.models.length; i++) if(Game.rendu.models[i].obj == undefined) check = false;
+                if (check) {
                     clearInterval(loadCheck);
-                    console.log('check')
-                    Rendu.loadBoardPieces(plateau.board);
+                    Game.rendu.loadBoardPieces(Game.echiquier.board);
+                    document.body.lastChild.addEventListener("click", onClick, false);
                     //addeventlistener
                 }
             }, 250); // interval set at 0.25 seconds
@@ -85,11 +92,13 @@ class Jeu{
             console.log('Event - playable')
 
             this.echiquier = plateau;
+            console.log(this.echiquier)
 
         //Coté threejs :
             // Afficher les couts jouable (autre couleur ?) +  !!!!!!!!! piece selectionnée !!!!!!!!!
 
         //Coté Gestion du jeu
+            if(Game.echiquier.select.x != -1) Game.rendu.setPlayables(Game.echiquier.board)
             // implémenter l'utilisation de selected pour envoyer move ou playable au click en fonction
             
 
