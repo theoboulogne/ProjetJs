@@ -17,14 +17,14 @@ class Pion extends Piece {
         if(this.deplacements.length == 1) { //si jms jouée
             if(plateau.isInBoard(this.x,this.y+(Math.pow(-1,this.couleur)*(2)))){
                 if(plateau.check_vide(this.x,this.y+(Math.pow(-1,this.couleur)*(2)))) {
-                    plateau.playable(this.x,this.y+(Math.pow(-1,this.couleur)*(2)),this.couleur, this)
+                    plateau.playable(this.x,this.y+(Math.pow(-1,this.couleur)*(2)),this)
                 }
             }
         }
         //déplacement par défault
         if(plateau.isInBoard(this.x,this.y+(Math.pow(-1,this.couleur)*(1)))){
             if(plateau.check_vide(this.x,this.y+(Math.pow(-1,this.couleur)*(1)))){
-                plateau.playable(this.x,this.y+(Math.pow(-1,this.couleur)*(1)),this.couleur, this)
+                plateau.playable(this.x,this.y+(Math.pow(-1,this.couleur)*(1)), this)
             }
         }
         
@@ -39,7 +39,7 @@ class Pion extends Piece {
             }
             //prise en passant
             if(plateau.isInBoard(this.x + i, this.y)){
-                if(plateau.getBoard(this.x + i,this.y).piece.constructor.name==this.constructor.name){ //regarder la class directement?
+                if(plateau.getBoard(this.x + i,this.y).piece.nom==this.nom){ //regarder la class directement?
                     if(plateau.getBoard(this.x+i,this.y).piece.deplacements.length == 2 && this.y == plateau.getBoard(this.x+i,this.y).piece.deplacements[1].y){
                         if(plateau.isInBoard(this.x + i,this.y+(Math.pow(-1,this.couleur)*(1)))){
                             if(plateau.check_vide(this.x + i,this.y+(Math.pow(-1,this.couleur)*(1)))){
@@ -59,7 +59,7 @@ class Pion extends Piece {
         if(plateau.isInBoard(x,y)){
             if(plateau.board[x][y].playable){
                 for(let i=-1; i<2; i+=2){ // on supprime la piece en cas de prise en passant,
-                    if(plateau.getBoard(this.x+i,this.y).piece.constructor.name==this.constructor.name){
+                    if(plateau.getBoard(this.x+i,this.y).piece.nom==this.nom){
                         if(x==this.x+i && y==this.y+(Math.pow(-1,this.couleur))){
                             if(plateau.getBoard(this.x+i,this.y).piece.deplacements.length == 2 && this.y == plateau.getBoard(this.x+i,this.y).piece.deplacements[1].y){
                                 if(plateau.getBoard(this.x+i,(Math.pow(-1,this.couleur)+this.y)).piece==0){

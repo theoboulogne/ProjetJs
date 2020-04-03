@@ -7,6 +7,8 @@ class Piece{
         this.x = x;//Initialisation des coordonnées (classe a faire ?)
         this.y = y;
         this.couleur = couleur; // couleur de la pièce
+        
+        this.nom = this.constructor.name;
 
         //Coté serveur
         this.deplacements = new Array()

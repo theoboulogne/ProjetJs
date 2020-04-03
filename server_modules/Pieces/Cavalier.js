@@ -11,11 +11,11 @@ class Cavalier extends Piece{
         for (let j=0; j<scan.length; j++){
             if(plateau.isInBoard(this.x + (scan[j][0]),this.y + (scan[j][1]))){
                 if (plateau.board[(this.x + (scan[j][0]))][this.y + (scan[j][1])].piece == 0) {
-                    plateau.playable((this.x + (scan[j][0] )),this.y + (scan[j][1] ),this.couleur);
+                    plateau.playable((this.x + (scan[j][0] )),this.y + (scan[j][1] ),this);
                 }
                 else {
                     if (plateau.board[(this.x + (scan[j][0]))][this.y + (scan[j][1])].piece.couleur != this.couleur){
-                        plateau.playable((this.x + (scan[j][0])),this.y + (scan[j][1]),this.couleur);
+                        plateau.playable((this.x + (scan[j][0])),this.y + (scan[j][1]),this);
                     }  
                 }
             }
