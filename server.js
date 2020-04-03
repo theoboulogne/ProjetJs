@@ -63,9 +63,7 @@ io.sockets.on('connection',  (socket) =>{
             for(let i = 0; i < 8; i++){
                 for(let j = 0; j < 8; j++){
                     if(game.echiquiers[indiceEchiquier].board[i][j].playable) {
-                        game.echiquiers[indiceEchiquier].select.x = piece.x;
-                        game.echiquiers[indiceEchiquier].select.y = piece.y;
-
+                        game.echiquiers[indiceEchiquier].select = {x:piece.x, y:piece.y};
                     }
                 }
             }
@@ -96,8 +94,7 @@ io.sockets.on('connection',  (socket) =>{
             (deplacement.y == game.echiquiers[indiceEchiquier].select.y) &&
             (game.echiquiers[indiceEchiquier].board[deplacement.x][deplacement.y].playable)){    
                     
-            game.echiquiers[indiceEchiquier].select.x = -1;
-            game.echiquiers[indiceEchiquier].select.y = -1;
+            game.echiquiers[indiceEchiquier].select = {x:-1, y:-1};
 
             //on clone le plateau pour l'envoyer avant le déplacement afin de l'effectuer graphiquement en front
             let plateau = clone(game.echiquiers[indiceEchiquier]); 

@@ -6,6 +6,7 @@ class Jeu{
         //Dans le menu :
         // demander le pseudo du joueur pour l'enregistrement des scores
 
+        function onclick(event) {
         function onClick(event){
 
         }
@@ -20,6 +21,8 @@ class Jeu{
 
         //Coté Gestion du jeu
             this.couleur = couleur;
+            this.rendu = new RenduThreeJs(); // prendre la couleur en entrée pour définir la caméra ?
+                                             // la déplacer au moment du start ?
 
         //Coté UI:
             // indiquer l'attente d'un autre joueur
@@ -51,9 +54,19 @@ class Jeu{
             // Lancer l'affichage de l'UI
 
 
+            //  TEST RENDU THREEJS
+            let Rendu = this.rendu;
 
             //  TEST RENDU THREEJS
             this.rendu = new RenduThreeJs(this.echiquier.board);
+            let loadCheck = setInterval(function() {
+                if (Rendu.pieces.length>=6) {
+                    clearInterval(loadCheck);
+                    console.log('check')
+                    //Rendu.LoadBoardPieces(plateau.board);
+                    //addeventlistener
+                }
+            }, 250); // interval set at 0.25 seconds
             
 
 
@@ -64,13 +77,11 @@ class Jeu{
             this.echiquier = plateau;
 
         //Coté threejs :
-            // Afficher les couts jouable (autre couleur ?) + piece selectionnée
+            // Afficher les couts jouable (autre couleur ?) +  !!!!!!!!! piece selectionnée !!!!!!!!!
 
         //Coté Gestion du jeu
             // implémenter l'utilisation de selected pour envoyer move ou playable au click en fonction
             
-            
-            //si pas de playable trouver un moyen de reset selected dans plateau (coté serveur ou client ?)
 
         });
         socket.on('move', (plateau,deplacement,piece_prise) => { // piece et deplacer en x,y
@@ -79,7 +90,7 @@ class Jeu{
             this.echiquier = plateau;
 
         //Coté threejs :
-            //suppr les playable, deplacer la pièce et retirer la pièce prise en simultané
+            //deplacer la pièce et retirer la pièce prise en simultané
 
         //Coté Gestion du jeu (Voir pour intégrer le roque à faire)
 
@@ -132,8 +143,8 @@ class Jeu{
         });
         /*socket.on('menu', () => {
             console.log('Redirection vers le menu')
-            window.location.href = "/menu"
-        });*/
+            //window.location.href = "/menu"
+        });
         
     }
 }
