@@ -98,7 +98,7 @@ class Jeu{
             // Afficher les couts jouable (autre couleur ?) +  !!!!!!!!! piece selectionnée !!!!!!!!!
 
         //Coté Gestion du jeu
-            if(Game.echiquier.select.x != -1) Game.rendu.setPlayables(Game.echiquier.board)
+            if(Game.echiquier.select.x != -1) Game.rendu.setPlayables(Game.echiquier.board, Game.couleur)
             // implémenter l'utilisation de selected pour envoyer move ou playable au click en fonction
             
 

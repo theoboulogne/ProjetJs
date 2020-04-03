@@ -165,23 +165,20 @@ class RenduThreeJs{
     }
 
     setPlayable(X, Y, playableType) {
-        if (playableType = 0) { this.playableCase.material.color.setHex(0x00ff00); }
-        if (playableType = 1) { this.playableCase.material.color.setHex(0xff0000); }
         let tmpPlayableCase = this.playableCase.clone();
-        tmpPlayableCase.position.set( (X-4)/2 + 0.25, (Y-4)/2 + 0.25, 0 );
+        if (!playableType) { tmpPlayableCase.material.color.setHex(0x00ff00); }
+        else { tmpPlayableCase.material.color.setHex(0xff0000); }
+        tmpPlayableCase.position.set( (Y-4)/2 + 0.25, (X-4)/2 + 0.25, 0 );
         this.playableCases.push(tmpPlayableCase) // on enregistre pour pouvoir les retirer
         this.scene.add( tmpPlayableCase );
     };
     //Suppr playables a deplacer
 
     setPlayables(board, couleur) {
-        this.board[3][5] == true;
-        this.board[3][5].couleur = 1;
         for (let i = 0; i < board.length; i++) {
             for (let j = 0; j < board.length; j++) {
                 if (board[i][j].playable) {
-                    if (board[i][j].playable.piece.couleur != couleur) { this.setPlayable(i,j,1); }
-                    else { this.setPlayable(i,j,0); }
+                    this.setPlayable(i,j,(board[i][j].piece.couleur != couleur));
                 }
             }
         }
