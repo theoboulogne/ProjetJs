@@ -36,7 +36,7 @@ class RenduThreeJs{
         ];
         this.modelsObj = []
         for(let i=0; i<this.models.length; i++){
-            objLoader.load("../models/" + this.models[i].nom + ".obj", function(object) {
+            objLoader.load("../models/" + this.models[i] + ".obj", function(object) {
                 Rendu.modelsObj.push(object);
             });
         }
@@ -72,7 +72,7 @@ class RenduThreeJs{
         //Gestion de la détection des clicks (Events)
         this.raycaster = new THREE.Raycaster();
 
-        function onclick(event) {
+        /*function onclick(event) {
 
             if(Rendu.pieces.length>0){
 
@@ -99,7 +99,7 @@ class RenduThreeJs{
                 }
             } 
             else Rendu.loadBoardPieces(board)
-        }
+        }*/
     }
 
 
@@ -271,7 +271,7 @@ class RenduThreeJs{
                 });
  
                 for(let j=0; j<Pieces.length; j++){
-                    if(Pieces[j].nom == this.models[i].nom && Pieces[j].couleur == couleur) {
+                    if(Pieces[j].nom == this.models[i] && Pieces[j].couleur == couleur) {
                         let tmpobj = (obj).clone();
  
                         // la position / taille / orientation

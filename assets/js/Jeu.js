@@ -7,11 +7,33 @@ class Jeu{
         // demander le pseudo du joueur pour l'enregistrement des scores
 
         function onclick(event) {
-        function onClick(event){
 
+            if(this.echiquier.Nbtour%2 == this.couleur){//si son tour
+                if(this.echiquier.select === {x:-1, y:-1}){ //Récup case de la piece pour dmd playable
+                    let intersectPiece = this.rendu.getClickModels(event, this.rendu.pieces);
+                    if(intersectPiece.length){
+                        let Coo = this.rendu.getCooSelected(intersectPiece[0]);
+                        if(this.echiquier.board[Coo.x][Coo.y].piece != 0) {
+                            socket.emit('playable', this.echiquier.board[Coo.x][Coo.y].piece);
+                        }
+                    }
+                }else { // Retirer playable et lancer move si sur case playable
+                    let intersectCase = this.rendu.getClickModels(event, this.rendu.playableCases);
+                    if(intersectCase.length){
+                        let Coo = this.rendu.getCooSelected(intersectCase[0]);
+                        if(this.echiquier.board[Coo.x][Coo.y].playable) {
+                            socket.emit('move', {piece:this.echiquier.board[this.echiquier.select.x][this.echiquier.select.y].piece, 
+                                                 x:Coo.x, 
+                                                 y:Coo.y});
+                        }
+                    }
+                    else this.echiquier.select = {x:-1, y:-1}
+                    this.rendu.removeObjects(this.rendu.playableCases); 
+                }
+            }
         }
 
-        this.play = false;
+        this.play = false; // retirer ??????????????????????
     
 
         //connection server
@@ -26,13 +48,8 @@ class Jeu{
 
         //Coté UI:
             // indiquer l'attente d'un autre joueur
-
-        //Coté ThreeJs
-            this.rendu = new RenduThreeJs();
         });
         socket.on('start', (plateau) => {
-
-
             console.log('Event - start')
             console.log(plateau)
 
@@ -43,11 +60,6 @@ class Jeu{
             console.log(this.echiquier)
 
         //Coté ThreeJS
-            while(this.rendu.models.length != 6);
-            
-            this.Rendu.loadBoardPieces(this.echiquier.board);
-            document.body.lastChild.addEventListener("click", onClick, false);
-
             // Lancer le rendu graphique
 
         //Coté UI
@@ -57,13 +69,11 @@ class Jeu{
             //  TEST RENDU THREEJS
             let Rendu = this.rendu;
 
-            //  TEST RENDU THREEJS
-            this.rendu = new RenduThreeJs(this.echiquier.board);
             let loadCheck = setInterval(function() {
                 if (Rendu.pieces.length>=6) {
                     clearInterval(loadCheck);
                     console.log('check')
-                    //Rendu.LoadBoardPieces(plateau.board);
+                    Rendu.loadBoardPieces(plateau.board);
                     //addeventlistener
                 }
             }, 250); // interval set at 0.25 seconds
@@ -141,7 +151,7 @@ class Jeu{
             // puis au click :
             //  rediriger vers menu
         });
-        /*socket.on('menu', () => {
+        socket.on('menu', () => {
             console.log('Redirection vers le menu')
             //window.location.href = "/menu"
         });
