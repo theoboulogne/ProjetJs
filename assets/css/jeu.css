@@ -1,36 +1,42 @@
-.affichage_piont_mangé{
+
+body {
+    background-color: black;
+    overflow : hidden;
+  }
+.AquiDejouer{
     height : 40%;
-    width : 20%;
-    position: relative;
+    width : 50%;
+    position: absolute;
     z-index: 1;
     height: 0;
     margin-bottom: 0;
     margin-top: 0;
+    margin-left: 37%;
 }
-.affichage_couts{
+.affichage_coups{
     height : 40%;
     width : 20%;
-    position: relative;
+    position: absolute;
     z-index: 2;
     height: 0;
     margin-bottom: 0;
     margin-top: 0;
     margin-left: 80%;
 }
-.couts_blanc{
+.coups_blanc{
     height : 40%;
     width : 50%;
-    position: relative;
+    position: absolute;
     z-index: 2;
     height: 0;
     margin-bottom: 0;
     margin-top: 0;
     margin-left: 0%;
 }
-.couts_noir{
+.coups_noir{
     height : 40%;
     width : 50%;
-    position: relative;
+    position: absolute;
     z-index: 2;
     height: 0;
     margin-bottom: 0;
