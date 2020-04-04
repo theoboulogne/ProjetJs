@@ -6,8 +6,45 @@ class Jeu{
         //Dans le menu :
         // demander le pseudo du joueur pour l'enregistrement des scores
 
+        function onClick(event) {
+            console.log('onClick')
+            if(Game.echiquier.Nbtour%2 == Game.couleur){//si son tour
+                console.log('Bon-Tour')
+                console.log(Game.echiquier)
+                if(Game.echiquier.select.x == -1 &&  Game.echiquier.select.y == -1){ //Récup case de la piece pour dmd playable
+                    console.log('Playable')
+                    let intersectPiece = Game.rendu.getClickModels(event, Game.rendu.pieces);
+                    if(intersectPiece.length){
+                        let Coo = Game.rendu.getCooSelected(intersectPiece[0]);
+                        if(Game.echiquier.board[Coo.x][Coo.y].piece != 0) {
+                            if(Game.echiquier.board[Coo.x][Coo.y].piece.couleur == Game.couleur) {
+                                console.log('Dmd Playable')
+                                socket.emit('playable', Game.echiquier.board[Coo.x][Coo.y].piece);
+                            }
+                        }
+                    }
+                }else { // Retirer playable et lancer move si sur case playable
+                    console.log('disable-playable')
+                    let intersectCase = Game.rendu.getClickModels(event, Game.rendu.playableCases);
+                    if(intersectCase.length){
+                        console.log('dmd-move')
+                        let Coo = Game.rendu.getCooSelected(intersectCase[0]);
+                        if(Game.echiquier.board[Coo.x][Coo.y].playable) {
+                            socket.emit('move', {piece:Game.echiquier.board[Game.echiquier.select.x][Game.echiquier.select.y].piece, 
+                                                 x:Coo.x, 
+                                                 y:Coo.y});
+                        }
+                    }
+                    else Game.echiquier.select = {x:-1, y:-1} 
+                        // reset coté client pour prochain click
+                    Game.rendu.removeObjects(Game.rendu.playableCases); 
+                }
+            }
+            console.log('End-onClick')
+        }
 
-        this.play = false;
+
+        let Game = this;
     
 
         //connection server
@@ -16,44 +53,37 @@ class Jeu{
             console.log('Event - repconnection')
 
         //Coté Gestion du jeu
-            this.couleur = couleur;
+            Game.couleur = couleur;
+
+            //On retire le renderer du DOM pour reset proprement en cas de reset du serveur
+            if(Game.rendu != undefined) document.body.removeChild(document.body.lastChild)
+            Game.rendu = new RenduThreeJs(); // prendre la couleur en entrée pour définir la caméra ?
+                                             // la déplacer au moment du start ?
 
         //Coté UI:
             // indiquer l'attente d'un autre joueur
         });
         socket.on('start', (plateau) => {
             console.log('Event - start')
-            console.log(plateau)
-
         //Coté Gestion du Jeu
-            this.play = true; // on lance le jeu (retirer si non utilisé)
-            this.echiquier = plateau;
-
-            console.log(this.echiquier)
-
-        //Coté ThreeJS
-            // Lancer le rendu graphique
+            Game.echiquier = plateau;
 
         //Coté UI
             // Lancer l'affichage de l'UI
 
 
-
-            //  TEST RENDU THREEJS
-            let tmpl = []
-            for(let i=0; i<8; i++){
-                for(let j=0; j<8; j++){
-                    if(this.echiquier.board[i][j].piece!=0){
-                        tmpl.push(this.echiquier.board[i][j].piece)
-                    }
+        //Coté ThreeJS          -   DEPLACER LE CHECK COTE CHESSSCRIPT
+            let i, check;
+            let loadCheck = setInterval(function() {
+                check = true;
+                for(i=0; i<Game.rendu.models.length; i++) if(Game.rendu.models[i].obj == undefined) check = false;
+                if (check) {
+                    clearInterval(loadCheck);
+                    Game.rendu.loadBoardPieces(Game.echiquier.board);
+                    document.body.lastChild.addEventListener("click", onClick, false);
+                    //addeventlistener
                 }
-            }
-            let tmpRendu = []
-            for(let i=0; i<tmpl.length;i++){
-                tmpRendu.push({name:tmpl[i].nom, couleur:tmpl[i].couleur, x:tmpl[i].x, y:tmpl[i].y})
-            }
-            console.log(tmpRendu[0])
-            this.rendu = new RenduThreeJs(tmpRendu);
+            }, 250); // interval set at 0.25 seconds
             
 
 
@@ -61,37 +91,39 @@ class Jeu{
         socket.on('playable', (plateau) => {
             console.log('Event - playable')
 
-            this.echiquier = plateau;
+            Game.echiquier = plateau;
 
         //Coté threejs :
-            // Afficher les couts jouable (autre couleur ?) + piece selectionnée
+            // Afficher les couts jouable (autre couleur ?) +  !!!!!!!!! piece selectionnée !!!!!!!!!
+            if(Game.echiquier.select.x != -1) Game.rendu.setPlayables(Game.echiquier.board, Game.couleur)
 
         //Coté Gestion du jeu
             // implémenter l'utilisation de selected pour envoyer move ou playable au click en fonction
             
-            
-            //si pas de playable trouver un moyen de reset selected dans plateau (coté serveur ou client ?)
 
         });
         socket.on('move', (plateau,deplacement,piece_prise) => { // piece et deplacer en x,y
             console.log('Event - move')
 
-            this.echiquier = plateau;
+            Game.echiquier = plateau;
 
         //Coté threejs :
-            //suppr les playable, deplacer la pièce et retirer la pièce prise en simultané
+            Game.rendu.movePiece(deplacement)
+            //deplacer la pièce et retirer la pièce prise en simultané
 
         //Coté Gestion du jeu (Voir pour intégrer le roque à faire)
 
+        // Vraiment utile ? <------------------------------------------------------------------------------------------
+
             //On supprime la pièce si nécessaire
             if(piece_prise != 0){ 
-                this.echiquier.board[piece_prise.x][piece_prise.y].piece = 0;
-                this.echiquier.Joueurs[piece_prise.couleur].pieces_prises.push(piece_prise);
+                Game.echiquier.board[piece_prise.x][piece_prise.y].piece = 0;
+                Game.echiquier.Joueurs[piece_prise.couleur].pieces_prises.push(piece_prise);
             }
 
             //Déplacement dans le board de la pièce
-            this.echiquier.board[deplacement.x][deplacement.y].piece = this.echiquier.board[deplacement.piece.x][deplacement.piece.y];
-            this.echiquier.board[deplacement.piece.x][deplacement.piece.y] = 0;
+            Game.echiquier.board[deplacement.x][deplacement.y].piece = Game.echiquier.board[deplacement.piece.x][deplacement.piece.y];
+            Game.echiquier.board[deplacement.piece.x][deplacement.piece.y] = 0;
 
             //Changement des Coo de la pièce
             plateau.board[deplacement.x][deplacement.y].piece.x = deplacement.x;
@@ -111,13 +143,16 @@ class Jeu{
             console.log('Event - reset')
             
         //Coté Gestion du jeu
-            this.couleur = couleurReset;
-            this.echiquier = echiquierReset;
+            Game.couleur = couleurReset;
+            Game.echiquier = echiquierReset;
             
         // Coté Threejs
-            // Changer l'affichage en conséquence
+            // Changer l'affichage en conséquence :
+            //Vider le board des pieces + des playables
+            //appeller LoadBoardPieces
 
         //Coté UI
+            //Refresh l'UI
             // montrer une alerte au joueur pour indiquer qu'il y a une erreur ??
         });
         socket.on('endGame', (couleurGagnant) => {
@@ -132,7 +167,7 @@ class Jeu{
         });
         socket.on('menu', () => {
             console.log('Redirection vers le menu')
-            window.location.href = "/menu"
+            window.location.href = "./"
         });
         
     }

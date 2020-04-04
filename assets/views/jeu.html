@@ -1,4 +1,5 @@
 <head>
+    <link rel="stylesheet" href="../css/Jeu.css">
     <style>
         body { margin: 0; }
         canvas { width: 100%; height: 100% }
@@ -6,13 +7,30 @@
 </head>
 <body>
 
-<script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r71/three.min.js"></script>
-<script src="/socket.io/socket.io.js"></script>
+    <div class = "AquiDejouer" id = "AquiDejouer"></div>
+    
+    <div class="affichage_coups" id="affichage_coups">
+        <div class="coups_blanc" >
+            <h2 class="ecriture">coups blanc:</h2>
+            <div id = "coups_blanc">
+            </div>
+        </div> 
+        <div class="coups_noir" >
+            <h2 class="ecriture">coups noir:</h2>
+            <div id = "coups_noir">
+            </div>
+        </div>
+    </div>
+        
+    <script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r71/three.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
 
-<script type="application/javascript" src="../js/Rendu/OBJLoader.js"></script>
-<script type='text/javascript' src='../js/Rendu/tween.js'></script>
-<script type="application/javascript" src="../js/Rendu/ChessScript.js"></script>
+    <script type="application/javascript" src="../js/Rendu/OBJLoader.js"></script>
+    <script type='text/javascript' src='../js/Rendu/tween.js'></script>
+    <script type="application/javascript" src="../js/Rendu/ChessScript.js"></script>
+    
+    <script type="application/javascript" src="../js/Hud/Jeu.js"></script>
 
-<script src="../js/Jeu.js"></script>
+    <script src="../js/Jeu.js"></script>
 
 </body>
