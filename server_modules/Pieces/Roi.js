@@ -69,15 +69,15 @@ class Roi extends Piece{
     roque(plateau){
         let renvoi = [];
         let valeurs = [-4,3];
-        
+       
         let tempX = this.x;
-
+ 
         if(this.deplacements.length == 0){
-            if(plateau.board[this.x - 4][this.y].piece.nom == 'Tour' && plateau.board[this.x - 4][this.y].piece.couleur == this.couleur){
-                if(plateau.board[this.x - 4][this.y].piece.deplacements.length == 0){
+            for (let j = 0; j < valeurs.length; j++){
+                if(plateau.board[this.x + valeurs[j]][this.y].piece.name == 'Tour' && plateau.board[this.x + valeurs[j]][this.y].piece.deplacements.length == 0){
                     let i = 1;
                     while (i < Math.abs(valeurs[j]) && (plateau.board[tempX - i][this.y].piece == 0)){
-                        this.x--;
+                        this.x = this.x + (valeurs[j]/Math.abs(valeurs[j]));
                         if(i < 3){
                             if(this.echec(plateau)){
                                 i = i + Math.abs(valeurs[j]);
@@ -90,15 +90,6 @@ class Roi extends Piece{
                         renvoi.push([this.x + valeurs[j], this.x, this.y]);
                     }
                 }
-            }
-            if(plateau.board[this.x + 3][this.y].piece.constructor.name == 'Tour' && plateau.board[this.x + 3][this.y].piece.couleur == this.couleur){
-                if(plateau.board[this.x + 3][this.y].piece.deplacements.length == 0){
-                    let i = 1;
-                    while (i < 3 && !this.isEnEcheque(this.x + i,y) && (board[this.x + i][this.y].piece == 0)) i++;
-                    if (i == 3){
-                        renvoi.push([this.x + 3, this.x, this.y]);
-                    }
-                 }
             }
         }
         return renvoi;
