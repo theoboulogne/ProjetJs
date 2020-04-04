@@ -9,10 +9,9 @@ class Piece{
 
         //Coté serveur
         this.deplacements = new Array()
-        let deplacement = Object() // classe coo a faire ?
-        deplacement.x = x;
-        deplacement.y = y;
-        this.deplacements.push(deplacement)
+        this.deplacements.push({x:x,
+                                y:y,
+                                })
     }
     // méthode générale
     move(x,y, plateau){ //toujours forcer playable avant move..

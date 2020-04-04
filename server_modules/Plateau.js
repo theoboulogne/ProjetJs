@@ -74,8 +74,6 @@ class Plateau{
             }
             if(!this.check_echec(x,y,piece)) this.board[x][y].playable = true; // erreur a afficher sinon ? (ex:en rouge au lieu de vert)
         }
-        
-        
     }
 
 
