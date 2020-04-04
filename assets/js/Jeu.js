@@ -72,7 +72,7 @@ class Jeu{
             // Lancer l'affichage de l'UI
 
 
-        //Coté ThreeJS          -   DEPLACER LE CHECK COTE CHESSSCRIPT
+        //Coté ThreeJS          -   DEPLACER LE CHECK COTE CHESSSCRIPT <--------------------------------------------
             let i, check;
             let loadCheck = setInterval(function() {
                 check = true;
@@ -81,12 +81,8 @@ class Jeu{
                     clearInterval(loadCheck);
                     Game.rendu.loadBoardPieces(Game.echiquier.board);
                     document.body.lastChild.addEventListener("click", onClick, false);
-
-                    Game.rendu.moveOut(Game.echiquier.board[3][0].piece);
-
-                    //addeventlistener
                 }
-            }, 250); // interval set at 0.25 seconds
+            }, 250);
             
 
 

@@ -5,6 +5,11 @@ class RenduThreeJs{
         //Initialisation de la scène
         this.scene = new THREE.Scene();
         this.camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight);
+        this.camera.position.x = 3.5;
+        this.camera.rotation.y = ( 50* (Math.PI / 180));
+        this.camera.rotation.z = ( 90* (Math.PI / 180));
+        this.camera.position.z = 3;
+        //this.camera.position.y = 0.5;
         //Ajout du rendu
         let renderer = new THREE.WebGLRenderer();
         renderer.setSize( window.innerWidth, window.innerHeight );
@@ -50,11 +55,6 @@ class RenduThreeJs{
         this.GenerateBoard();
         //Gestion du rendu (lumière+camera+renderFunction)
         this.GenerateLight();
-        this.camera.position.x = 3.5;
-        this.camera.rotation.y = ( 40* (Math.PI / 180));
-        this.camera.rotation.z = ( 90* (Math.PI / 180));
-        this.camera.position.z = 4;
-        this.camera.position.y = 0.5;
 
         function render() {
             requestAnimationFrame( render );
