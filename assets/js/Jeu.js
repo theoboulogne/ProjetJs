@@ -81,6 +81,9 @@ class Jeu{
                     clearInterval(loadCheck);
                     Game.rendu.loadBoardPieces(Game.echiquier.board);
                     document.body.lastChild.addEventListener("click", onClick, false);
+
+                    Game.rendu.moveOut(Game.echiquier.board[3][0].piece);
+
                     //addeventlistener
                 }
             }, 250); // interval set at 0.25 seconds

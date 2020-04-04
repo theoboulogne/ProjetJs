@@ -4,15 +4,16 @@ class RenduThreeJs{
         let Rendu = this;
         //Initialisation de la scène
         this.scene = new THREE.Scene();
-        this.camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.1, 1000 );
+        this.camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight);
         //Ajout du rendu
         let renderer = new THREE.WebGLRenderer();
         renderer.setSize( window.innerWidth, window.innerHeight );
         document.body.appendChild( renderer.domElement );
         
+        // auto game resize
         window.addEventListener( 'resize', function() {
-            var width = window.innerWidth;
-            var height = window.innerHeight;
+            let width = window.innerWidth;
+            let height = window.innerHeight;
             renderer.setSize( width, height );
             Rendu.camera.aspect = width / height;
             Rendu.camera.updateProjectionMatrix();
@@ -20,13 +21,17 @@ class RenduThreeJs{
 
         //Chargement et stockage des modèles réutilisés
         let objLoader = new THREE.OBJLoader();
-            // Cases jouables
+        // Cases jouables
         this.playableCases = [];
         this.vert = new THREE.MeshBasicMaterial( {color: 0x00ff00, opacity: 0.5, transparent: true} )
         this.rouge = new THREE.MeshBasicMaterial( {color: 0xff0000, opacity: 0.5, transparent: true} )
         this.playableCase = new THREE.Mesh( new THREE.BoxGeometry( 0.5, 0.5, 0.02 ), this.vert);
-        //Pièces
+        // Pièces
         this.pieces = [];
+        // Pièces mangés
+        this.piecesOut = [[], []];
+        this.deplacement = [];
+
         this.models = [ // définition des nom de modèles en dur
             {nom:"Pion", obj:undefined},
             {nom:"Fou", obj:undefined},
@@ -40,15 +45,16 @@ class RenduThreeJs{
                 Rendu.models[i].obj = (object);
             });
         }
-            //Board
+
+        //Board
         this.GenerateBoard();
-  
         //Gestion du rendu (lumière+camera+renderFunction)
         this.GenerateLight();
-        this.camera.position.x = 5
-        this.camera.rotation.y = ( 60* (Math.PI / 180))
-        this.camera.rotation.z = ( 90* (Math.PI / 180))
-        this.camera.position.z = 3;
+        this.camera.position.x = 3.5;
+        this.camera.rotation.y = ( 40* (Math.PI / 180));
+        this.camera.rotation.z = ( 90* (Math.PI / 180));
+        this.camera.position.z = 4;
+        this.camera.position.y = 0.5;
 
         function render() {
             requestAnimationFrame( render );
@@ -60,7 +66,6 @@ class RenduThreeJs{
         //Gestion de la détection des clicks (Events)
         this.raycaster = new THREE.Raycaster();
     }
-
 
     //Module a faire avec fonction interne + tile
     Tween(piece, targets, delai) {
@@ -76,7 +81,6 @@ class RenduThreeJs{
 
         return tween;
     };
-
     animatePiece(piece, X, Y) {
         let tweenUp = this.Tween(piece, [{Axis:'z', Offset:1}], 800)
         let tweenMove = this.Tween(piece, [{Axis:'x', Offset:0.5*X}, 
@@ -97,27 +101,49 @@ class RenduThreeJs{
         tweenUp.start();
     }*/
 
+    //entrée : tableau taille 2 avec deplacement dedans
+        //deplacement : piece(x, y, couleur, nom), x, y
+
+
     movePiece(deplacement) {
         let pieceIdx = this.getPiece(deplacement.piece)
         if(pieceIdx>-1){
             this.animatePiece(this.pieces[pieceIdx], deplacement.y-deplacement.piece.y, deplacement.x-deplacement.piece.x);
         }// Gérer la gestion d'erreur !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     }
+    moveOut(piece) {
+        let pieceIdx = this.getPiece(piece)
+        console.log("moveoutdebut");
+        console.log(piece);
+        console.log(pieceIdx);
 
-    getPiece(Coo){
-        for(let i=0, Cootmp; i<this.pieces.length; i++){ // on parcours toutes les pièces pour trouver la bonne à défault d'une meilleure méthode
-            Cootmp = this.getCooObject(this.pieces[i]);
-            if(Cootmp.x==Coo.x && Cootmp.y==Coo.y) return i;
+        if(pieceIdx>-1){
+            let tweenUp = this.Tween(this.pieces[pieceIdx], [{Axis:'z', Offset:3}], 1200); 
+            tweenUp.start();            // on lève la pièce
+
+            let Rendu = this;
+
+            setTimeout(function(){
+                Rendu.removePiece(piece);    // on supprime la piece mangé du plateau
+                Rendu.LoadPieceOut(piece);   // on la recharge dans la scene
+                let tweenDown = Rendu.Tween(Rendu.piecesOut[piece.couleur][Rendu.piecesOut[piece.couleur].length-1], [{Axis:'z', Offset:-3}],1200);
+                tweenDown.start();           // on la fait redescendre sur le coté du plateau*/
+            }, 1200);
         }
-        return -1;
     }
-
+    moveRoque(deplacement) {
+        // ROI
+        this.movePiece(deplacement[0].x, deplacement[0].y);
+        // TOUR
+        let tweenMove = this.Tween(piece, [{Axis:'x', Offset:0.5*this.deplacement[1].x}], 300*Math.max(Math.abs(X),Math.abs(Y))) // calcul delai en fonction distance ?
+        tweenMove.start();           // on la fait redescendre sur le coté du plateau*/
+    }
     removeObjects(array) {
         for (let i = 0; i < array.length; i++) this.removeObject(array[i])
         array.length = 0;
     }
     removePiece(Coo){
-        let idx = getPiece(Coo);
+        let idx = this.getPiece(Coo);
         if(idx!=-1){
             this.removeObject(this.pieces[idx]);
             this.pieces.splice(idx, 1);
@@ -148,13 +174,19 @@ class RenduThreeJs{
     };
 
     //Module avec arrowFunction a faire
+    getPiece(Coo){
+        for(let i=0, Cootmp; i<this.pieces.length; i++){ // on parcours toutes les pièces pour trouver la bonne à défault d'une meilleure méthode
+            Cootmp = this.getCooObject(this.pieces[i]);
+            if(Cootmp.x==Coo.x && Cootmp.y==Coo.y) return i;
+        }
+        return -1;
+    }
     getCooObject(Objet){
         return this.getCoo(Objet.position);
     }
     getCooSelected(selectedObject){
         return this.getCoo(selectedObject.point);
     }
-
     getCoo(position){
         let Coo = new THREE.Vector2();
         Coo.x = Math.trunc(2*(position.y + 2)); // Calcul coo
@@ -212,11 +244,11 @@ class RenduThreeJs{
     }
     
     getBoardPieces(board){
-        let tmpPieces = []
+        let tmpPieces = [];
         for(let i=0; i<8; i++){
             for(let j=0; j<8; j++){
                 if(board[i][j].piece!=0){
-                    tmpPieces.push(board[i][j].piece)
+                    tmpPieces.push(board[i][j].piece);
                 }
             }
         }
@@ -253,6 +285,32 @@ class RenduThreeJs{
                 }
             }
         }
+    }
+
+    LoadPieceOut(piece){
+        let idx = -1;
+        for(let i=0; i<this.models.length; i++) if(this.models[i].nom == piece.nom) idx = i;
+
+        let obj = (this.models[idx].obj).clone()
+        obj.traverse( function ( child ) {
+            if (child instanceof THREE.Mesh) {
+                // on définit la couleur
+                if(piece.couleur) child.material = new THREE.MeshLambertMaterial({color: 0x555555});
+                else child.material = new THREE.MeshLambertMaterial({color: 0xFFFFFF});
+            }
+        });
+
+        // add tableau
+        this.piecesOut[piece.couleur].push(obj);
+        if (piece.couleur) obj.position.set( 3+this.piecesOut.indexOf(obj), -2.3, 3);   // z hors champs de caméra
+        else obj.position.set( 3+this.piecesOut.indexOf(obj), 2.3, 3);                  // z hors champs de caméra
+
+        // taille / orientation
+        obj.scale.set(.015, .015, .015);
+        obj.rotation.x = 1.57;
+
+        // on l'affiche
+        this.scene.add(obj);
     }
 }
 
