@@ -6,7 +6,6 @@ class Tour extends Piece{
     }
     
     playable(plateau) {
-        plateau.reset_playable();
         let scan = [[-1,0],[1,0],[0,-1],[0,1]];
         for (let j=0; j<scan.length; j++){
             let i=1;

@@ -7,21 +7,20 @@ class Jeu{
         // demander le pseudo du joueur pour l'enregistrement des scores
 
         function onClick(event) {
-            console.log('click')
+            console.log('onClick')
             if(Game.echiquier.Nbtour%2 == Game.couleur){//si son tour
-                console.log('bon-tour')
+                console.log('Bon-Tour')
                 console.log(Game.echiquier)
                 if(Game.echiquier.select.x == -1 &&  Game.echiquier.select.y == -1){ //Récup case de la piece pour dmd playable
-                    console.log('dmd-playable')
+                    console.log('Playable')
                     let intersectPiece = Game.rendu.getClickModels(event, Game.rendu.pieces);
                     if(intersectPiece.length){
                         let Coo = Game.rendu.getCooSelected(intersectPiece[0]);
                         if(Game.echiquier.board[Coo.x][Coo.y].piece != 0) {
-                            console.log('emit playable')
-                            console.log(Game)
-                            console.log(Coo)
-                            console.log(Game.echiquier.board[Coo.x][Coo.y].piece)
-                            socket.emit('playable', Game.echiquier.board[Coo.x][Coo.y].piece);
+                            if(Game.echiquier.board[Coo.x][Coo.y].piece.couleur == Game.couleur) {
+                                console.log('Dmd Playable')
+                                socket.emit('playable', Game.echiquier.board[Coo.x][Coo.y].piece);
+                            }
                         }
                     }
                 }else { // Retirer playable et lancer move si sur case playable
@@ -36,11 +35,12 @@ class Jeu{
                                                  y:Coo.y});
                         }
                     }
-                    else Game.echiquier.select = {x:-1, y:-1}
+                    else Game.echiquier.select = {x:-1, y:-1} 
+                        // reset coté client pour prochain click
                     Game.rendu.removeObjects(Game.rendu.playableCases); 
                 }
             }
-            console.log('end-click')
+            console.log('End-onClick')
         }
 
 
@@ -53,8 +53,11 @@ class Jeu{
             console.log('Event - repconnection')
 
         //Coté Gestion du jeu
-            this.couleur = couleur;
-            this.rendu = new RenduThreeJs(); // prendre la couleur en entrée pour définir la caméra ?
+            Game.couleur = couleur;
+
+            //On retire le renderer du DOM pour reset proprement en cas de reset du serveur
+            if(Game.rendu != undefined) document.body.removeChild(document.body.lastChild)
+            Game.rendu = new RenduThreeJs(); // prendre la couleur en entrée pour définir la caméra ?
                                              // la déplacer au moment du start ?
 
         //Coté UI:
@@ -63,16 +66,13 @@ class Jeu{
         socket.on('start', (plateau) => {
             console.log('Event - start')
         //Coté Gestion du Jeu
-            this.echiquier = plateau;
-
-        //Coté ThreeJS
-            // Lancer le rendu graphique
+            Game.echiquier = plateau;
 
         //Coté UI
             // Lancer l'affichage de l'UI
 
 
-            //  TEST RENDU THREEJS
+        //Coté ThreeJS          -   DEPLACER LE CHECK COTE CHESSSCRIPT
             let i, check;
             let loadCheck = setInterval(function() {
                 check = true;
@@ -91,14 +91,13 @@ class Jeu{
         socket.on('playable', (plateau) => {
             console.log('Event - playable')
 
-            this.echiquier = plateau;
-            console.log(this.echiquier)
+            Game.echiquier = plateau;
 
         //Coté threejs :
             // Afficher les couts jouable (autre couleur ?) +  !!!!!!!!! piece selectionnée !!!!!!!!!
+            if(Game.echiquier.select.x != -1) Game.rendu.setPlayables(Game.echiquier.board, Game.couleur)
 
         //Coté Gestion du jeu
-            if(Game.echiquier.select.x != -1) Game.rendu.setPlayables(Game.echiquier.board, Game.couleur)
             // implémenter l'utilisation de selected pour envoyer move ou playable au click en fonction
             
 
@@ -106,7 +105,7 @@ class Jeu{
         socket.on('move', (plateau,deplacement,piece_prise) => { // piece et deplacer en x,y
             console.log('Event - move')
 
-            this.echiquier = plateau;
+            Game.echiquier = plateau;
 
         //Coté threejs :
             //deplacer la pièce et retirer la pièce prise en simultané
@@ -115,13 +114,13 @@ class Jeu{
 
             //On supprime la pièce si nécessaire
             if(piece_prise != 0){ 
-                this.echiquier.board[piece_prise.x][piece_prise.y].piece = 0;
-                this.echiquier.Joueurs[piece_prise.couleur].pieces_prises.push(piece_prise);
+                Game.echiquier.board[piece_prise.x][piece_prise.y].piece = 0;
+                Game.echiquier.Joueurs[piece_prise.couleur].pieces_prises.push(piece_prise);
             }
 
             //Déplacement dans le board de la pièce
-            this.echiquier.board[deplacement.x][deplacement.y].piece = this.echiquier.board[deplacement.piece.x][deplacement.piece.y];
-            this.echiquier.board[deplacement.piece.x][deplacement.piece.y] = 0;
+            Game.echiquier.board[deplacement.x][deplacement.y].piece = Game.echiquier.board[deplacement.piece.x][deplacement.piece.y];
+            Game.echiquier.board[deplacement.piece.x][deplacement.piece.y] = 0;
 
             //Changement des Coo de la pièce
             plateau.board[deplacement.x][deplacement.y].piece.x = deplacement.x;
@@ -141,13 +140,16 @@ class Jeu{
             console.log('Event - reset')
             
         //Coté Gestion du jeu
-            this.couleur = couleurReset;
-            this.echiquier = echiquierReset;
+            Game.couleur = couleurReset;
+            Game.echiquier = echiquierReset;
             
         // Coté Threejs
-            // Changer l'affichage en conséquence
+            // Changer l'affichage en conséquence :
+            //Vider le board des pieces + des playables
+            //appeller LoadBoardPieces
 
         //Coté UI
+            //Refresh l'UI
             // montrer une alerte au joueur pour indiquer qu'il y a une erreur ??
         });
         socket.on('endGame', (couleurGagnant) => {
