@@ -1,205 +1,257 @@
 class RenduThreeJs{
-    constructor(Pieces){
-        var scene = new THREE.Scene();
-        var camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.1, 1000 );
- 
-        var renderer = new THREE.WebGLRenderer();
+    constructor(){
+        //Pour appel du raycast des variables
+        let Rendu = this;
+        //Initialisation de la scène
+        this.scene = new THREE.Scene();
+        this.camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.1, 1000 );
+        //Ajout du rendu
+        let renderer = new THREE.WebGLRenderer();
         renderer.setSize( window.innerWidth, window.innerHeight );
         document.body.appendChild( renderer.domElement );
- 
-        var objLoader = new THREE.OBJLoader();
- 
-        var tile = {
-            height: .25,
-            width: .25,
-            center: .125,
-            translate: .475
-        };
- 
-        var models = [
-            {name: "Pion"},
-            {name: "Fou"},
-            {name: "Cavalier"},
-            {name: "Tour"},
-            {name: "Reine"},
-            {name: "Roi"},
-        ];
-        var pieces = [];
-        console.log(Pieces)
-        //loadPieces(Pieces);
- 
-        var test;
-        for(let k=0; k<2; k++){
-            for(let i=0; i<models.length; i++){
-                objLoader.load("../models/" + models[i].name + ".obj", function(object) {
-                    object.traverse( function ( child ) {
-                        if (child instanceof THREE.Mesh) {
-                            // on définit la couleur
-                            if(k) child.material = new THREE.MeshLambertMaterial({color: 0x555555});
-                            else child.material = new THREE.MeshLambertMaterial({color: 0xFFFFFF});
-                        }
-                    });
-
-                    let ATraiter = []
-                    for(let j=0; j<Pieces.length; j++){
-                        if(Pieces[j].name == models[i].name && Pieces[j].couleur == k) ATraiter.push(Pieces[j]); // push les indices pour réduire les couts ?
-                    }
-
-                    for(let j=0; j<ATraiter.length; j++){
-                        let tmpobj = object.clone();
-
-                        // la position / taille / orientation
-                        tmpobj.position.set(-1.75 + (0.5 * ATraiter[j].y),-1.75 + (0.5 * ATraiter[j].x),0); // -1.2 -> -0.7 -> -0.25 -> 0.2 -> 0.65 | -1.62 -> -1.15 -> -0.7 -> -0.24 -> 0.23
-                        tmpobj.scale.set(.025, .025, .025);
-                        //$$tmpobj.rotation.z = -.1;
-                        tmpobj.rotation.x = 1.6;
-                        //tmpobj.rotation.y = 1.7;
-
-                        //On enregistre pour la détection de click
-                        pieces.push(tmpobj);
-                        //Puis on l'affiche
-                        scene.add(tmpobj);
-                    }
-                });
-            }
-        }
- 
         
-        var boardTexture = new THREE.ImageUtils.loadTexture("../../textures/board-pattern.png");
-        boardTexture.repeat.set(4,4);
-        boardTexture.wrapS = THREE.RepeatWrapping;
-        boardTexture.wrapT = THREE.RepeatWrapping;
- 
-        var boardMaterials = [
- 
-            new THREE.MeshLambertMaterial({color: 0x555555}),
-            new THREE.MeshLambertMaterial({color: 0x555555}),
-            new THREE.MeshLambertMaterial({color: 0x555555}),
-            new THREE.MeshLambertMaterial({color: 0x555555}),
-            new THREE.MeshLambertMaterial({ map: boardTexture }),
-            new THREE.MeshLambertMaterial({color: 0x555555})
- 
+        window.addEventListener( 'resize', function() {
+            var width = window.innerWidth;
+            var height = window.innerHeight;
+            renderer.setSize( width, height );
+            Rendu.camera.aspect = width / height;
+            Rendu.camera.updateProjectionMatrix();
+        });
+
+        //Chargement et stockage des modèles réutilisés
+        let objLoader = new THREE.OBJLoader();
+            // Cases jouables
+        this.playableCases = [];
+        this.vert = new THREE.MeshBasicMaterial( {color: 0x00ff00, opacity: 0.5, transparent: true} )
+        this.rouge = new THREE.MeshBasicMaterial( {color: 0xff0000, opacity: 0.5, transparent: true} )
+        this.playableCase = new THREE.Mesh( new THREE.BoxGeometry( 0.5, 0.5, 0.02 ), this.vert);
+        //Pièces
+        this.pieces = [];
+        this.models = [ // définition des nom de modèles en dur
+            {nom:"Pion", obj:undefined},
+            {nom:"Fou", obj:undefined},
+            {nom:"Cavalier", obj:undefined},
+            {nom:"Tour", obj:undefined},
+            {nom:"Reine", obj:undefined},
+            {nom:"Roi", obj:undefined}
         ];
- 
-        var geometry = new THREE.BoxGeometry( 4, 4, 0.01);
-        var board = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial(boardMaterials) );
-        scene.add( board );
- 
-        var light = new THREE.AmbientLight( 0x555555 ); // soft white light
-        scene.add( light );
- 
-        var spotLight = new THREE.SpotLight( 0xffffff );
-        spotLight.position.set( 50, 100, 50 );
- 
-        spotLight.castShadow = true;
- 
-        spotLight.shadowMapWidth = 1024;
-        spotLight.shadowMapHeight = 1024;
- 
-        spotLight.shadowCameraNear = 500;
-        spotLight.shadowCameraFar = 4000;
-        spotLight.shadowCameraFov = 30;
- 
-        scene.add( spotLight );
- 
- 
-        camera.position.x = 5
-        camera.rotation.y = ( 60* (Math.PI / 180))
-        camera.rotation.z = ( 90* (Math.PI / 180))
-        camera.position.z = 3;
- 
-        function roundDecimal(nombre, precision){
-            var precision = precision || 2;
-            var tmp = Math.pow(10, precision);
-            return Math.round( nombre*tmp )/tmp;
+        for(let i=0; i<this.models.length; i++){
+            objLoader.load("../models/" + this.models[i].nom + ".obj", function(object) {
+                Rendu.models[i].obj = (object);
+            });
         }
+            //Board
+        this.GenerateBoard();
+  
+        //Gestion du rendu (lumière+camera+renderFunction)
+        this.GenerateLight();
+        this.camera.position.x = 5
+        this.camera.rotation.y = ( 60* (Math.PI / 180))
+        this.camera.rotation.z = ( 90* (Math.PI / 180))
+        this.camera.position.z = 3;
 
         function render() {
             requestAnimationFrame( render );
             TWEEN.update();
-            renderer.render( scene, camera );
+            renderer.render( Rendu.scene, Rendu.camera );
         }
         render();
-    
-        renderer.domElement.addEventListener("click", onclick, false);
-        var selectedObject;
-        var raycaster = new THREE.Raycaster();
- 
-        function onclick(event) {
-            var mouse = new THREE.Vector2();
-            mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-            mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+        
+        //Gestion de la détection des clicks (Events)
+        this.raycaster = new THREE.Raycaster();
+    }
 
-            raycaster.setFromCamera(mouse, camera);
-            var intersects = raycaster.intersectObjects(pieces, true); //array
-            if (intersects.length > 0) {
-                selectedObject = intersects[0]; // 40 * le déplacement,
-                                                // z correspond à x, x -> y, y -> z
-                                                
-                animatePiece(selectedObject.object, 140, 0);
-                
-                let X = Math.trunc(2*(selectedObject.point.x + 2));
-                let Y = Math.trunc(2*(selectedObject.point.y + 2));
 
-                console.log(" ");
-                console.log("X");
-                console.log(X);
-                console.log("Y");
-                console.log(Y);
+    //Module a faire avec fonction interne + tile
+    Tween(piece, targets, delai) {
+        console.log('Piece Tween')
+        let position = piece.position;
+        let target = new Object;
+        for(let i=0; i<targets.length; i++) target[targets[i].Axis] = position[targets[i].Axis] + targets[i].Offset;
+        let tween = new TWEEN.Tween(piece.position).to(target, delai);
+
+        tween.onUpdate(function() { // fonction d'update (lié à la cible)
+            for(let i=0; i<targets.length; i++) piece.position[targets[i].Axis] = position[targets[i].Axis];
+        });
+
+        return tween;
+    };
+
+    animatePiece(piece, X, Y) {
+        let tweenUp = this.Tween(piece, [{Axis:'z', Offset:1}], 800)
+        let tweenMove = this.Tween(piece, [{Axis:'x', Offset:0.5*X}, 
+                                           {Axis:'y', Offset:0.5*Y}], 300*Math.max(Math.abs(X),Math.abs(Y))) // calcul delai en fonction distance ?
+        let tweenDown = this.Tween(piece, [{Axis:'z', Offset:0}], 800)
+        tweenUp.chain(tweenMove);
+        tweenMove.chain(tweenDown);
+        tweenUp.start();
+    }
+
+    /*animateSelectedPiece(piece, X, Y) {
+        let tweenUp = this.Tween(piece, [{Axis:'y', Offset:40}], 1000)
+        let tweenMove = this.Tween(piece, [{Axis:'x', Offset:20*X}, 
+                                            {Axis:'z', Offset:20*Y}], 3000) // calcul delai en fonction distance ?
+        let tweenDown = this.Tween(piece, [{Axis:'y', Offset:0}], 1000)
+        tweenUp.chain(tweenMove);
+        tweenMove.chain(tweenDown);
+        tweenUp.start();
+    }*/
+
+    movePiece(deplacement) {
+        let pieceIdx = this.getPiece(deplacement.piece)
+        if(pieceIdx>-1){
+            this.animatePiece(this.pieces[pieceIdx], deplacement.y-deplacement.piece.y, deplacement.x-deplacement.piece.x);
+        }// Gérer la gestion d'erreur !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    }
+
+    getPiece(Coo){
+        for(let i=0, Cootmp; i<this.pieces.length; i++){ // on parcours toutes les pièces pour trouver la bonne à défault d'une meilleure méthode
+            Cootmp = this.getCooObject(this.pieces[i]);
+            if(Cootmp.x==Coo.x && Cootmp.y==Coo.y) return i;
+        }
+        return -1;
+    }
+
+    removeObjects(array) {
+        for (let i = 0; i < array.length; i++) this.removeObject(array[i])
+        array.length = 0;
+    }
+    removePiece(Coo){
+        let idx = getPiece(Coo);
+        if(idx!=-1){
+            this.removeObject(this.pieces[idx]);
+            this.pieces.splice(idx, 1);
+        }
+    }
+    removeObject(piece) {
+        this.scene.remove(piece);
+    }
+
+    setPlayable(X, Y, playableType) {
+        let tmpPlayableCase = this.playableCase.clone();
+        if (playableType) { tmpPlayableCase.material = this.vert/*.color.setHex(0x00ff00);*/ }
+        else { tmpPlayableCase.material = this.rouge/*.color.setHex(0xff0000);*/ }
+        tmpPlayableCase.position.set( (Y-4)/2 + 0.25, (X-4)/2 + 0.25, 0 );
+        this.playableCases.push(tmpPlayableCase) // on enregistre pour pouvoir les retirer
+        this.scene.add( tmpPlayableCase );
+    };
+    //Suppr playables a deplacer
+
+    setPlayables(board, couleur) {
+        for (let i = 0; i < board.length; i++) {
+            for (let j = 0; j < board.length; j++) {
+                if (board[i][j].playable) {
+                    this.setPlayable(i,j,(board[i][j].piece == 0));
+                }
             }
         }
-       
-        var TweenUp = function(piece) {
-            console.log('piece up')
-            var position = piece.position;
-            var target = {y: position.y + 40};
-            var tween = new TWEEN.Tween(piece.position).to(target, 1000);
+    };
+
+    //Module avec arrowFunction a faire
+    getCooObject(Objet){
+        return this.getCoo(Objet.position);
+    }
+    getCooSelected(selectedObject){
+        return this.getCoo(selectedObject.point);
+    }
+
+    getCoo(position){
+        let Coo = new THREE.Vector2();
+        Coo.x = Math.trunc(2*(position.y + 2)); // Calcul coo
+        Coo.y = Math.trunc(2*(position.x + 2));
+        return Coo;
+    }
+
+    getClickModels(event, TabModels) {
+        let mouse = new THREE.Vector2();
+        mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+        mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+        this.raycaster.setFromCamera(mouse, this.camera);
+        return this.raycaster.intersectObjects(TabModels, true); //array avec objets
+    }
+
+    GenerateBoard(){
+        let boardTexture = new THREE.ImageUtils.loadTexture("../../textures/board-pattern.png");
+        boardTexture.repeat.set(4,4);
+        boardTexture.wrapS = THREE.RepeatWrapping;
+        boardTexture.wrapT = THREE.RepeatWrapping;
+        let board = new THREE.Mesh(
+            new THREE.BoxGeometry( 4, 4, 0.01),
+            new THREE.MeshFaceMaterial([
+                new THREE.MeshLambertMaterial({color: 0x555555}),
+                new THREE.MeshLambertMaterial({color: 0x555555}),
+                new THREE.MeshLambertMaterial({color: 0x555555}),
+                new THREE.MeshLambertMaterial({color: 0x555555}),
+                new THREE.MeshLambertMaterial({ map: boardTexture }),
+                new THREE.MeshLambertMaterial({color: 0x555555})
+            ])
+        );
+        this.scene.add( board );
+    }
+
+    GenerateLight(){
+        let light = new THREE.AmbientLight( 0x555555 ); // soft white light
+        this.scene.add( light );
  
-            tween.onUpdate(function() {
-                piece.position.y = position.y;
-            });
+        let spotLight = new THREE.SpotLight( 0xffffff );
+        spotLight.position.set( 50, 100, 50 );
+        spotLight.castShadow = true;
+        spotLight.shadowMapWidth = 1024;
+        spotLight.shadowMapHeight = 1024;
+        spotLight.shadowCameraNear = 500;
+        spotLight.shadowCameraFar = 4000;
+        spotLight.shadowCameraFov = 30;
+        this.scene.add( spotLight );
+    }
+
+
+    loadBoardPieces(board){
+        
+        this.LoadPieces(this.getBoardPieces(board))
+    }
+    
+    getBoardPieces(board){
+        let tmpPieces = []
+        for(let i=0; i<8; i++){
+            for(let j=0; j<8; j++){
+                if(board[i][j].piece!=0){
+                    tmpPieces.push(board[i][j].piece)
+                }
+            }
+        }
+        return tmpPieces
+    }
+
+    LoadPieces(Pieces){
+        for(let i=0; i<this.models.length; i++){
+            for(let couleur=0; couleur<2; couleur++){
+                let obj = (this.models[i].obj).clone()
+                obj.traverse( function ( child ) {
+                    if (child instanceof THREE.Mesh) {
+                        // on définit la couleur
+                        if(couleur) child.material = new THREE.MeshLambertMaterial({color: 0x555555});
+                        else child.material = new THREE.MeshLambertMaterial({color: 0xFFFFFF});
+                    }
+                });
  
-            return tween;
-        };
+                for(let j=0; j<Pieces.length; j++){
+                    if(Pieces[j].nom == this.models[i].nom && Pieces[j].couleur == couleur) {
+                        let tmpobj = (obj).clone();
  
-        var TweenDown = function(piece) {
-            console.log('piece down')
-            var position = piece.position;
-            var target = {y: position.y};
-            var tween = new TWEEN.Tween(piece.position).to(target, 1000);
-            tween.onUpdate(function() {
-                piece.position.y = position.y;
-            });
-            return tween;
-        };
+                        // la position / taille / orientation
+                        tmpobj.position.set(-1.75 + (0.5 * Pieces[j].y),-1.75 + (0.5 * Pieces[j].x),0);
+                        tmpobj.scale.set(.025, .025, .025);
+                        tmpobj.rotation.x = 1.57;
  
-        var TweenSpacesUp = function(piece, spaces) {
-            var position = piece.position;
-            var target = {y: position.y + tile.translate*spaces};
-            var tween = new TWEEN.Tween(piece.position).to(target, 3000);
-            tween.onUpdate(function() {
-                piece.position.y = position.y;
-            });
-            return tween;
-        };
-        var TweenSpacesDiagonal = function(piece, spacesX, spacesZ) {
-            var position = piece.position;
-            var target = {z: position.z + tile.translate*spacesZ, x: position.x +tile.translate*spacesX};
-            var tween = new TWEEN.Tween(piece.position).to(target, 3000);
-            tween.onUpdate(function() {
-                piece.position.z = position.z;
-                piece.position.x = position.x;
-            });
-            return tween;
-        };
+                        //On enregistre pour la détection de click
+                        this.pieces.push(tmpobj);
+                        //Puis on l'affiche
+                        this.scene.add(tmpobj);
+                    }
  
-        function animatePiece(piece, X, Y) {
-            var tweenUp = TweenUp(piece);
-            var tweenOneUp = TweenSpacesDiagonal(piece, X, Y);
-            var tweenDown = TweenDown(piece);
-            tweenUp.chain(tweenOneUp);
-            tweenOneUp.chain(tweenDown);
-            tweenUp.start();
+                }
+            }
         }
     }
 }
