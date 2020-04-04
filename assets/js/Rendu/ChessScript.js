@@ -41,10 +41,8 @@ class RenduThreeJs{
             });
         }
             //Board
-
         this.GenerateBoard();
- 
- 
+  
         //Gestion du rendu (lumière+camera+renderFunction)
         this.GenerateLight();
         this.camera.position.x = 5
@@ -59,18 +57,6 @@ class RenduThreeJs{
         }
         render();
         
-        //Test de case playable, fonction qui prend un board a faire
-
-        
-        this.setPlayable(7,7,0);
-        this.setPlayable(6,6,0);
-        this.setPlayable(5,5,0);
-        this.setPlayable(4,4,0);
-        this.setPlayable(3,3,1);
-        this.setPlayable(2,2,0);
-        this.setPlayable(1,1,0);
-        this.setPlayable(0,0,1);
-
         //Gestion de la détection des clicks (Events)
         this.raycaster = new THREE.Raycaster();
     }
@@ -140,7 +126,7 @@ class RenduThreeJs{
 
     setPlayable(X, Y, playableType) {
         let tmpPlayableCase = this.playableCase.clone();
-        if (!playableType) { tmpPlayableCase.material = this.vert/*.color.setHex(0x00ff00);*/ }
+        if (playableType) { tmpPlayableCase.material = this.vert/*.color.setHex(0x00ff00);*/ }
         else { tmpPlayableCase.material = this.rouge/*.color.setHex(0xff0000);*/ }
         tmpPlayableCase.position.set( (Y-4)/2 + 0.25, (X-4)/2 + 0.25, 0 );
         this.playableCases.push(tmpPlayableCase) // on enregistre pour pouvoir les retirer
@@ -152,7 +138,7 @@ class RenduThreeJs{
         for (let i = 0; i < board.length; i++) {
             for (let j = 0; j < board.length; j++) {
                 if (board[i][j].playable) {
-                    this.setPlayable(i,j,(board[i][j].piece.couleur != couleur));
+                    this.setPlayable(i,j,(board[i][j].piece == 0));
                 }
             }
         }

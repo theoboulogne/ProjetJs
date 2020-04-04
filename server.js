@@ -15,10 +15,10 @@ const Joueur = require('./server_modules/Joueur');
 //Redirection des pages                                 REDIRECTION A CHANGER APRES CREATION DU MENU
 app.use(express.static(__dirname + '/assets/'));
 app.get('/', (req, res, next) => {
-    res.sendFile(__dirname + '/assets/views/jeu.html')
-});
-app.get('/menu', (req, res, next) => {
     res.sendFile(__dirname + '/assets/views/menu.html')
+});
+app.get('/jeu', (req, res, next) => {
+    res.sendFile(__dirname + '/assets/views/jeu.html')
 });
 
 //On enregistre nos plateaux et nos joueurs avec leur socket
