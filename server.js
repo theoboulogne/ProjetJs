@@ -1,7 +1,8 @@
 //Serveur - Echec
 
 //Base de donee
-var mysql = require('mysql');
+
+/*var mysql = require('mysql');
 
 var con = mysql.createConnection({
   host: "localhost:800",
@@ -18,7 +19,7 @@ con.connect(function(err) {
       if (err) throw err;
       console.log("1 record inserted");
     });
-});
+});*/
 
 //Constantes
 
@@ -44,13 +45,6 @@ app.get('/jeu', (req, res, next) => {
 //On enregistre nos plateaux et nos joueurs avec leur socket
 this.echiquiers = new Array();
 let game = this;
-
-connection.connect(function(err) {
-    if(err){
-        console.log(err.code);
-        console.log(err.fatal);
-    }
-});
 
 io.sockets.on('connection',  (socket) =>{
     console.log('Nouvelle Connection Client')
@@ -122,13 +116,13 @@ io.sockets.on('connection',  (socket) =>{
         }
         // si son tour et les bonnes infos alors :
         if ((couleurSocket) == (game.echiquiers[indiceEchiquier].Nbtour%2) &&
-            (deplacement.piece.x == game.echiquiers[indiceEchiquier].select.x) && 
+            (deplacement.piece.x == game.echiquiers[indiceEchiquier].select.x) &&
             (deplacement.piece.y == game.echiquiers[indiceEchiquier].select.y) &&
-            (game.echiquiers[indiceEchiquier].board[deplacement.x][deplacement.y].playable)){    
+            (game.echiquiers[indiceEchiquier].board[deplacement.x][deplacement.y].playable)){
                     
 
             //on clone le plateau pour l'envoyer avant le déplacement afin de l'effectuer graphiquement en front
-            let plateau = (game.echiquiers[indiceEchiquier]).clone(); 
+            let plateau = (game.echiquiers[indiceEchiquier]).clone();
             game.echiquiers[indiceEchiquier].board[deplacement.piece.x][deplacement.piece.y].piece.move(deplacement.x,deplacement.y,game.echiquiers[indiceEchiquier])
             game.echiquiers[indiceEchiquier].select = {x:-1, y:-1};
 

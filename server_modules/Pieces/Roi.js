@@ -64,10 +64,14 @@ class Roi extends Piece{
                 }
             }
         }
+        let roque = this.roquePlayable(plateau);
+        for (let k = 0; k < 2; k++){
+            if (roque[k]) plateau.playable(this.x, this.y + (7*k-4), this);
+        }
     }
 
-    roque(plateau){
-        let renvoi = [];
+    roquePlayable(plateau){
+        let renvoi = [0,0];
         let valeurs = [-4,3];
        
         let tempX = this.x;
@@ -87,7 +91,7 @@ class Roi extends Piece{
                     }
                     this.x = tempX;
                     if (i == Math.abs(valeurs[j])){
-                        renvoi.push([this.x + valeurs[j], this.x, this.y]);
+                        renvoi[j];
                     }
                 }
             }
@@ -95,12 +99,26 @@ class Roi extends Piece{
         return renvoi;
     }
 
-
     move(x,y, plateau){ 
         if(plateau.isInBoard(x,y)){
             if(plateau.board[x][y].playable){
-                plateau.jouer(x, y, this); // appeler méthode du parent ?
+                let diff = y - this.y;
+                if(Math.abs(diff) == 2){
+                    plateau.jouer(x,y,this);
+                    if (diff == -2) plateau.jouer(x,y + 1,plateau.board[this.x][this.y - 4].piece);
+                    else plateau.jouer(x,y - 1,plateau.board[this.x][this.y + 3].piece);
 
+                    plateau.Nbtour--;
+
+                    plateau.couts.splice(couts.length()-2, 2);
+
+                    if(diff == 2)  plateau.couts.push("Petit roque");
+                    else plateau.couts.push("Grand roque");
+                }
+                else{
+                    plateau.jouer(x, y, this); // appeler méthode du parent ?
+
+                }
                 plateau.Joueurs[this.couleur].roi.x = x;
                 plateau.Joueurs[this.couleur].roi.y = y;
             }

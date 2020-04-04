@@ -112,6 +112,13 @@ class Jeu{
             //deplacer la pièce et retirer la pièce prise en simultané
 
         //Coté Gestion du jeu (Voir pour intégrer le roque à faire)
+        let diff = deplacement.y - deplacement.piece.y
+        if(deplacement.piece.name == "Roi" && Math.abs(diff) == 2){
+            let newDeplacement = {  x:deplacement.x,
+                                    y:deplacement.y + diff/Math.abs(diff),
+                                    piece:plateau.board[deplacement.x][deplacement.piece.y + (diff/Math.abs(diff)) * 3.5 - 0.5]
+                                 };
+        }
 
         // Vraiment utile ? <------------------------------------------------------------------------------------------
 
@@ -169,7 +176,6 @@ class Jeu{
             console.log('Redirection vers le menu')
             window.location.href = "./"
         });
-        
     }
 }
 
