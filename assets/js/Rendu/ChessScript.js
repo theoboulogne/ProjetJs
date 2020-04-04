@@ -22,7 +22,7 @@ class RenduThreeJs{
         let objLoader = new THREE.OBJLoader();
             // Cases jouables
         this.playableCases = [];
-        this.playableCase = new THREE.Mesh( new THREE.BoxGeometry( 0.5, 0.5, 0.07 ), 
+        this.playableCase = new THREE.Mesh( new THREE.BoxGeometry( 0.5, 0.5, 0.01 ), 
                                             new THREE.MeshBasicMaterial( {color: 0x00ff00, opacity: 0.7, transparent: true} ) );
         //Pièces
         this.pieces = [];
