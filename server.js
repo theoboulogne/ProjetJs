@@ -108,7 +108,7 @@ io.sockets.on('connection',  (socket) =>{
 
             let piece_prise = 0 //On détecte la pièce prise
             if(game.echiquiers[indiceEchiquier].Joueurs[couleurSocket].pieces_prises.length>0){
-                if(game.echiquiers[indiceEchiquier].Joueurs[couleurSocket].pieces_prises[game.echiquiers[indiceEchiquier].Joueurs[couleurSocket].pieces_prises.length - 1].Nbtour == Nbtour-1){ 
+                if(game.echiquiers[indiceEchiquier].Joueurs[couleurSocket].pieces_prises[game.echiquiers[indiceEchiquier].Joueurs[couleurSocket].pieces_prises.length - 1].Nbtour == game.echiquiers[indiceEchiquier].Nbtour-1){ 
                     piece_prise = game.echiquiers[indiceEchiquier].Joueurs[couleurSocket].pieces_prises[game.echiquiers[indiceEchiquier].Joueurs[couleurSocket].pieces_prises.length - 1].piece;
                 }
             }
