@@ -32,7 +32,7 @@ class Pion extends Piece {
             if(plateau.isInBoard(this.x + i,this.y+(Math.pow(-1,this.couleur)*(1)))){
                 if(plateau.check_piece(this.x + i,this.y+(Math.pow(-1,this.couleur)*(1)))){
                     if(plateau.board[this.x + i][this.y+(Math.pow(-1,this.couleur)*(1))].piece.couleur != this.couleur){
-                        plateau.playable(this.x + i,this.y+(Math.pow(-1,this.couleur)*(1)),this.couleur)
+                        plateau.playable(this.x + i,this.y+(Math.pow(-1,this.couleur)*(1)),this)
                     }
                 }
             }
@@ -42,7 +42,7 @@ class Pion extends Piece {
                     if(plateau.getBoard(this.x+i,this.y).piece.deplacements.length == 2 && this.y == plateau.getBoard(this.x+i,this.y).piece.deplacements[1].y){
                         if(plateau.isInBoard(this.x + i,this.y+(Math.pow(-1,this.couleur)*(1)))){
                             if(plateau.check_vide(this.x + i,this.y+(Math.pow(-1,this.couleur)*(1)))){
-                                plateau.playable(this.x + i,this.y+(Math.pow(-1,this.couleur)*(1)),this.couleur, this)
+                                plateau.playable(this.x + i,this.y+(Math.pow(-1,this.couleur)*(1)), this)
                             }
                         }
                     }

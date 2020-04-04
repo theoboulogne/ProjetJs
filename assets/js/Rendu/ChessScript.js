@@ -78,10 +78,10 @@ class RenduThreeJs{
     };
 
     animatePiece(piece, X, Y) {
-        let tweenUp = this.Tween(piece, [{Axis:'z', Offset:1}], 1000)
+        let tweenUp = this.Tween(piece, [{Axis:'z', Offset:1}], 800)
         let tweenMove = this.Tween(piece, [{Axis:'x', Offset:0.5*X}, 
-                                           {Axis:'y', Offset:0.5*Y}], 3000) // calcul delai en fonction distance ?
-        let tweenDown = this.Tween(piece, [{Axis:'z', Offset:0}], 1000)
+                                           {Axis:'y', Offset:0.5*Y}], 300*Math.max(Math.abs(X),Math.abs(Y))) // calcul delai en fonction distance ?
+        let tweenDown = this.Tween(piece, [{Axis:'z', Offset:0}], 800)
         tweenUp.chain(tweenMove);
         tweenMove.chain(tweenDown);
         tweenUp.start();
@@ -98,7 +98,10 @@ class RenduThreeJs{
     }*/
 
     movePiece(deplacement) {
-        this.animatePiece(getPiece(deplacement.piece.x, deplacement.piece.y), deplacement.x-piece.x, deplacement.y-piece.y);
+        let pieceIdx = this.getPiece(deplacement.piece)
+        if(pieceIdx>-1){
+            this.animatePiece(this.pieces[pieceIdx], deplacement.y-deplacement.piece.y, deplacement.x-deplacement.piece.x);
+        }// Gérer la gestion d'erreur !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     }
 
     getPiece(Coo){
