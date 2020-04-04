@@ -61,6 +61,8 @@ class RenduThreeJs{
         //Test de case playable, fonction qui prend un board a faire
 
         this.setPlayable(6,5,0);
+        this.setPlayable(6,4,1);
+        this.setPlayable(5,5,0);
 
         //Gestion de la détection des clicks (Events)
         this.raycaster = new THREE.Raycaster();
@@ -103,7 +105,7 @@ class RenduThreeJs{
     }
 
     movePiece(piece, newX, newY) {
-        Rendu.animateSelectedPiece(selectedPiece.object, newX-piece.x, newY-piece.y);
+        this.animateSelectedPiece(selectedPiece.object, newX-piece.x, newY-piece.y);
     }
 
     getPiece(Coo){
