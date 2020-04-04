@@ -15,10 +15,10 @@ const Joueur = require('./server_modules/Joueur');
 //Redirection des pages                                 REDIRECTION A CHANGER APRES CREATION DU MENU
 app.use(express.static(__dirname + '/assets/'));
 app.get('/', (req, res, next) => {
-    res.sendFile(__dirname + '/assets/views/jeu.html')
-});
-app.get('/menu', (req, res, next) => {
     res.sendFile(__dirname + '/assets/views/menu.html')
+});
+app.get('/jeu', (req, res, next) => {
+    res.sendFile(__dirname + '/assets/views/jeu.html')
 });
 
 //On enregistre nos plateaux et nos joueurs avec leur socket
@@ -57,8 +57,14 @@ io.sockets.on('connection',  (socket) =>{
                 }
             }
         }
-
-        if ((couleurSocket) == (game.echiquiers[indiceEchiquier].Nbtour%2) && game.echiquiers[indiceEchiquier].board[piece.x][piece.y].piece.nom == piece.nom){ // si son tour et pas d'erreur
+        //Reset si les conditions sont pas bonnes / si pas de cases playable
+        game.echiquiers[indiceEchiquier].select = {x:-1, y:-1};
+        if ((couleurSocket) == (game.echiquiers[indiceEchiquier].Nbtour%2) && 
+            game.echiquiers[indiceEchiquier].board[piece.x][piece.y].piece.nom == piece.nom &&
+            couleurSocket == game.echiquiers[indiceEchiquier].board[piece.x][piece.y].piece.couleur
+            ){ // si son tour et pas d'erreur
+            
+            game.echiquiers[indiceEchiquier].reset_playable();
             game.echiquiers[indiceEchiquier].board[piece.x][piece.y].piece.playable(game.echiquiers[indiceEchiquier]);
             for(let i = 0; i < 8; i++){
                 for(let j = 0; j < 8; j++){
@@ -90,24 +96,24 @@ io.sockets.on('connection',  (socket) =>{
         }
         // si son tour et les bonnes infos alors :
         if ((couleurSocket) == (game.echiquiers[indiceEchiquier].Nbtour%2) &&
-            (deplacement.x == game.echiquiers[indiceEchiquier].select.x) && 
-            (deplacement.y == game.echiquiers[indiceEchiquier].select.y) &&
+            (deplacement.piece.x == game.echiquiers[indiceEchiquier].select.x) && 
+            (deplacement.piece.y == game.echiquiers[indiceEchiquier].select.y) &&
             (game.echiquiers[indiceEchiquier].board[deplacement.x][deplacement.y].playable)){    
                     
-            game.echiquiers[indiceEchiquier].select = {x:-1, y:-1};
 
             //on clone le plateau pour l'envoyer avant le déplacement afin de l'effectuer graphiquement en front
-            let plateau = clone(game.echiquiers[indiceEchiquier]); 
+            let plateau = (game.echiquiers[indiceEchiquier]).clone(); 
             game.echiquiers[indiceEchiquier].board[deplacement.piece.x][deplacement.piece.y].piece.move(deplacement.x,deplacement.y,game.echiquiers[indiceEchiquier])
+            game.echiquiers[indiceEchiquier].select = {x:-1, y:-1};
 
             let piece_prise = 0 //On détecte la pièce prise
-            if(game.echiquiers[indiceEchiquier].Joueurs[couleurSocket].pieces_prises[game.echiquiers[indiceEchiquier].Joueurs[couleurSocket].pieces_prises.length - 1].Nbtour == Nbtour-1){ 
-                piece_prise = game.echiquiers[indiceEchiquier].Joueurs[couleurSocket].pieces_prises[game.echiquiers[indiceEchiquier].Joueurs[couleurSocket].pieces_prises.length - 1].piece;
+            if(game.echiquiers[indiceEchiquier].Joueurs[couleurSocket].pieces_prises.length>0){
+                if(game.echiquiers[indiceEchiquier].Joueurs[couleurSocket].pieces_prises[game.echiquiers[indiceEchiquier].Joueurs[couleurSocket].pieces_prises.length - 1].Nbtour == Nbtour-1){ 
+                    piece_prise = game.echiquiers[indiceEchiquier].Joueurs[couleurSocket].pieces_prises[game.echiquiers[indiceEchiquier].Joueurs[couleurSocket].pieces_prises.length - 1].piece;
+                }
             }
-
-            plateau.reset_playable();
             for(let i=0; i<2; i++){ // On envoi le déplacement a tout le monde
-                io.sockets.sockets[game.echiquiers[indiceEchiquier].Joueurs[couleurSocket].id].emit('move', plateau, deplacement, piece_prise);
+                io.sockets.sockets[game.echiquiers[indiceEchiquier].Joueurs[i].id].emit('move', plateau, deplacement, piece_prise);
             }
             
             if(game.echiquiers[indiceEchiquier].echecEtMat(couleurSocket)){//Detection fin de partie
@@ -149,4 +155,4 @@ io.sockets.on('connection',  (socket) =>{
 });
 
 server.listen(port);
-console.log('server connected');
+console.log('Serveur en Ligne');

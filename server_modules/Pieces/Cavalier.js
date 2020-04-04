@@ -6,7 +6,6 @@ class Cavalier extends Piece{
     }
 
     playable(plateau) {
-        plateau.reset_playable();
         let scan = [[2,1],[2,-1],[-2,1],[-2,-1],[1,2],[1,-2],[-1,2],[-1,-2]];
         for (let j=0; j<scan.length; j++){
             if(plateau.isInBoard(this.x + (scan[j][0]),this.y + (scan[j][1]))){

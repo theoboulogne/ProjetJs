@@ -5,7 +5,6 @@ class Fou extends Piece{
         super(couleur, x, y)
     }
     playable(plateau) {
-        plateau.reset_playable();
         let scan = [[-1,-1],[1,-1],[1,1],[-1,1]];
         for (let j=0; j<scan.length; j++){
             let i=1;

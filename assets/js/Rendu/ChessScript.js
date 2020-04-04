@@ -41,10 +41,8 @@ class RenduThreeJs{
             });
         }
             //Board
-
         this.GenerateBoard();
- 
- 
+  
         //Gestion du rendu (lumière+camera+renderFunction)
         this.GenerateLight();
         this.camera.position.x = 5
@@ -59,18 +57,6 @@ class RenduThreeJs{
         }
         render();
         
-        //Test de case playable, fonction qui prend un board a faire
-
-        
-        this.setPlayable(7,7,0);
-        this.setPlayable(6,6,0);
-        this.setPlayable(5,5,0);
-        this.setPlayable(4,4,0);
-        this.setPlayable(3,3,1);
-        this.setPlayable(2,2,0);
-        this.setPlayable(1,1,0);
-        this.setPlayable(0,0,1);
-
         //Gestion de la détection des clicks (Events)
         this.raycaster = new THREE.Raycaster();
     }
@@ -92,10 +78,10 @@ class RenduThreeJs{
     };
 
     animatePiece(piece, X, Y) {
-        let tweenUp = this.Tween(piece, [{Axis:'z', Offset:1}], 1000)
+        let tweenUp = this.Tween(piece, [{Axis:'z', Offset:1}], 800)
         let tweenMove = this.Tween(piece, [{Axis:'x', Offset:0.5*X}, 
-                                           {Axis:'y', Offset:0.5*Y}], 3000) // calcul delai en fonction distance ?
-        let tweenDown = this.Tween(piece, [{Axis:'z', Offset:0}], 1000)
+                                           {Axis:'y', Offset:0.5*Y}], 300*Math.max(Math.abs(X),Math.abs(Y))) // calcul delai en fonction distance ?
+        let tweenDown = this.Tween(piece, [{Axis:'z', Offset:0}], 800)
         tweenUp.chain(tweenMove);
         tweenMove.chain(tweenDown);
         tweenUp.start();
@@ -112,7 +98,10 @@ class RenduThreeJs{
     }*/
 
     movePiece(deplacement) {
-        this.animatePiece(getPiece(deplacement.piece.x, deplacement.piece.y), deplacement.x-piece.x, deplacement.y-piece.y);
+        let pieceIdx = this.getPiece(deplacement.piece)
+        if(pieceIdx>-1){
+            this.animatePiece(this.pieces[pieceIdx], deplacement.y-deplacement.piece.y, deplacement.x-deplacement.piece.x);
+        }// Gérer la gestion d'erreur !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     }
 
     getPiece(Coo){
@@ -140,7 +129,7 @@ class RenduThreeJs{
 
     setPlayable(X, Y, playableType) {
         let tmpPlayableCase = this.playableCase.clone();
-        if (!playableType) { tmpPlayableCase.material = this.vert/*.color.setHex(0x00ff00);*/ }
+        if (playableType) { tmpPlayableCase.material = this.vert/*.color.setHex(0x00ff00);*/ }
         else { tmpPlayableCase.material = this.rouge/*.color.setHex(0xff0000);*/ }
         tmpPlayableCase.position.set( (Y-4)/2 + 0.25, (X-4)/2 + 0.25, 0 );
         this.playableCases.push(tmpPlayableCase) // on enregistre pour pouvoir les retirer
@@ -152,7 +141,7 @@ class RenduThreeJs{
         for (let i = 0; i < board.length; i++) {
             for (let j = 0; j < board.length; j++) {
                 if (board[i][j].playable) {
-                    this.setPlayable(i,j,(board[i][j].piece.couleur != couleur));
+                    this.setPlayable(i,j,(board[i][j].piece == 0));
                 }
             }
         }
