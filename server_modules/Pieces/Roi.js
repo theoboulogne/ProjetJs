@@ -73,12 +73,14 @@ class Roi extends Piece{
     roquePlayable(plateau){
         let renvoi = [0,0];
         let valeurs = [-4,3];
+        //Première itération erreur : board[-1][7]
+        // j'ai essayé en inversant 4 et 3 ([-3,4]) -> pas de playable affiché du tout
        
         let tempX = this.x;
  
-        if(this.deplacements.length == 0){
+        if(this.deplacements.length == 1){
             for (let j = 0; j < valeurs.length; j++){
-                if(plateau.board[this.x + valeurs[j]][this.y].piece.name == 'Tour' && plateau.board[this.x + valeurs[j]][this.y].piece.deplacements.length == 0){
+                if(plateau.board[this.x + valeurs[j]][this.y].piece.nom == 'Tour' && plateau.board[this.x + valeurs[j]][this.y].piece.deplacements.length == 1){
                     let i = 1;
                     while (i < Math.abs(valeurs[j]) && (plateau.board[tempX - i][this.y].piece == 0)){
                         this.x = this.x + (valeurs[j]/Math.abs(valeurs[j]));

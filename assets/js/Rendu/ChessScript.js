@@ -124,7 +124,7 @@ class RenduThreeJs{
             let Rendu = this;
 
             setTimeout(function(){
-                Rendu.removePiece(piece);    // on supprime la piece mangé du plateau
+                Rendu.removePiece(pieceIdx);    // on supprime la piece mangé du plateau
                 Rendu.LoadPieceOut(piece);   // on la recharge dans la scene
                 let tweenDown = Rendu.Tween(Rendu.piecesOut[piece.couleur][Rendu.piecesOut[piece.couleur].length-1], [{Axis:'z', Offset:-3}],1200);
                 tweenDown.start();           // on la fait redescendre sur le coté du plateau*/
@@ -142,8 +142,7 @@ class RenduThreeJs{
         for (let i = 0; i < array.length; i++) this.removeObject(array[i])
         array.length = 0;
     }
-    removePiece(Coo){
-        let idx = this.getPiece(Coo);
+    removePiece(idx){
         if(idx!=-1){
             this.removeObject(this.pieces[idx]);
             this.pieces.splice(idx, 1);
