@@ -1,5 +1,26 @@
 //Serveur - Echec
 
+//Base de donee
+
+/*var mysql = require('mysql');
+
+var con = mysql.createConnection({
+  host: "localhost:800",
+  user: "Projet_JS",
+  password: null,
+  database: "test"
+});
+
+con.connect(function(err) {
+    if (err) throw err;
+    console.log("Connected!");
+    var sql = "INSERT INTO `partie`(`pseudoGagnant`, `pseudoPerdant`) VALUES ([value-1],[value-2])";
+    con.query(sql, function (err, result) {
+      if (err) throw err;
+      console.log("1 record inserted");
+    });
+});*/
+
 //Constantes
 
 const port = 800;
@@ -24,7 +45,6 @@ app.get('/jeu', (req, res, next) => {
 //On enregistre nos plateaux et nos joueurs avec leur socket
 this.echiquiers = new Array();
 let game = this;
-
 
 io.sockets.on('connection',  (socket) =>{
     console.log('Nouvelle Connection Client')
@@ -96,22 +116,25 @@ io.sockets.on('connection',  (socket) =>{
         }
         // si son tour et les bonnes infos alors :
         if ((couleurSocket) == (game.echiquiers[indiceEchiquier].Nbtour%2) &&
-            (deplacement.piece.x == game.echiquiers[indiceEchiquier].select.x) && 
+            (deplacement.piece.x == game.echiquiers[indiceEchiquier].select.x) &&
             (deplacement.piece.y == game.echiquiers[indiceEchiquier].select.y) &&
-            (game.echiquiers[indiceEchiquier].board[deplacement.x][deplacement.y].playable)){    
+            (game.echiquiers[indiceEchiquier].board[deplacement.x][deplacement.y].playable)){
                     
 
             //on clone le plateau pour l'envoyer avant le déplacement afin de l'effectuer graphiquement en front
-            let plateau = (game.echiquiers[indiceEchiquier]).clone(); 
+            let plateau = (game.echiquiers[indiceEchiquier]).clone();
             game.echiquiers[indiceEchiquier].board[deplacement.piece.x][deplacement.piece.y].piece.move(deplacement.x,deplacement.y,game.echiquiers[indiceEchiquier])
             game.echiquiers[indiceEchiquier].select = {x:-1, y:-1};
 
-            let piece_prise = 0 //On détecte la pièce prise
-            if(game.echiquiers[indiceEchiquier].Joueurs[couleurSocket].pieces_prises.length>0){
-                if(game.echiquiers[indiceEchiquier].Joueurs[couleurSocket].pieces_prises[game.echiquiers[indiceEchiquier].Joueurs[couleurSocket].pieces_prises.length - 1].Nbtour == Nbtour-1){ 
-                    piece_prise = game.echiquiers[indiceEchiquier].Joueurs[couleurSocket].pieces_prises[game.echiquiers[indiceEchiquier].Joueurs[couleurSocket].pieces_prises.length - 1].piece;
-                }
+            let piece_prise = 0 //On détecte la pièce prise, A FAIRE COTE CLIENT <-----------------------------------------------------------------------------------------------------------------------------------------
+            if(game.echiquiers[indiceEchiquier].Joueurs[(couleurSocket+1)%2].pieces_prises.length!=plateau.Joueurs[(couleurSocket+1)%2].pieces_prises.length){
+                piece_prise = game.echiquiers[indiceEchiquier].Joueurs[(couleurSocket+1)%2].pieces_prises[game.echiquiers[indiceEchiquier].Joueurs[(couleurSocket+1)%2].pieces_prises.length - 1].piece
             }
+            //if(game.echiquiers[indiceEchiquier].Joueurs[couleurSocket].pieces_prises.length>0){
+            //    if(game.echiquiers[indiceEchiquier].Joueurs[couleurSocket].pieces_prises[game.echiquiers[indiceEchiquier].Joueurs[couleurSocket].pieces_prises.length - 1].Nbtour == game.echiquiers[indiceEchiquier].Nbtour-1){ 
+            //        piece_prise = game.echiquiers[indiceEchiquier].Joueurs[couleurSocket].pieces_prises[game.echiquiers[indiceEchiquier].Joueurs[couleurSocket].pieces_prises.length - 1].piece;
+            //    }
+            //}
             for(let i=0; i<2; i++){ // On envoi le déplacement a tout le monde
                 io.sockets.sockets[game.echiquiers[indiceEchiquier].Joueurs[i].id].emit('move', plateau, deplacement, piece_prise);
             }

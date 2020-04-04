@@ -1,4 +1,31 @@
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Définir un Idx par pièce au lieu de les récupérer par coordonnées pour éviter les bugs liés aux rendus décallés
+
+// OU mettre un timeout d'attente de fin de tween a chaque fois avant de sortir d'une animation.
+
+
+
+
+
+
+
+
+
+
 class Jeu{
     constructor(){
 
@@ -72,7 +99,7 @@ class Jeu{
             // Lancer l'affichage de l'UI
 
 
-        //Coté ThreeJS          -   DEPLACER LE CHECK COTE CHESSSCRIPT
+        //Coté ThreeJS          -   DEPLACER LE CHECK COTE CHESSSCRIPT <--------------------------------------------
             let i, check;
             let loadCheck = setInterval(function() {
                 check = true;
@@ -81,12 +108,8 @@ class Jeu{
                     clearInterval(loadCheck);
                     Game.rendu.loadBoardPieces(Game.echiquier.board);
                     document.body.lastChild.addEventListener("click", onClick, false);
-
-                    Game.rendu.moveOut(Game.echiquier.board[3][0].piece);
-
-                    //addeventlistener
                 }
-            }, 250); // interval set at 0.25 seconds
+            }, 250);
             
 
 
@@ -108,29 +131,48 @@ class Jeu{
         socket.on('move', (plateau,deplacement,piece_prise) => { // piece et deplacer en x,y
             console.log('Event - move')
 
+            console.log(plateau)
+            console.log(deplacement)
+            console.log(piece_prise)
+
+            //Récupération des données
             Game.echiquier = plateau;
+            //Détermination du roque
+            let deplacements = [deplacement];
+            let diff = deplacement.y - deplacement.piece.y
+            if(deplacement.piece.name == "Roi" && Math.abs(diff) == 2){
+                deplacements.push({ x:deplacement.x,
+                                    y:deplacement.y + diff/Math.abs(diff),
+                                    piece:plateau.board[deplacement.x][deplacement.piece.y + (diff/Math.abs(diff)) * 3.5 - 0.5]
+                                    });
+            }
 
-        //Coté threejs :
-            Game.rendu.movePiece(deplacement)
-            //deplacer la pièce et retirer la pièce prise en simultané
-
-        //Coté Gestion du jeu (Voir pour intégrer le roque à faire)
-
-        // Vraiment utile ? <------------------------------------------------------------------------------------------
+        //Coté Gestion du jeu
 
             //On supprime la pièce si nécessaire
-            if(piece_prise != 0){ 
+            if(piece_prise != 0){ // RECUPERER LA PIECE COTE CLIENT <-----------------------------------------------------------------------------------------------
+            //Coté threejs :
+                Game.rendu.moveOut(piece_prise);
+            //Coté Gestion du jeu
                 Game.echiquier.board[piece_prise.x][piece_prise.y].piece = 0;
                 Game.echiquier.Joueurs[piece_prise.couleur].pieces_prises.push(piece_prise);
             }
+            
+        //Coté threejs :
+        if(deplacements.length == 1) Game.rendu.movePiece(deplacement); // si pas de roque
+        else Game.rendu.moveRoque(deplacements);
 
-            //Déplacement dans le board de la pièce
-            Game.echiquier.board[deplacement.x][deplacement.y].piece = Game.echiquier.board[deplacement.piece.x][deplacement.piece.y];
-            Game.echiquier.board[deplacement.piece.x][deplacement.piece.y] = 0;
 
-            //Changement des Coo de la pièce
-            plateau.board[deplacement.x][deplacement.y].piece.x = deplacement.x;
-            plateau.board[deplacement.x][deplacement.y].piece.y = deplacement.y;
+            // on déplace une piece (ou deux si on fait un roque)
+            for(let i = 0; i < deplacements.length; i++){
+                //Déplacement dans le board de la pièce
+                Game.echiquier.board[deplacements[i].x][deplacements[i].y].piece = Game.echiquier.board[deplacements[i].piece.x][deplacements[i].piece.y];
+                Game.echiquier.board[deplacements[i].piece.x][deplacements[i].piece.y] = 0;
+
+                //Changement des Coo de la pièce dans l'objet
+                plateau.board[deplacements[i].x][deplacements[i].y].piece.x = deplacements[i].x;
+                plateau.board[deplacements[i].x][deplacements[i].y].piece.y = deplacements[i].y;
+            }
 
             //Enregistrement des couts pour l'affichage
             plateau.couts.push(plateau.board[deplacement.x][deplacement.y].piece);
@@ -139,7 +181,7 @@ class Jeu{
             plateau.Nbtour++;
 
         //Coté UI
-            // Récupérer les couts joués et les pièces prises et actualiser l'ui en conséquence
+            // Récupérer les couts joués et actualiser l'ui en conséquence
 
         });
         socket.on('reset', (echiquierReset, couleurReset) => {
@@ -172,7 +214,6 @@ class Jeu{
             console.log('Redirection vers le menu')
             window.location.href = "./"
         });
-        
     }
 }
 
