@@ -22,9 +22,10 @@ class RenduThreeJs{
         let objLoader = new THREE.OBJLoader();
             // Cases jouables
         this.playableCases = [];
-        this.playableCase = new THREE.Mesh( new THREE.BoxGeometry( 0.5, 0.5, 0.1 ), 
-                                            new THREE.MeshBasicMaterial( {color: 0x00ff00} ) );
-                        //Pièces
+        this.vert = new THREE.MeshBasicMaterial( {color: 0x00ff00, opacity: 0.5, transparent: true} )
+        this.rouge = new THREE.MeshBasicMaterial( {color: 0xff0000, opacity: 0.5, transparent: true} )
+        this.playableCase = new THREE.Mesh( new THREE.BoxGeometry( 0.5, 0.5, 0.02 ), this.vert);
+        //Pièces
         this.pieces = [];
         this.models = [ // définition des nom de modèles en dur
             {nom:"Pion", obj:undefined},
@@ -60,45 +61,18 @@ class RenduThreeJs{
         
         //Test de case playable, fonction qui prend un board a faire
 
-        //this.setPlayable(6,5);
-        //this.setPlayable(7,5);
-        //this.setPlayable(4,5);
-        //this.setPlayable(7,7);
-        //this.setPlayable(0,0);
-
-        //Rendu.setPlayables(board);
+        
+        this.setPlayable(7,7,0);
+        this.setPlayable(6,6,0);
+        this.setPlayable(5,5,0);
+        this.setPlayable(4,4,0);
+        this.setPlayable(3,3,1);
+        this.setPlayable(2,2,0);
+        this.setPlayable(1,1,0);
+        this.setPlayable(0,0,1);
 
         //Gestion de la détection des clicks (Events)
         this.raycaster = new THREE.Raycaster();
-
-        /*function onclick(event) {
-
-            if(Rendu.pieces.length>0){
-
-                let intersectPiece = Rendu.getClickModels(event, Rendu.pieces)
-                let intersectCase = Rendu.getClickModels(event, Rendu.playableCases);
-
-                if (intersectPiece.length > 0) {
-                    let selectedPiece = intersectPiece[0];
-                    
-                    let Coo = Rendu.getCooSelected(selectedPiece);
-                    console.log("X : " + (Coo.x).toString() + ", Y : " + (Coo.y).toString());
-                    
-                    Rendu.animateSelectedPiece(selectedPiece.object, 2, 2); // test deplacement
-                }
-
-                if (intersectCase.length > 0) {
-                    let selectedCase = intersectCase[0]
-
-                    let Coo = Rendu.getCooSelected(selectedCase);
-
-                    Rendu.removeObjects(Rendu.playableCases);
-                    
-                    console.log("X : " + (Coo.x).toString() + ", Y : " + (Coo.y).toString());
-                }
-            } 
-            else Rendu.loadBoardPieces(board)
-        }*/
     }
 
 
@@ -127,7 +101,7 @@ class RenduThreeJs{
         tweenUp.start();
     }
 
-    animateSelectedPiece(piece, X, Y) {
+    /*animateSelectedPiece(piece, X, Y) {
         let tweenUp = this.Tween(piece, [{Axis:'y', Offset:40}], 1000)
         let tweenMove = this.Tween(piece, [{Axis:'x', Offset:20*X}, 
                                             {Axis:'z', Offset:20*Y}], 3000) // calcul delai en fonction distance ?
@@ -135,10 +109,10 @@ class RenduThreeJs{
         tweenUp.chain(tweenMove);
         tweenMove.chain(tweenDown);
         tweenUp.start();
-    }
+    }*/
 
-    movePiece(X, Y, newX, newY) {
-        Rendu.animateSelectedPiece(selectedPiece.object, newX-X, newY-Y);
+    movePiece(deplacement) {
+        this.animatePiece(getPiece(deplacement.piece.x, deplacement.piece.y), deplacement.x-piece.x, deplacement.y-piece.y);
     }
 
     getPiece(Coo){
@@ -166,8 +140,8 @@ class RenduThreeJs{
 
     setPlayable(X, Y, playableType) {
         let tmpPlayableCase = this.playableCase.clone();
-        if (!playableType) { tmpPlayableCase.material.color.setHex(0x00ff00); }
-        else { tmpPlayableCase.material.color.setHex(0xff0000); }
+        if (!playableType) { tmpPlayableCase.material = this.vert/*.color.setHex(0x00ff00);*/ }
+        else { tmpPlayableCase.material = this.rouge/*.color.setHex(0xff0000);*/ }
         tmpPlayableCase.position.set( (Y-4)/2 + 0.25, (X-4)/2 + 0.25, 0 );
         this.playableCases.push(tmpPlayableCase) // on enregistre pour pouvoir les retirer
         this.scene.add( tmpPlayableCase );
