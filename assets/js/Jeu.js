@@ -198,9 +198,6 @@ class Jeu{
             //avec un bouton qui redirige avec le code ci dessous
 
             window.location.href = "./"
-            if (confirm('texte')){
-                window.location.href = "./"
-            }
         });
     }
 }
