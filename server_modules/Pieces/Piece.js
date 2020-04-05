@@ -1,7 +1,7 @@
 class Piece{
     constructor(couleur, x, y){
         //Coté client
-        this.x = x;//Initialisation des coordonnées (classe a faire ?)
+        this.x = x;
         this.y = y;
         this.couleur = couleur; // couleur de la pièce
         
@@ -14,7 +14,7 @@ class Piece{
                                 })
     }
     // méthode générale
-    move(x,y, plateau){ //toujours forcer playable avant move..
+    move(x,y, plateau){ 
         if(plateau.isInBoard(x,y)){
             if(plateau.board[x][y].playable){
                 plateau.jouer(x, y, this);

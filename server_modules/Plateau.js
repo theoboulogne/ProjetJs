@@ -26,7 +26,7 @@ class Plateau{
             for(let i=0; i<2; i++) this.board[1 + (i*5)][j*7].piece = new Cavalier(j, 1 + (i*5), j*7);
             for(let i=0; i<2; i++) this.board[2 + (i*3)][j*7].piece = new Fou(j, 2+ (i*3), j*7);
             this.board[4][j*7].piece = new Reine(j, 4, j*7);
-            this.board[3][j*7].piece = new Roi(j, 3, j*7); // mettre la coordonnée du roi depuis joueur ?
+            this.board[3][j*7].piece = new Roi(j, 3, j*7); 
         }
 
         //Coté Serveur
@@ -107,7 +107,6 @@ class Plateau{
             this.board[x][y].piece = 0;
         }
     }
-
 
     echecEtMat(couleur){
         if(this.board[this.Joueurs[couleur].roi.x][this.Joueurs[couleur].roi.y].piece.echec(this)){
