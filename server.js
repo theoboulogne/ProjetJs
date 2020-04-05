@@ -1,14 +1,14 @@
 //Serveur - Echec
 
 //Constantes
-/*
+
 const mysql = require('mysql');
-let con = mysql.createConnection({ //Info de connection à la BDD
+const InfoConnectionBDD = { //Info de connection à la BDD
   host: "localhost",
   user: "root",
   password: "",
   database: "echecs"
-});*/
+};
 
 const port = 800;
 const express = require('express');
@@ -126,7 +126,8 @@ io.sockets.on('connection',  (socket) =>{
                 console.log('Echec et Mat')
                 
                 //Enregistrement dans la BDD mysql
-                /*con.connect(function(err) {
+                let con = mysql.createConnection(InfoConnectionBDD);
+                con.connect(function(err) {
                     if (err) throw err;
                     console.log("Connecté à la mysql !");
                     var sql = "INSERT INTO `scores`(`pseudo`, `pieces`, `chrono`) VALUES ('" + 
@@ -138,7 +139,6 @@ io.sockets.on('connection',  (socket) =>{
                         console.log("Score inséré");
                     });
                 });
-                con.end();*/
 
                 //Envoi de l'event aux client pour rediriger vers le menu
                 for(let i=0; i<2; i++) io.sockets.sockets[game.echiquiers[indiceEchiquier].Joueurs[i].id].emit('endGame', couleurSocket);
