@@ -10,34 +10,26 @@ for(let i = 0; i < test.length; i++){
 
 
 coups = new Array()
-coups.push('B3')
-coups.push('H4')
 coups.push('B8')
 let Nbtour = 0;
-
 let Hud = (function(){
     return{
         Affichage_coups : (coups, Nbtour) => { 
-            document.getElementById('coups_blanc').innerHTML = "";
-            document.getElementById('coups_noir').innerHTML = "";
-            for(let i = 0 + Nbtour % 2; i < coups.length; i++){
-                if(i % 2 == 0){
-                    let div = document.getElementById("coups_blanc");
-                    let cout = document.createElement("h2");
-                    cout.setAttribute("class","ecriture");
-                    var texte = document.createTextNode(coups[i]);
-                    div.append(cout);
-                    cout.appendChild(texte);
-                }
-                if(i % 2 == 1){
-                    let div = document.getElementById("coups_noir");
-                    let cout = document.createElement("h2");
-                    cout.setAttribute("class","ecriture");
-                    var texte = document.createTextNode(coups[i]);
-                    div.append(cout);
-                    cout.appendChild(texte);
-                }
-            } 
+            let div
+            //document.getElementById('coups_blanc').innerHTML = "";
+            //document.getElementById('coups_noir').innerHTML = "";
+            let cout = document.createElement("h2");
+            cout.setAttribute("class","ecriture_coups");
+            if(Nbtour % 2 == 0){
+                div = document.getElementById("coups_blanc");
+            }
+            if(Nbtour % 2 == 1){
+               div = document.getElementById("coups_noir");
+            }
+            var texte = document.createTextNode(coups[coups.length - 1]);
+            div.append(cout);
+            cout.appendChild(texte);
+            var x = div.childElementCount; 
         },
 
         Affichage_AquiDejouer : (Nbtour) => {
@@ -57,7 +49,55 @@ let Hud = (function(){
     }
 })();
 
-
 Hud.Affichage_coups(coups,Nbtour);
 Hud.Affichage_AquiDejouer(Nbtour);
+
+
+coups.push('C3')
+Nbtour = 1;
+Hud.Affichage_coups(coups,Nbtour);
+
+coups.push('C6')
+Nbtour = 2;
+Hud.Affichage_coups(coups,Nbtour);
+
+coups.push('C3')
+Nbtour = 1;
+Hud.Affichage_coups(coups,Nbtour);
+
+coups.push('C6')
+Nbtour = 2;
+Hud.Affichage_coups(coups,Nbtour);
+
+coups.push('C3')
+Nbtour = 1;
+Hud.Affichage_coups(coups,Nbtour);
+
+coups.push('C6')
+Nbtour = 2;
+Hud.Affichage_coups(coups,Nbtour);
+
+coups.push('C3')
+Nbtour = 1;
+Hud.Affichage_coups(coups,Nbtour);
+
+coups.push('C6')
+Nbtour = 2;
+Hud.Affichage_coups(coups,Nbtour);
+
+coups.push('C3')
+Nbtour = 1;
+Hud.Affichage_coups(coups,Nbtour);
+
+coups.push('C6')
+Nbtour = 2;
+Hud.Affichage_coups(coups,Nbtour);
+
+coups.push('C3')
+Nbtour = 1;
+Hud.Affichage_coups(coups,Nbtour);
+
+coups.push('C6')
+Nbtour = 2;
+Hud.Affichage_coups(coups,Nbtour);
 
