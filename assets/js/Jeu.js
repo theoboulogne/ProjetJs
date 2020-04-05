@@ -80,8 +80,6 @@ class Jeu{
             // indiquer l'attente d'un autre joueur
         });
         socket.on('start', (plateau) => {
-            
-            //SetInt();
             console.log('Event - start')
         //Coté Gestion du Jeu
             Game.echiquier = plateau;
@@ -163,6 +161,8 @@ class Jeu{
             
         //Coté UI
             Hud.Affichage_AquiDejouer(plateau.Nbtour)
+            //Hud.Affichage_coups(plateau.couts,plateau.Nbtour);
+            //Hud.Affichage_coups(plateau.couts[plateau.couts.length-1],Nbtour);
             // Récupérer les couts joués et actualiser l'ui en conséquence
         });
         socket.on('reset', (echiquierReset, couleurReset) => {

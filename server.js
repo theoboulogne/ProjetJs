@@ -1,27 +1,14 @@
 //Serveur - Echec
 
-//Base de donee
-
-/*var mysql = require('mysql');
-
-var con = mysql.createConnection({
-  host: "localhost:800",
-  user: "Projet_JS",
-  password: null,
-  database: "test"
-});
-
-con.connect(function(err) {
-    if (err) throw err;
-    console.log("Connected!");
-    var sql = "INSERT INTO `partie`(`pseudoGagnant`, `pseudoPerdant`) VALUES ([value-1],[value-2])";
-    con.query(sql, function (err, result) {
-      if (err) throw err;
-      console.log("1 record inserted");
-    });
-});*/
-
 //Constantes
+/*
+const mysql = require('mysql');
+let con = mysql.createConnection({ //Info de connection à la BDD
+  host: "localhost",
+  user: "root",
+  password: "",
+  database: "echecs"
+});*/
 
 const port = 800;
 const express = require('express');
@@ -126,7 +113,7 @@ io.sockets.on('connection',  (socket) =>{
             game.echiquiers[indiceEchiquier].board[deplacement.piece.x][deplacement.piece.y].piece.move(deplacement.x,deplacement.y,game.echiquiers[indiceEchiquier])
             game.echiquiers[indiceEchiquier].select = {x:-1, y:-1};
 
-            let piece_prise = 0 //On détecte la pièce prise, A FAIRE COTE CLIENT <-----------------------------------------------------------------------------------------------------------------------------------------
+            let piece_prise = 0 //On détecte la pièce prise,
             if(game.echiquiers[indiceEchiquier].Joueurs[(couleurSocket+1)%2].pieces_prises.length!=plateau.Joueurs[(couleurSocket+1)%2].pieces_prises.length){
                 piece_prise = game.echiquiers[indiceEchiquier].Joueurs[(couleurSocket+1)%2].pieces_prises[game.echiquiers[indiceEchiquier].Joueurs[(couleurSocket+1)%2].pieces_prises.length - 1].piece
             }
@@ -135,8 +122,25 @@ io.sockets.on('connection',  (socket) =>{
                 io.sockets.sockets[game.echiquiers[indiceEchiquier].Joueurs[i].id].emit('move', plateau, deplacement, piece_prise);
             }
             
-            if(game.echiquiers[indiceEchiquier].echecEtMat(couleurSocket)){//Detection fin de partie
+            if(game.echiquiers[indiceEchiquier].echecEtMat((couleurSocket+1)%2)){//Detection fin de partie
                 console.log('Echec et Mat')
+                
+                //Enregistrement dans la BDD mysql
+                /*con.connect(function(err) {
+                    if (err) throw err;
+                    console.log("Connecté à la mysql !");
+                    var sql = "INSERT INTO `scores`(`pseudo`, `pieces`, `chrono`) VALUES ('" + 
+                            "Pseudo" + "'," +
+                            String(16 - game.echiquiers[indiceEchiquier].Joueurs[(couleurSocket+1)%2].pieces_prises.length) + "," +
+                            String(0) + ")";
+                    con.query(sql, function (err, result) {
+                        if (err) throw err;
+                        console.log("Score inséré");
+                    });
+                });
+                con.end();*/
+
+                //Envoi de l'event aux client pour rediriger vers le menu
                 for(let i=0; i<2; i++) io.sockets.sockets[game.echiquiers[indiceEchiquier].Joueurs[i].id].emit('endGame', couleurSocket);
             }
         }

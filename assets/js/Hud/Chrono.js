@@ -5,13 +5,14 @@ function Chrono(){
     //var MSec=parseInt(Ext(GetEle(document.forms[0].Text_1.value,3)));
     var Sec=parseInt(Ext(GetEle(document.forms[0].Text_1.value,1)));
     var Min=parseInt(Ext(GetEle(document.forms[0].Text_1.value,0)));
-    //if(MSec<100){
-    //    MSec++;
-    //}
-    //else{
-    Sec++;//MSec=0;
-    if(Sec>60){
-        Min++;Sec=0;
+    if(MSec<100){
+        MSec++;
+    }
+    else{
+        Sec++;MSec=0;
+        if(Sec>60){
+            Min++;Sec=0;
+        }
     }
         
     document.forms[0].Text_1.value=Trans(Min)+":"+Trans(Sec);

@@ -9,8 +9,8 @@ for(let i = 0; i < test.length; i++){
 
 
 
-coups = new Array()
-coups.push('B8')
+//coups = new Array()
+//coups.push('B8')
 let Nbtour = 0;
 let Hud = (function(){
     return{
@@ -48,7 +48,7 @@ let Hud = (function(){
         },
     }
 })();
-
+/*
 Hud.Affichage_coups(coups,Nbtour);
 Hud.Affichage_AquiDejouer(Nbtour);
 
@@ -100,4 +100,4 @@ Hud.Affichage_coups(coups,Nbtour);
 coups.push('C6')
 Nbtour = 2;
 Hud.Affichage_coups(coups,Nbtour);
-
+*/
