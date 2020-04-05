@@ -73,7 +73,7 @@ class Roi extends Piece{
     roquePlayable(plateau){
         let renvoi = [0,0];
         let valeurs = [-3,4];
-        // j'ai essayé en inversant 4 et 3 ([-3,4]) -> pas de playable affiché du tout
+        
         let tempX = this.x;
         
         if(this.deplacements.length == 1){

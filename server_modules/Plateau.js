@@ -33,6 +33,11 @@ class Plateau{
         this.Joueurs = new Array()
         this.couts = new Array()
 
+        //le temps
+        /*this.chrono = 0 // temps de la partie
+        this.horraire = [{heures:00, minutes:00, secondes:00}, // la couleur blanche a la valeur zero
+                         {heures:00, minutes:00, secondes:00}]*/ // la couleur noire a la valeure une
+
         //select du playable a implémenter pour la sécurité
         this.select = {x:-1, y:-1};
     }
