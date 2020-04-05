@@ -5,11 +5,6 @@ class RenduThreeJs{
         //Initialisation de la scène
         this.scene = new THREE.Scene();
         this.camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight);
-        this.camera.position.x = 3.5;
-        this.camera.rotation.y = ( 50* (Math.PI / 180));
-        this.camera.rotation.z = ( 90* (Math.PI / 180));
-        this.camera.position.z = 3;
-        //this.camera.position.y = 0.5;
         //Ajout du rendu
         let renderer = new THREE.WebGLRenderer();
         renderer.setSize( window.innerWidth, window.innerHeight );
@@ -55,6 +50,11 @@ class RenduThreeJs{
         this.GenerateBoard();
         //Gestion du rendu (lumière+camera+renderFunction)
         this.GenerateLight();
+        this.camera.position.x = 3.5;
+        this.camera.rotation.y = ( 40* (Math.PI / 180));
+        this.camera.rotation.z = ( 90* (Math.PI / 180));
+        this.camera.position.z = 4;
+        this.camera.position.y = 0.5;
 
         function render() {
             requestAnimationFrame( render );
@@ -124,7 +124,7 @@ class RenduThreeJs{
             let Rendu = this;
 
             setTimeout(function(){
-                Rendu.removePiece(pieceIdx);    // on supprime la piece mangé du plateau
+                Rendu.removePiece(piece);    // on supprime la piece mangé du plateau
                 Rendu.LoadPieceOut(piece);   // on la recharge dans la scene
                 let tweenDown = Rendu.Tween(Rendu.piecesOut[piece.couleur][Rendu.piecesOut[piece.couleur].length-1], [{Axis:'z', Offset:-3}],1200);
                 tweenDown.start();           // on la fait redescendre sur le coté du plateau*/
@@ -142,7 +142,8 @@ class RenduThreeJs{
         for (let i = 0; i < array.length; i++) this.removeObject(array[i])
         array.length = 0;
     }
-    removePiece(idx){
+    removePiece(Coo){
+        let idx = this.getPiece(Coo);
         if(idx!=-1){
             this.removeObject(this.pieces[idx]);
             this.pieces.splice(idx, 1);
@@ -301,7 +302,7 @@ class RenduThreeJs{
 
         // add tableau
         this.piecesOut[piece.couleur].push(obj);
-        if (piece.couleur) obj.position.set( 3+this.piecesOut.indexOf(obj), -2.3, 3);   // z hors champs de caméra
+        if (piece.couleur) obj.position.set( 5-this.piecesOut.indexOf(obj), -2.3, 3);   // z hors champs de caméra
         else obj.position.set( 3+this.piecesOut.indexOf(obj), 2.3, 3);                  // z hors champs de caméra
 
         // taille / orientation
@@ -311,5 +312,39 @@ class RenduThreeJs{
         // on l'affiche
         this.scene.add(obj);
     }
+
+    LoadPiecesOut(piecesOut) {
+        for(let i=0; i<this.piecesOut.length; i++){
+            let obj = (this.piecesOut[i].obj).clone()
+            obj.traverse( function ( child ) {
+                if (child instanceof THREE.Mesh) {
+                    // on définit la couleur
+                    if(couleur) child.material = new THREE.MeshLambertMaterial({color: 0x555555});
+                    else child.material = new THREE.MeshLambertMaterial({color: 0xFFFFFF});
+                }
+            });
+
+            for(let j=0; j<piecesOut.length; j++){
+        
+                if (piece.couleur) obj.position.set(5-this.piecesOut.indexOf(obj), -2.3, 3);   // z hors champs de caméra
+                else obj.position.set( 3+this.piecesOut.indexOf(obj), 2.3, 3);                 // z hors champs de caméra
+
+                // taille / orientation
+                obj.scale.set(.015, .015, .015);
+                obj.rotation.x = 1.57;
+
+                // on l'affiche
+                this.scene.add(obj);
+            }
+        }
+    }
+
+    reloadAll() {
+        this.removePieces();
+        this.removePlayables();
+        this.LoadPieces(pieces);
+        this.LoadPiecesOut(this.piecesOut);
+    }
 }
+
 
