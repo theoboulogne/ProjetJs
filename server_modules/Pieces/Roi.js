@@ -65,8 +65,8 @@ class Roi extends Piece{
             }
         }
         let roque = this.roquePlayable(plateau);
-        for (let k = 0; k < 2; k++){
-            if (roque[k]) plateau.playable(this.x, this.y + (7*k-4), this);
+        for (let k = 0; k < roque.length; k++){
+            if (roque[k]) plateau.playable(this.x + (4*k-2), this.y, this);
         }
     }
 
@@ -75,23 +75,24 @@ class Roi extends Piece{
         let valeurs = [-4,3];
        
         let tempX = this.x;
- 
+        
         if(this.deplacements.length == 1){
             for (let j = 0; j < valeurs.length; j++){
                 if(plateau.board[this.x + valeurs[j]][this.y].piece.nom == 'Tour' && plateau.board[this.x + valeurs[j]][this.y].piece.deplacements.length == 1){
                     let i = 1;
-                    while (i < Math.abs(valeurs[j]) && (plateau.board[tempX - i][this.y].piece == 0)){
+                    let indiceR = 1;
+                    while (i < Math.abs(valeurs[j]) && (plateau.board[tempX - i][this.y].piece == 0 && indiceR)){
                         this.x = this.x + (valeurs[j]/Math.abs(valeurs[j]));
                         if(i < 3){
                             if(this.echec(plateau)){
-                                i = i + Math.abs(valeurs[j]);
+                                indiceR = 0;
                             }
                         }
                         i++;
                     }
                     this.x = tempX;
-                    if (i == Math.abs(valeurs[j])){
-                        renvoi[j];
+                    if (indiceR){
+                        renvoi[j] = 1;
                     }
                 }
             }
@@ -102,18 +103,19 @@ class Roi extends Piece{
     move(x,y, plateau){ 
         if(plateau.isInBoard(x,y)){
             if(plateau.board[x][y].playable){
-                let diff = y - this.y;
-                if(Math.abs(diff) == 2){ // Déplacement du Roque
+                let diff = x - this.x;
+                if(Math.abs(diff) == 2){
+                    
+                    if (diff == -2) plateau.jouer(x + 1,y,plateau.board[this.x - 3][this.y].piece);
+                    else plateau.jouer(x - 1,y,plateau.board[this.x + 4][this.y].piece);
                     plateau.jouer(x,y,this);
-                    if (diff == -2) plateau.jouer(x,y + 1,plateau.board[this.x][this.y - 4].piece);
-                    else plateau.jouer(x,y - 1,plateau.board[this.x][this.y + 3].piece);
 
                     plateau.Nbtour--;
 
-                    plateau.couts.splice(couts.length()-2, 2);
+                    plateau.couts.splice(plateau.couts.length - 2, 2);
 
-                    if(diff == 2)  plateau.couts.push("Petit roque");
-                    else plateau.couts.push("Grand roque");
+                    if(diff == 2)  plateau.couts.push("G.R");
+                    else plateau.couts.push("P.R");
                 }
                 else{ //Déplacement normal
                     plateau.jouer(x, y, this);

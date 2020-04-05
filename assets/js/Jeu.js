@@ -121,11 +121,11 @@ class Jeu{
             Game.echiquier = plateau;
         //Détermination du roque
             let deplacements = [deplacement];
-            let diff = deplacement.y - deplacement.piece.y
+            let diff = deplacement.x - deplacement.piece.x
             if(deplacement.piece.name == "Roi" && Math.abs(diff) == 2){
-                deplacements.push({ x:deplacement.x,
-                                    y:deplacement.y + diff/Math.abs(diff),
-                                    piece:plateau.board[deplacement.x][deplacement.piece.y + (diff/Math.abs(diff)) * 3.5 - 0.5]
+                deplacements.push({ x:deplacement.x + diff/Math.abs(diff),
+                                    y:deplacement.y,
+                                    piece:plateau.board[deplacement.x + (diff/Math.abs(diff)) * 3.5 + 0.5][deplacement.piece.y]
                                     });
             }
 

@@ -143,6 +143,11 @@ io.sockets.on('connection',  (socket) =>{
                 //Envoi de l'event aux client pour rediriger vers le menu
                 for(let i=0; i<2; i++) io.sockets.sockets[game.echiquiers[indiceEchiquier].Joueurs[i].id].emit('endGame', couleurSocket);
             }
+
+            //console.log() pour verifications a supr a la fin
+            console.log(game.echiquiers[indiceEchiquier].board);
+            console.log(game.echiquiers[indiceEchiquier].Nbtour);
+            console.log(game.echiquiers[indiceEchiquier].couts);
         }
         else{
             console.log("Réinitialisation d'un client - Move");
