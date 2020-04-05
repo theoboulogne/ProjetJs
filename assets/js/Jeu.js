@@ -95,6 +95,7 @@ class Jeu{
 
                     Game.rendu.loadBoardPieces(Game.echiquier.board);
                     document.body.lastChild.addEventListener("click", onClick, false);
+                    Hud.Affichage_AquiDejouer(0)
                 }
             }, 250);
             
@@ -162,7 +163,7 @@ class Jeu{
         //Coté UI
             Hud.Affichage_AquiDejouer(plateau.Nbtour)
             //Hud.Affichage_coups(plateau.couts,plateau.Nbtour);
-            //Hud.Affichage_coups(plateau.couts[plateau.couts.length-1],Nbtour);
+            Hud.Affichage_coups(plateau.couts,Nbtour);
             // Récupérer les couts joués et actualiser l'ui en conséquence
         });
         socket.on('reset', (echiquierReset, couleurReset) => {
