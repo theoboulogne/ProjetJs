@@ -126,8 +126,8 @@ io.sockets.on('connection',  (socket) =>{
             game.echiquiers[indiceEchiquier].board[deplacement.piece.x][deplacement.piece.y].piece.move(deplacement.x,deplacement.y,game.echiquiers[indiceEchiquier])
             game.echiquiers[indiceEchiquier].select = {x:-1, y:-1};
 
-            let piece_prise = 0 //On détecte la pièce prise, A FAIRE COTE CLIENT <-----------------------------------------------------------------------------------------------------------------------------------------
-            if(game.echiquiers[indiceEchiquier].Joueurs[(couleurSocket+1)%2].pieces_prises.length!=plateau.Joueurs[(couleurSocket+1)%2].pieces_prises.length){
+            let piece_prise = 0 //On détecte la pièce prise, A FAIRE COTE CLIENT
+            if(game.echiquiers[indiceEchiquier].Joueurs[(couleurSocket+1)%2].pieces_prises.length != plateau.Joueurs[(couleurSocket+1)%2].pieces_prises.length){
                 piece_prise = game.echiquiers[indiceEchiquier].Joueurs[(couleurSocket+1)%2].pieces_prises[game.echiquiers[indiceEchiquier].Joueurs[(couleurSocket+1)%2].pieces_prises.length - 1].piece
             }
             //if(game.echiquiers[indiceEchiquier].Joueurs[couleurSocket].pieces_prises.length>0){
@@ -143,6 +143,11 @@ io.sockets.on('connection',  (socket) =>{
                 console.log('Echec et Mat')
                 for(let i=0; i<2; i++) io.sockets.sockets[game.echiquiers[indiceEchiquier].Joueurs[i].id].emit('endGame', couleurSocket);
             }
+
+            //console.log() pour verifications a supr a la fin
+            console.log(game.echiquiers[indiceEchiquier].board);
+            console.log(game.echiquiers[indiceEchiquier].Nbtour);
+            console.log(game.echiquiers[indiceEchiquier].couts);
         }
         else{
             console.log("Réinitialisation d'un client - Move");
