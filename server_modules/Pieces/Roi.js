@@ -72,8 +72,8 @@ class Roi extends Piece{
 
     roquePlayable(plateau){
         let renvoi = [0,0];
-        let valeurs = [-4,3];
-       
+        let valeurs = [-3,4];
+        
         let tempX = this.x;
         
         if(this.deplacements.length == 1){
