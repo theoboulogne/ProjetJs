@@ -9,13 +9,9 @@
 
 
 
-
-
-
-
-// Définir un Idx par pièce au lieu de les récupérer par coordonnées pour éviter les bugs liés aux rendus décallés
-
-// OU mettre un timeout d'attente de fin de tween a chaque fois avant de sortir d'une animation.
+//TO DO :
+//CHANGEMENT DU PION A LA DERNIERE LIGNE
+//RECUPERER PSEUDO DU MENU
 
 
 
@@ -29,18 +25,14 @@
 class Jeu{
     constructor(){
 
-
-        //Dans le menu :
-        // demander le pseudo du joueur pour l'enregistrement des scores
-
+        let Game = this; // pour accéder depuis les fonctions
         function onClick(event) {
             console.log('onClick')
             if(Game.echiquier.Nbtour%2 == Game.couleur){//si son tour
                 console.log('Bon-Tour')
-                console.log(Game.echiquier)
                 if(Game.echiquier.select.x == -1 &&  Game.echiquier.select.y == -1){ //Récup case de la piece pour dmd playable
                     console.log('Playable')
-                    let intersectPiece = Game.rendu.getClickModels(event, Game.rendu.pieces);
+                    let intersectPiece = Game.rendu.getClickModels(event, Game.rendu.piecesObj);
                     if(intersectPiece.length){
                         let Coo = Game.rendu.getCooSelected(intersectPiece[0]);
                         if(Game.echiquier.board[Coo.x][Coo.y].piece != 0) {
@@ -64,14 +56,11 @@ class Jeu{
                     }
                     else Game.echiquier.select = {x:-1, y:-1} 
                         // reset coté client pour prochain click
-                    Game.rendu.removeObjects(Game.rendu.playableCases); 
+                    Game.rendu.removePlayable();
                 }
             }
             console.log('End-onClick')
         }
-
-
-        let Game = this;
     
 
         //connection server
@@ -99,19 +88,17 @@ class Jeu{
             // Lancer l'affichage de l'UI
 
 
-        //Coté ThreeJS          -   DEPLACER LE CHECK COTE CHESSSCRIPT <--------------------------------------------
-            let i, check;
+        //Coté ThreeJS
             let loadCheck = setInterval(function() {
-                check = true;
-                for(i=0; i<Game.rendu.models.length; i++) if(Game.rendu.models[i].obj == undefined) check = false;
-                if (check) {
+                if (Game.rendu.checkLoadModels()) {
                     clearInterval(loadCheck);
+
                     Game.rendu.loadBoardPieces(Game.echiquier.board);
                     document.body.lastChild.addEventListener("click", onClick, false);
+                    Hud.Affichage_AquiDejouer(0)
                 }
             }, 250);
             
-
 
         });
         socket.on('playable', (plateau) => {
@@ -130,37 +117,30 @@ class Jeu{
         });
         socket.on('move', (plateau,deplacement,piece_prise) => { // piece et deplacer en x,y
             console.log('Event - move')
-
-            console.log(plateau)
-            console.log(deplacement)
-            console.log(piece_prise)
-
-            //Récupération des données
+        //Récupération des données
             Game.echiquier = plateau;
-            //Détermination du roque
+        //Détermination du roque
             let deplacements = [deplacement];
-            let diff = deplacement.y - deplacement.piece.y
+            let diff = deplacement.x - deplacement.piece.x
             if(deplacement.piece.name == "Roi" && Math.abs(diff) == 2){
-                deplacements.push({ x:deplacement.x,
-                                    y:deplacement.y + diff/Math.abs(diff),
-                                    piece:plateau.board[deplacement.x][deplacement.piece.y + (diff/Math.abs(diff)) * 3.5 - 0.5]
+                deplacements.push({ x:deplacement.x + diff/Math.abs(diff),
+                                    y:deplacement.y,
+                                    piece:plateau.board[deplacement.x + (diff/Math.abs(diff)) * 3.5 + 0.5][deplacement.piece.y]
                                     });
             }
 
-        //Coté Gestion du jeu
-
             //On supprime la pièce si nécessaire
             if(piece_prise != 0){ // RECUPERER LA PIECE COTE CLIENT <-----------------------------------------------------------------------------------------------
-            //Coté threejs :
+            //Coté Threejs :
                 Game.rendu.moveOut(piece_prise);
             //Coté Gestion du jeu
                 Game.echiquier.board[piece_prise.x][piece_prise.y].piece = 0;
                 Game.echiquier.Joueurs[piece_prise.couleur].pieces_prises.push(piece_prise);
             }
             
-        //Coté threejs :
-        if(deplacements.length == 1) Game.rendu.movePiece(deplacement); // si pas de roque
-        else Game.rendu.moveRoque(deplacements);
+        //Coté ThreeJs :
+            if(deplacements.length == 1) Game.rendu.movePiece(deplacement); // si pas de roque
+            else Game.rendu.moveRoque(deplacements);
 
 
             // on déplace une piece (ou deux si on fait un roque)
@@ -179,10 +159,12 @@ class Jeu{
 
             //On augmente le nombre de tour pour indiquer que l'on change de joueur et pour l'affichage des couts
             plateau.Nbtour++;
-
+            
         //Coté UI
+            Hud.Affichage_AquiDejouer(plateau.Nbtour)
+            //Hud.Affichage_coups(plateau.couts,plateau.Nbtour);
+            Hud.Affichage_coups(plateau.couts,Nbtour);
             // Récupérer les couts joués et actualiser l'ui en conséquence
-
         });
         socket.on('reset', (echiquierReset, couleurReset) => {
             console.log('Event - reset')
@@ -193,12 +175,11 @@ class Jeu{
             
         // Coté Threejs
             // Changer l'affichage en conséquence :
-            //Vider le board des pieces + des playables
-            //appeller LoadBoardPieces
+            // Vider le board des pieces + des playables
+            // appeller LoadBoardPieces
 
         //Coté UI
-            //Refresh l'UI
-            // montrer une alerte au joueur pour indiquer qu'il y a une erreur ??
+            // Réactualiser tout l'HUD
         });
         socket.on('endGame', (couleurGagnant) => {
 
@@ -207,11 +188,15 @@ class Jeu{
 
         //Coté UI :
             // afficher un message indiquant si gagné ou perdu
-            // puis au click :
-            //  rediriger vers menu
+            // avec un bouton qui execute le code ci dessous
+            window.location.href = "./"
         });
         socket.on('menu', () => {
             console.log('Redirection vers le menu')
+
+            //Ajouter une fenetre de l'HUD pour signaler une déconnection de l'adversaire 
+            //avec un bouton qui redirige avec le code ci dessous
+
             window.location.href = "./"
         });
     }

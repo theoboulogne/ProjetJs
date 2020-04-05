@@ -1,8 +1,8 @@
 const Piece = require('./Piece');
 
 class Fou extends Piece{
-    constructor(couleur, x, y){
-        super(couleur, x, y)
+    constructor(couleur, x, y, id){
+        super(couleur, x, y, id)
     }
     playable(plateau) {
         let scan = [[-1,-1],[1,-1],[1,1],[-1,1]];
