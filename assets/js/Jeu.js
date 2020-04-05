@@ -80,6 +80,8 @@ class Jeu{
             // indiquer l'attente d'un autre joueur
         });
         socket.on('start', (plateau) => {
+            
+            SetInt();
             console.log('Event - start')
         //Coté Gestion du Jeu
             Game.echiquier = plateau;
@@ -98,7 +100,6 @@ class Jeu{
                 }
             }, 250);
             
-
 
         });
         socket.on('playable', (plateau) => {
