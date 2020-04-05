@@ -33,7 +33,7 @@ const io =  require('socket.io')(server);
 const Plateau = require('./server_modules/Plateau');
 const Joueur = require('./server_modules/Joueur');
 
-//Redirection des pages                                 REDIRECTION A CHANGER APRES CREATION DU MENU
+//Redirection des pages
 app.use(express.static(__dirname + '/assets/'));
 app.get('/', (req, res, next) => {
     res.sendFile(__dirname + '/assets/views/menu.html')
@@ -44,7 +44,7 @@ app.get('/jeu', (req, res, next) => {
 
 //On enregistre nos plateaux et nos joueurs avec leur socket
 this.echiquiers = new Array();
-let game = this;
+let game = this; // on stocke la variable pour pouvoir accéder de nos définitions d'event aux échiquiers
 
 io.sockets.on('connection',  (socket) =>{
     console.log('Nouvelle Connection Client')
@@ -77,8 +77,8 @@ io.sockets.on('connection',  (socket) =>{
                 }
             }
         }
-        //Reset si les conditions sont pas bonnes / si pas de cases playable
-        game.echiquiers[indiceEchiquier].select = {x:-1, y:-1};
+        
+        game.echiquiers[indiceEchiquier].select = {x:-1, y:-1}; //Reset si les conditions sont pas bonnes / si pas de cases playable
         if ((couleurSocket) == (game.echiquiers[indiceEchiquier].Nbtour%2) && 
             game.echiquiers[indiceEchiquier].board[piece.x][piece.y].piece.nom == piece.nom &&
             couleurSocket == game.echiquiers[indiceEchiquier].board[piece.x][piece.y].piece.couleur
@@ -130,11 +130,7 @@ io.sockets.on('connection',  (socket) =>{
             if(game.echiquiers[indiceEchiquier].Joueurs[(couleurSocket+1)%2].pieces_prises.length!=plateau.Joueurs[(couleurSocket+1)%2].pieces_prises.length){
                 piece_prise = game.echiquiers[indiceEchiquier].Joueurs[(couleurSocket+1)%2].pieces_prises[game.echiquiers[indiceEchiquier].Joueurs[(couleurSocket+1)%2].pieces_prises.length - 1].piece
             }
-            //if(game.echiquiers[indiceEchiquier].Joueurs[couleurSocket].pieces_prises.length>0){
-            //    if(game.echiquiers[indiceEchiquier].Joueurs[couleurSocket].pieces_prises[game.echiquiers[indiceEchiquier].Joueurs[couleurSocket].pieces_prises.length - 1].Nbtour == game.echiquiers[indiceEchiquier].Nbtour-1){ 
-            //        piece_prise = game.echiquiers[indiceEchiquier].Joueurs[couleurSocket].pieces_prises[game.echiquiers[indiceEchiquier].Joueurs[couleurSocket].pieces_prises.length - 1].piece;
-            //    }
-            //}
+            
             for(let i=0; i<2; i++){ // On envoi le déplacement a tout le monde
                 io.sockets.sockets[game.echiquiers[indiceEchiquier].Joueurs[i].id].emit('move', plateau, deplacement, piece_prise);
             }

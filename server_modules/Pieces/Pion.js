@@ -6,13 +6,6 @@ class Pion extends Piece {
     }
 
     playable(plateau){
-
-        //optimisation avec boucle de direction a faire..
-
-        //rajouter fonction de verification de sortie de plateau sur les coordonnées
-
-        // forcer le canmove lors du click sur la piece et jouer au relachement du click 
-        //(piece qui suit la souris avec l'animation)
         if(this.deplacements.length == 1) { //si jms jouée
             if(plateau.isInBoard(this.x,this.y+(Math.pow(-1,this.couleur)*(2)))){
                 if(plateau.check_vide(this.x,this.y+(Math.pow(-1,this.couleur)*(2)))) {
@@ -68,7 +61,7 @@ class Pion extends Piece {
                         }
                     }
                 }
-                plateau.jouer(x, y, this); // rajouter le changement de piece sur la derniere ligne
+                plateau.jouer(x, y, this);
             }
         }
     }

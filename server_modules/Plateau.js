@@ -6,12 +6,10 @@ const Reine = require('./Pieces/Reine');
 const Tour = require('./Pieces/Tour');
 
 const Case = require('./Case');
-//const Joueur = require('./Joueur'); // a verifier l'utilité pour joueur
 
 class Plateau{
     constructor(){
 
-        //Coté Client
         this.Nbtour = 0;
         this.board = new Array(8)
         for(let i = 0; i<8; i++){
@@ -47,37 +45,36 @@ class Plateau{
             idGeneration++;
         }
 
-        //Coté Serveur
         this.Joueurs = new Array()
         this.couts = new Array()
 
-        //select du playable a implémenter pour la sécurité
+        //Case sélectionnée du playable
         this.select = {x:-1, y:-1};
     }
+
+    //Méthodes d'accès au board
     isInBoard(x, y){
         if(x<0||y<0||x>7||y>7) return false;
         else return true;
     }
     getBoard(x,y){
         if(this.isInBoard(x,y)) return this.board[x][y];
-        else return new Case(); // Gestion de l'erreur a faire en fonction de l'utilisation, Case en attendant pour eviter l'erreur
+        else return new Case(); 
+        // Gestion de l'erreur a faire en fonction de l'utilisation, Case en attendant pour eviter l'erreur
+        //<---------------------------------------------------------------------------------------------------------------------
     }
     
-
+    //Méthode de vérification pour la présence de pièce (2 méthodes par rapport à la gestion d'erreur)
     check_vide(x,y){
-        if(this.isInBoard(x,y)){
-            if(this.board[x][y].piece == 0) return true;
-        }
+        if(this.isInBoard(x,y)) return (this.board[x][y].piece == 0);
         return false;
     }
     check_piece(x,y){
-        if(this.isInBoard(x,y)){
-            if(this.board[x][y].piece != 0) return true;
-        }
+        if(this.isInBoard(x,y)) return (this.board[x][y].piece != 0);
         return false;
     }
 
-
+    //Méthodes de gestion des cases jouables
     reset_playable(){
         for(let i = 0; i<8; i++){
             for(let j = 0; j<8; j++){
@@ -90,21 +87,19 @@ class Plateau{
             if(this.board[x][y].piece != 0) {
                 if(this.board[x][y].piece.couleur == piece.couleur) return;
             }
-            if(!this.check_echec(x,y,piece)) this.board[x][y].playable = true; // erreur a afficher sinon ? (ex:en rouge au lieu de vert)
+            if(!this.check_echec(x,y,piece)) this.board[x][y].playable = true; 
+            // erreur a afficher sinon ? (ex:en rouge au lieu de vert)
+            // A voir <------------------------------------------------------------------------------------------------
         }
     }
 
 
-    jouer(x, y, piece){//rajouter le coup dans l'affichage a faire par la suite + sécurité
-        if(this.board[x][y].piece!=0) this.supprimer(x, y)
+    jouer(x, y, piece){
+        this.supprimer(x, y)
         
-        //let deplacement = new Object(); // Vérif que ça marche bien a faire 
-                                          // sinon undo les commment
-        //deplacement.x = x
-        //deplacement.y = y
         piece.deplacements.push({x:x, y:y});
 
-        this.board[piece.x][piece.y].piece=0; //rajouter dans une methode ?
+        this.board[piece.x][piece.y].piece=0; //rajouter dans une methode ? <---------------------------------------------
         piece.x = x
         piece.y = y
 
@@ -113,15 +108,15 @@ class Plateau{
         this.board[x][y].piece = piece
 
         this.Nbtour++;
-        
-        this.reset_playable();
+
+        this.reset_playable(); // Vérifier que l'on ne répète pas ça <-----------------------------------------------------
     }
     supprimer(x,y){
-        if(this.isInBoard(x,y)){ // rajouter verif si pas vide
-            let piece_prise = {Nbtour:this.Nbtour, piece:this.board[x][y].piece}
+        if(this.check_piece(x, y)){
+            let piece_prise = {Nbtour:this.Nbtour, piece:this.board[x][y].piece}//Enregistrement pièce prise
             this.Joueurs[this.board[x][y].piece.couleur].pieces_prises.push(piece_prise);
 
-            this.Joueurs[this.board[x][y].piece.couleur].pieces--;
+            this.Joueurs[this.board[x][y].piece.couleur].pieces--;//Retrait de la pièce du board
             this.board[x][y].piece = 0;
         }
     }
@@ -151,10 +146,8 @@ class Plateau{
     
     check_echec(x, y, piece){ 
 
-        //Clone par copie, plus long a executer mais plus simple
-        // Amélioration possible en sélectionnant le strict nécessaire à cloner (Non car on l'utilise pour l'envoi au client)
+        //Clone par copie, plus long a executer mais plus simple à comprendre
 
-        //tmpPlateau.board[i][j].piece = window[classNameString](this.board[i][j].piece.couleur)
         let tmpPlateau = this.clone();
         tmpPlateau.board[x][y].playable = true;
         tmpPlateau.board[piece.x][piece.y].piece.move(x, y, tmpPlateau);
@@ -176,6 +169,9 @@ class Plateau{
         tmp.Joueurs = JSON.parse(JSON.stringify(this.Joueurs));
         tmp.couts = JSON.parse(JSON.stringify(this.couts));
         return tmp;
+
+        //Ancienne méthode de clone, non conservée car inutile
+
         //for(let i=0; i<this.Joueurs.length; i++){
         //    tmp.Joueurs.push(this.Joueurs[i].clone())
         //}
@@ -189,6 +185,9 @@ class Plateau{
     }
 
         /*
+
+        
+        //tmpPlateau.board[i][j].piece = window[classNameString](this.board[i][j].piece.couleur)
 
         //Test de clone sans conservation des méthodes, trop long..
 

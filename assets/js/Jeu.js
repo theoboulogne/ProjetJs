@@ -9,13 +9,9 @@
 
 
 
-
-
-
-
-// Définir un Idx par pièce au lieu de les récupérer par coordonnées pour éviter les bugs liés aux rendus décallés
-
-// OU mettre un timeout d'attente de fin de tween a chaque fois avant de sortir d'une animation.
+//TO DO :
+//CHANGEMENT DU PION A LA DERNIERE LIGNE
+//RECUPERER PSEUDO DU MENU
 
 
 
@@ -29,15 +25,11 @@
 class Jeu{
     constructor(){
 
-
-        //Dans le menu :
-        // demander le pseudo du joueur pour l'enregistrement des scores
-
+        let Game = this; // pour accéder depuis les fonctions
         function onClick(event) {
             console.log('onClick')
             if(Game.echiquier.Nbtour%2 == Game.couleur){//si son tour
                 console.log('Bon-Tour')
-                console.log(Game.echiquier)
                 if(Game.echiquier.select.x == -1 &&  Game.echiquier.select.y == -1){ //Récup case de la piece pour dmd playable
                     console.log('Playable')
                     let intersectPiece = Game.rendu.getClickModels(event, Game.rendu.piecesObj);
@@ -69,9 +61,6 @@ class Jeu{
             }
             console.log('End-onClick')
         }
-
-
-        let Game = this;
     
 
         //connection server
@@ -128,14 +117,9 @@ class Jeu{
         });
         socket.on('move', (plateau,deplacement,piece_prise) => { // piece et deplacer en x,y
             console.log('Event - move')
-
-            console.log(plateau)
-            console.log(deplacement)
-            console.log(piece_prise)
-
-            //Récupération des données
+        //Récupération des données
             Game.echiquier = plateau;
-            //Détermination du roque
+        //Détermination du roque
             let deplacements = [deplacement];
             let diff = deplacement.y - deplacement.piece.y
             if(deplacement.piece.name == "Roi" && Math.abs(diff) == 2){
@@ -145,18 +129,16 @@ class Jeu{
                                     });
             }
 
-        //Coté Gestion du jeu
-
             //On supprime la pièce si nécessaire
             if(piece_prise != 0){ // RECUPERER LA PIECE COTE CLIENT <-----------------------------------------------------------------------------------------------
-            //Coté threejs :
+            //Coté Threejs :
                 Game.rendu.moveOut(piece_prise);
             //Coté Gestion du jeu
                 Game.echiquier.board[piece_prise.x][piece_prise.y].piece = 0;
                 Game.echiquier.Joueurs[piece_prise.couleur].pieces_prises.push(piece_prise);
             }
             
-            //Coté threejs :
+        //Coté ThreeJs :
             if(deplacements.length == 1) Game.rendu.movePiece(deplacement); // si pas de roque
             else Game.rendu.moveRoque(deplacements);
 
@@ -177,10 +159,10 @@ class Jeu{
 
             //On augmente le nombre de tour pour indiquer que l'on change de joueur et pour l'affichage des couts
             plateau.Nbtour++;
-
+            
         //Coté UI
+            Hud.Affichage_AquiDejouer(plateau.Nbtour)
             // Récupérer les couts joués et actualiser l'ui en conséquence
-
         });
         socket.on('reset', (echiquierReset, couleurReset) => {
             console.log('Event - reset')
@@ -191,12 +173,11 @@ class Jeu{
             
         // Coté Threejs
             // Changer l'affichage en conséquence :
-            //Vider le board des pieces + des playables
-            //appeller LoadBoardPieces
+            // Vider le board des pieces + des playables
+            // appeller LoadBoardPieces
 
         //Coté UI
-            //Refresh l'UI
-            // montrer une alerte au joueur pour indiquer qu'il y a une erreur ??
+            // Réactualiser tout l'HUD
         });
         socket.on('endGame', (couleurGagnant) => {
 
@@ -205,11 +186,15 @@ class Jeu{
 
         //Coté UI :
             // afficher un message indiquant si gagné ou perdu
-            // puis au click :
-            //  rediriger vers menu
+            // avec un bouton qui execute le code ci dessous
+            window.location.href = "./"
         });
         socket.on('menu', () => {
             console.log('Redirection vers le menu')
+
+            //Ajouter une fenetre de l'HUD pour signaler une déconnection de l'adversaire 
+            //avec un bouton qui redirige avec le code ci dessous
+
             window.location.href = "./"
         });
     }

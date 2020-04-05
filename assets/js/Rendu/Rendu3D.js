@@ -221,7 +221,7 @@ class RenduThreeJs{
 
 
     GenerateBoard(){
-        let boardTexture = new THREE.ImageUtils.loadTexture("../../textures/board-pattern.png");
+        let boardTexture = new THREE.ImageUtils.loadTexture("../../img/board-pattern.png");
         boardTexture.repeat.set(4,4);
         boardTexture.wrapS = THREE.RepeatWrapping;
         boardTexture.wrapT = THREE.RepeatWrapping;

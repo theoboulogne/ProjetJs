@@ -73,8 +73,6 @@ class Roi extends Piece{
     roquePlayable(plateau){
         let renvoi = [0,0];
         let valeurs = [-4,3];
-        //Première itération erreur : board[-1][7]
-        // j'ai essayé en inversant 4 et 3 ([-3,4]) -> pas de playable affiché du tout
        
         let tempX = this.x;
  
@@ -105,7 +103,7 @@ class Roi extends Piece{
         if(plateau.isInBoard(x,y)){
             if(plateau.board[x][y].playable){
                 let diff = y - this.y;
-                if(Math.abs(diff) == 2){
+                if(Math.abs(diff) == 2){ // Déplacement du Roque
                     plateau.jouer(x,y,this);
                     if (diff == -2) plateau.jouer(x,y + 1,plateau.board[this.x][this.y - 4].piece);
                     else plateau.jouer(x,y - 1,plateau.board[this.x][this.y + 3].piece);
@@ -117,10 +115,11 @@ class Roi extends Piece{
                     if(diff == 2)  plateau.couts.push("Petit roque");
                     else plateau.couts.push("Grand roque");
                 }
-                else{
-                    plateau.jouer(x, y, this); // appeler méthode du parent ?
+                else{ //Déplacement normal
+                    plateau.jouer(x, y, this);
 
                 }
+                //On enregistre les coo dans joueur pour pouvoir regarder echec depuis le plateau
                 plateau.Joueurs[this.couleur].roi.x = x;
                 plateau.Joueurs[this.couleur].roi.y = y;
             }
