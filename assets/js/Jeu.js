@@ -81,7 +81,7 @@ class Jeu{
         });
         socket.on('start', (plateau) => {
             
-            SetInt();
+            //SetInt();
             console.log('Event - start')
         //Coté Gestion du Jeu
             Game.echiquier = plateau;

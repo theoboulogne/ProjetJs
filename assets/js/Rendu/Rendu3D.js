@@ -287,9 +287,6 @@ class RenduThreeJs{
                         else child.material = new THREE.MeshLambertMaterial({color: 0xFFFFFF});
                     }
                 });
-                
-                console.log('Pieces tab')
-                console.log(Pieces)
                 for(let j=0; j<Pieces.length; j++){
                     if(Pieces[j].nom == this.models[i].nom && Pieces[j].couleur == couleur) {
                         let tmpobj = (obj).clone();
