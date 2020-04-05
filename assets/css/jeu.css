@@ -1,11 +1,8 @@
-
-.test{
-    padding-right: 50%;
-}
 body {
     background-color: black;
     overflow: hidden;
   }
+
 .AquiDejouer{
     height : 40%;
     width : 50%;
@@ -16,6 +13,7 @@ body {
     margin-top: 0;
     margin-left: 37%;
 }
+
 .coups_blanc{
     height : 40%;
     width : 50%;
@@ -38,6 +36,7 @@ body {
     margin-left: 60%;
     float: left;
 }
+
 .ecriture{
     color: beige;
 }
@@ -57,54 +56,61 @@ h2{
     font-size: 1vw;
     color: beige;
 }
+
 .sc-overflow {
     overflow-y: auto;
-  }
-  
-  section {
-    min-height: 100px;
-  }
-  
-  .container {
-    max-height: 200px;
-    margin-top: 13%;
-    overflow-x: hidden;
-    background :rgb(230, 225, 225);
-  }
-  
-  article {
-    height: 200px;
-    background :rgb(230, 225, 225);
-    padding: 0;
-    padding-top: 0;
-  }
-  .fenetre_coups{
-    margin-left: 75%;
-    height : 40%;
-    width : 20%;
-    position: absolute;
-    z-index: 2;
-    height: 0;
-    margin-bottom: 0;
-    margin-top: 0;
-    margin-left: 80%;
-    background: rgb(230, 225, 225);
-  }
-  .navbar {
-    overflow: hidden;
-    background-color: #333;
-    position: fixed; /* Set the navbar to fixed position */
-    top: 0; /* Position the navbar at the top of the page */
-    width: 20%; /* Full width */
-  }
-  .navbar a {
-    float: left;
-    display: block;
-    color: #f2f2f2;
-    text-align: center;
-    padding: 14px 16px;
-    text-decoration: none;
-  }
-  .chrono{
-    position: absolute;
-  }
+}
+
+section {
+  min-height: 100px;
+}
+
+.container {
+  max-height: 200px;
+  overflow-x: hidden;
+  background :rgb(230, 225, 225);
+}
+article {
+  height: 200px;
+  background :rgb(230, 225, 225);
+  padding: 0;
+  padding-top: 0;
+}
+.fenetre_coups{
+  margin-left: 75%;
+  height : 40%;
+  width : 20%;
+  position: absolute;
+  z-index: 2;
+  height: 0;
+  margin-bottom: 0;
+  margin-top: 0;
+  margin-left: 80%;
+  background: rgb(230, 225, 225);
+}
+
+.navbar {
+  overflow: hidden;
+  background-color: #333;
+  position: fixed; /* Set the navbar to fixed position */
+  top: 0; /* Position the navbar at the top of the page */
+  width: 20%; /* Full width */
+}
+.navbar a {
+  float: left;
+  display: block;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+.chrono{
+  position: absolute;
+  border-width:5px;
+  border-color: #333;
+  background :rgb(230, 225, 225);
+  font-size: 2vw;
+  width: 29%;
+  margin-left: 35%;
+}
