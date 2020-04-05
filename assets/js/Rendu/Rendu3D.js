@@ -308,32 +308,64 @@ class RenduThreeJs{
         }
     }
 
-    LoadPieceOut(piece){
-        let idx = -1;
-        for(let i=0; i<this.models.length; i++) if(this.models[i].nom == piece.nom) idx = i;
-
-        if(idx > -1){
-            let obj = (this.models[idx].obj).clone()
+    LoadPiecesOut(piecesOut) {
+        for(let i=0; i<this.piecesOut.length; i++){
+            let obj = (this.piecesOut[i].obj).clone()
             obj.traverse( function ( child ) {
                 if (child instanceof THREE.Mesh) {
                     // on définit la couleur
-                    if(piece.couleur) child.material = new THREE.MeshLambertMaterial({color: 0x555555});
+                    if(couleur) child.material = new THREE.MeshLambertMaterial({color: 0x555555});
                     else child.material = new THREE.MeshLambertMaterial({color: 0xFFFFFF});
                 }
             });
 
-            // add tableau
-            this.piecesOut[piece.couleur].push(obj);
-            if (piece.couleur) obj.position.set( 3+this.piecesOut.indexOf(obj), -2.3, 3);   // z hors champs de caméra
-            else obj.position.set( 3+this.piecesOut.indexOf(obj), 2.3, 3);                  // z hors champs de caméra
+            for(let j=0; j<piecesOut.length; j++){
+        
+                if (piece.couleur) obj.position.set(5-this.piecesOut.indexOf(obj), -2.3, 3);   // z hors champs de caméra
+                else obj.position.set( 3+this.piecesOut.indexOf(obj), 2.3, 3);                 // z hors champs de caméra
 
-            // taille / orientation
-            obj.scale.set(.015, .015, .015);
-            obj.rotation.x = 1.57;
+                // taille / orientation
+                obj.scale.set(.015, .015, .015);
+                obj.rotation.x = 1.57;
 
-            // on l'affiche
-            this.scene.add(obj);
+                // on l'affiche
+                this.scene.add(obj);
+            }
         }
+    }
+
+    reloadAll() {
+        this.removePieces();
+        this.removePlayables();
+        this.LoadPieces(pieces);
+        this.LoadPiecesOut(this.piecesOut);
+    }
+	
+	
+    LoadPieceOut(piece){
+        let idx = -1;
+        for(let i=0; i<this.models.length; i++) if(this.models[i].nom == piece.nom) idx = i;
+
+        let obj = (this.models[idx].obj).clone()
+        obj.traverse( function ( child ) {
+            if (child instanceof THREE.Mesh) {
+                // on définit la couleur
+                if(piece.couleur) child.material = new THREE.MeshLambertMaterial({color: 0x555555});
+                else child.material = new THREE.MeshLambertMaterial({color: 0xFFFFFF});
+            }
+        });
+
+        // add tableau
+        this.piecesOut[piece.couleur].push(obj);
+        if (piece.couleur) obj.position.set( 5-this.piecesOut.indexOf(obj), -2.3, 3);   // z hors champs de caméra
+        else obj.position.set( 3+this.piecesOut.indexOf(obj), 2.3, 3);                  // z hors champs de caméra
+
+        // taille / orientation
+        obj.scale.set(.015, .015, .015);
+        obj.rotation.x = 1.57;
+
+        // on l'affiche
+        this.scene.add(obj);
     }
 }
 
