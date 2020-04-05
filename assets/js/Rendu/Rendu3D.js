@@ -46,7 +46,7 @@ class RenduThreeJs{
             {nom:"Roi", obj:undefined}
         ];
         for(let i=0; i<this.models.length; i++){
-            objLoader.load("../models/" + this.models[i].nom + ".obj", function(object) {
+            objLoader.load("../models/Classic/" + this.models[i].nom + ".obj", function(object) {
                 Rendu.models[i].obj = (object);
             });
         }
