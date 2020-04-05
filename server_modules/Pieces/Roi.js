@@ -1,8 +1,8 @@
 const Piece = require('./Piece');
 
 class Roi extends Piece{
-    constructor(couleur, x, y){
-        super(couleur, x, y)
+    constructor(couleur, x, y, id){
+        super(couleur, x, y, id)
     }
 
     verifierboucle(pieceName,sens, plateau){

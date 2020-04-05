@@ -1,9 +1,14 @@
 class Piece{
-    constructor(couleur, x, y){
+    constructor(couleur, x, y, id){
+
+        console.log("Initialisation d'un : "+this.constructor.name+" , id : " + id)
+
         //Coté client
         this.x = x;//Initialisation des coordonnées (classe a faire ?)
         this.y = y;
         this.couleur = couleur; // couleur de la pièce
+
+        this.id = id;
         
         this.nom = this.constructor.name;
 
@@ -24,7 +29,7 @@ class Piece{
     clone(){
         //On peut pas le mettre en haut car il s'agit de classe enfant
         const P = eval("require('./"+this.nom+"')")
-        let tmp = new P(this.couleur, this.x, this.y)
+        let tmp = new P(this.couleur, this.x, this.y, this.id)
         tmp.deplacements = JSON.parse(JSON.stringify(this.deplacements));
         return tmp;
         

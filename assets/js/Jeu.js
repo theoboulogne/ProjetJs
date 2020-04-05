@@ -40,7 +40,7 @@ class Jeu{
                 console.log(Game.echiquier)
                 if(Game.echiquier.select.x == -1 &&  Game.echiquier.select.y == -1){ //Récup case de la piece pour dmd playable
                     console.log('Playable')
-                    let intersectPiece = Game.rendu.getClickModels(event, Game.rendu.pieces);
+                    let intersectPiece = Game.rendu.getClickModels(event, Game.rendu.piecesObj);
                     if(intersectPiece.length){
                         let Coo = Game.rendu.getCooSelected(intersectPiece[0]);
                         if(Game.echiquier.board[Coo.x][Coo.y].piece != 0) {
@@ -64,7 +64,7 @@ class Jeu{
                     }
                     else Game.echiquier.select = {x:-1, y:-1} 
                         // reset coté client pour prochain click
-                    Game.rendu.removeObjects(Game.rendu.playableCases); 
+                    Game.rendu.removePlayable();
                 }
             }
             console.log('End-onClick')
@@ -99,13 +99,11 @@ class Jeu{
             // Lancer l'affichage de l'UI
 
 
-        //Coté ThreeJS          -   DEPLACER LE CHECK COTE CHESSSCRIPT <--------------------------------------------
-            let i, check;
+        //Coté ThreeJS
             let loadCheck = setInterval(function() {
-                check = true;
-                for(i=0; i<Game.rendu.models.length; i++) if(Game.rendu.models[i].obj == undefined) check = false;
-                if (check) {
+                if (Game.rendu.checkLoadModels()) {
                     clearInterval(loadCheck);
+
                     Game.rendu.loadBoardPieces(Game.echiquier.board);
                     document.body.lastChild.addEventListener("click", onClick, false);
                 }
@@ -158,9 +156,9 @@ class Jeu{
                 Game.echiquier.Joueurs[piece_prise.couleur].pieces_prises.push(piece_prise);
             }
             
-        //Coté threejs :
-        if(deplacements.length == 1) Game.rendu.movePiece(deplacement); // si pas de roque
-        else Game.rendu.moveRoque(deplacements);
+            //Coté threejs :
+            if(deplacements.length == 1) Game.rendu.movePiece(deplacement); // si pas de roque
+            else Game.rendu.moveRoque(deplacements);
 
 
             // on déplace une piece (ou deux si on fait un roque)

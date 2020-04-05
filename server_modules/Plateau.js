@@ -20,13 +20,31 @@ class Plateau{
                 this.board[i][j] = new Case();
             }
         }
+        let idGeneration = 0 // on définit un Id à la génération pour chaque pièce afin de pouvoir les sélectionner 
+                             // correctement et ainsi éviter les problèmes liés aux fonctions de déplacement qui sont
+                             // executées lorsque l'on est sur la page 
+                             // (sinon lors de la prise d'une pièce il arrive que la pièce déplacée soit supprimée également..)
         for(let j=0; j<2; j++){
-            for(let i=0; i<8; i++) this.board[i][1 + (j*5)].piece = new Pion(j, i, 1 + (j*5));
-            for(let i=0; i<2; i++) this.board[i*7][j*7].piece = new Tour(j, i*7, j*7);
-            for(let i=0; i<2; i++) this.board[1 + (i*5)][j*7].piece = new Cavalier(j, 1 + (i*5), j*7);
-            for(let i=0; i<2; i++) this.board[2 + (i*3)][j*7].piece = new Fou(j, 2+ (i*3), j*7);
-            this.board[4][j*7].piece = new Reine(j, 4, j*7);
-            this.board[3][j*7].piece = new Roi(j, 3, j*7); // mettre la coordonnée du roi depuis joueur ?
+            for(let i=0; i<8; i++) {
+                this.board[i][1 + (j*5)].piece = new Pion(j, i, 1 + (j*5), idGeneration); 
+                idGeneration++;
+            }
+            for(let i=0; i<2; i++) {
+                this.board[i*7][j*7].piece = new Tour(j, i*7, j*7, idGeneration);
+                idGeneration++;
+            }
+            for(let i=0; i<2; i++) {
+                this.board[1 + (i*5)][j*7].piece = new Cavalier(j, 1 + (i*5), j*7, idGeneration); 
+                idGeneration++;
+            }
+            for(let i=0; i<2; i++) {
+                this.board[2 + (i*3)][j*7].piece = new Fou(j, 2+ (i*3), j*7, idGeneration); 
+                idGeneration++;
+            }
+            this.board[4][j*7].piece = new Reine(j, 4, j*7, idGeneration); 
+            idGeneration++;
+            this.board[3][j*7].piece = new Roi(j, 3, j*7, idGeneration); 
+            idGeneration++;
         }
 
         //Coté Serveur
