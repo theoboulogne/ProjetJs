@@ -6,21 +6,23 @@
     </style>
 </head>
 <body>
-
+    
     <div class = "AquiDejouer" id = "AquiDejouer"></div>
     
-    <div class="affichage_coups" id="affichage_coups">
-        <div class="coups_blanc" >
-            <h2 class="ecriture">coups blanc:</h2>
-            <div id = "coups_blanc">
+    <div class = "fenetre_coups">
+            <div class="container scstyle-10 sc-overflow">
+                <div class="navbar">
+                    <a class="ecriture_coups">coups blanc:</a>
+                    <a class="ecriture_coups_noir">coups noir:</a>
+                </div>
+                <article>
+                    <div class="coups_blanc"  id = "coups_blanc">
+                    </div>
+                    <div class="coups_noir" id = "coups_noir">
+                    </div>
+                </article>
             </div>
-        </div> 
-        <div class="coups_noir" >
-            <h2 class="ecriture">coups noir:</h2>
-            <div id = "coups_noir">
-            </div>
-        </div>
-    </div>
+
         
     <script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r71/three.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
@@ -32,5 +34,10 @@
     <script type="application/javascript" src="../js/Hud/Jeu.js"></script>
 
     <script src="../js/Jeu.js"></script>
+
+    <form>
+        <input  class = "chrono" type=text name=Text_1 value=00:00>
+    </form>
+    <script src="../js/Hud/Chrono.js"></script>
 
 </body>

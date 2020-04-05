@@ -16,8 +16,6 @@ let Hud = (function(){
     return{
         Affichage_coups : (coups, Nbtour) => { 
             let div
-            //document.getElementById('coups_blanc').innerHTML = "";
-            //document.getElementById('coups_noir').innerHTML = "";
             let cout = document.createElement("h2");
             cout.setAttribute("class","ecriture_coups");
             if(Nbtour % 2 == 0){
@@ -46,8 +44,14 @@ let Hud = (function(){
             div.append(cout);
             cout.appendChild(texte);
         },
+        /*Message_Alerte : (texte)=>{
+            alert(texte);
+            while(!confirm(texte)){}
+            window.location.href = "./";
+        }*/
     }
 })();
+
 
 Hud.Affichage_coups(coups,Nbtour);
 Hud.Affichage_AquiDejouer(Nbtour);
@@ -101,3 +105,4 @@ coups.push('C6')
 Nbtour = 2;
 Hud.Affichage_coups(coups,Nbtour);
 
+//Hud.Message_Alerte("test");
