@@ -19,6 +19,7 @@ const io =  require('socket.io')(server);
 //Import des classes
 const Plateau = require('./server_modules/Plateau');
 const Joueur = require('./server_modules/Joueur');
+const Chrono = require('./server_modules/Chrono');
 
 //Redirection des pages
 app.use(express.static(__dirname + '/assets/'));
@@ -106,8 +107,7 @@ io.sockets.on('connection',  (socket) =>{
             (deplacement.piece.x == game.echiquiers[indiceEchiquier].select.x) &&
             (deplacement.piece.y == game.echiquiers[indiceEchiquier].select.y) &&
             (game.echiquiers[indiceEchiquier].board[deplacement.x][deplacement.y].playable)){
-                    
-
+            
             //on clone le plateau pour l'envoyer avant le déplacement afin de l'effectuer graphiquement en front
             let plateau = (game.echiquiers[indiceEchiquier]).clone();
             game.echiquiers[indiceEchiquier].board[deplacement.piece.x][deplacement.piece.y].piece.move(deplacement.x,deplacement.y,game.echiquiers[indiceEchiquier])
