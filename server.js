@@ -1,8 +1,6 @@
 //Serveur - Echec
 
 //Constantes
-
-
 const port = 800;
 const express = require('express');
 const app = express();
@@ -13,7 +11,8 @@ const io =  require('socket.io')(server);
 const Plateau = require('./server_modules/Plateau');
 const Joueur = require('./server_modules/Joueur');
 const Chrono = require('./server_modules/Chrono');
-const EnvoiScoreBDD = require('./server_modules/Mysql');
+//Import des Modules
+const MYSQL = require('./server_modules/Mysql');
 
 //Redirection des pages
 app.use(express.static(__dirname + '/assets/'));
@@ -25,10 +24,15 @@ app.get('/jeu', (req, res, next) => {
     res.sendFile(__dirname + '/assets/views/jeu.html')
 });
 
+//Création de la table score dans la BDD si nécessaire
+MYSQL.CreationScoreBDD()
+
+//On stocke dans une variable tampon les paramètre du dernier client car on y accède uniquement depuis le app.get
 let lastParam = undefined;
 //On enregistre nos plateaux et nos joueurs avec leur socket
 this.echiquiers = new Array();
-let game = this; // on stocke la variable pour pouvoir accéder de nos définitions d'event aux échiquiers
+// on stocke la variable pour pouvoir accéder de nos définitions d'event aux échiquiers
+let game = this; 
 
 io.sockets.on('connection',  (socket) =>{
     console.log('Nouvelle Connection Client')
@@ -133,11 +137,11 @@ io.sockets.on('connection',  (socket) =>{
                 io.sockets.sockets[game.echiquiers[indiceEchiquier].Joueurs[i].id].emit('move', plateau, deplacement, piece_prise);
             }
             
-            if(game.echiquiers[indiceEchiquier].echecEtMat((couleurSocket+1)%2)){//Detection fin de partie
+            if(true || game.echiquiers[indiceEchiquier].echecEtMat((couleurSocket+1)%2)){//Detection fin de partie
                 console.log('Echec et Mat')
                 
                 //Enregistrement dans la BDD mysql
-                EnvoiScoreBDD(game.echiquiers[indiceEchiquier], couleurSocket);
+                MYSQL.EnvoiScoreBDD(game.echiquiers[indiceEchiquier], couleurSocket);
 
                 //Envoi de l'event aux client pour rediriger vers le menu
                 for(let i=0; i<2; i++) io.sockets.sockets[game.echiquiers[indiceEchiquier].Joueurs[i].id].emit('endGame', couleurSocket);
