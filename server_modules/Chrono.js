@@ -8,22 +8,36 @@ class Chrono{
     startTour(couleur){
         let Tour = new Date();
 
-        let m = Math.abs(tour.getMinutes() - this.Precedent.getMinutes());
-        let s = Math.abs(tour.getSecondes() - this.Precedent.getSecondes());
-
-        this.Chrono[couleur].m += m;
-        this.Chrono[couleur].s += s;
-
-        if(this.Chrono[couleur].s >= 60){
-            this.Chrono[couleur].m += 1;
-            this.Chrono[couleur].s -= 60;
-        }
+        let TempsEcoule = {
+            m: Math.abs(Tour.getMinutes() - this.Precedent.getMinutes()),
+            s: Math.abs(Tour.getSeconds() - this.Precedent.getSeconds())
+        };
+        this.Chrono[couleur] = this.addChrono(this.Chrono[couleur], TempsEcoule);
 
         this.Precedent = Tour;
     }
+    addChrono(a, b){
+        let renvoi = {m:(a.m + b.m), s:(a.s + b.s)};
+        
+        while(renvoi.s >= 60){
+            renvoi.m += 1;
+            renvoi.s -= 60;
+        }
+
+        return renvoi;
+    }
+
 
     getChronoTotal(){
-        return {m:this.Chrono[0].m + this.Chrono[1].m, s:this.Chrono[0].s + this.Chrono[1].s}
+        let ChronoTotal = this.addChrono(this.Chrono[0], this.Chrono[1]);
+
+        ChronoTotal.h = 0 // on rajoute les heures uniquement pour l'enregistrement en BDD
+        while(ChronoTotal.m >= 60){
+            ChronoTotal.h += 1;
+            ChronoTotal.m -= 60;
+        }
+
+        return String(ChronoTotal.h) + ":" + String(ChronoTotal.m) + ":" + String(ChronoTotal.s);
     }
 }
 

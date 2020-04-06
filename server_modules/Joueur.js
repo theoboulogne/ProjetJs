@@ -7,8 +7,9 @@
 
 
 class Joueur{
-    constructor(couleur, id){
+    constructor(couleur, id, pseudo){
         this.id = id; // l'id correspond à l'id de la socket correspondante
+        this.pseudo = pseudo // le pseudo est enregistré pour l'enregistrement des scores
 
         this.pieces = 16; // 16 au debut de la partie  
         this.couleur = couleur // 0 ou 1, blanc/noir 
