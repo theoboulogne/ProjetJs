@@ -129,7 +129,7 @@ class Plateau{
                         this.board[j][k].piece.playable(this);
                         for(let l = 0; l < 8; l++){
                             for(let m = 0; m < 8; m++){
-                                if(this.board[l][m].playable()){
+                                if(this.board[l][m].playable){
                                     return false;
                                 }
                             }

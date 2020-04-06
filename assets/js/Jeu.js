@@ -6,9 +6,6 @@
 
 
 
-
-
-
 //TO DO :
 //CHANGEMENT DU PION A LA DERNIERE LIGNE
 //RECUPERER PSEUDO DU MENU
@@ -25,7 +22,11 @@
 class Jeu{
     constructor(){
 
+
         let Game = this; // pour accéder depuis les fonctions
+
+
+
         function onClick(event) {
             console.log('onClick')
             if(Game.echiquier.Nbtour%2 == Game.couleur){//si son tour
@@ -70,9 +71,14 @@ class Jeu{
 
         //Coté Gestion du jeu
             Game.couleur = couleur;
-
+            
             //On retire le renderer du DOM pour reset proprement en cas de reset du serveur
-            if(Game.rendu != undefined) document.body.removeChild(document.body.lastChild)
+            if(Game.rendu != undefined) {
+                document.body.removeChild(document.body.lastChild)//on supprime le rendu
+                document.getElementById('infos').parentNode.removeChild(document.getElementById('infos'));
+                //on supprime l'import des infos sur les modèles
+            }
+
             Game.rendu = new RenduThreeJs(); // prendre la couleur en entrée pour définir la caméra ?
                                              // la déplacer au moment du start ?
 
@@ -191,12 +197,17 @@ class Jeu{
             // avec un bouton qui execute le code ci dessous
             window.location.href = "./"
         });
-        socket.on('menu', () => {
-            console.log('Redirection vers le menu')
+        socket.on('deconnection', () => {
+            console.log('Redirection vers le menu') // car déconnection de l'adversaire
 
             //Ajouter une fenetre de l'HUD pour signaler une déconnection de l'adversaire 
             //avec un bouton qui redirige avec le code ci dessous
 
+            window.location.href = "./"
+        });
+        
+        socket.on('menu', () => {
+            console.log('Redirection vers le menu') // manque de paramètres (gérer un message d'erreur ?)
             window.location.href = "./"
         });
     }
@@ -204,6 +215,8 @@ class Jeu{
 
 
 (function() {
+    
+
 	let game = new Jeu();
 })();
 

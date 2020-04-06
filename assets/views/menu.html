@@ -18,8 +18,10 @@
             <center>
                 <div class="entrer_pseudo">
                     <h2 class= "ecriture">Entrer votre nom d'utilisateur :</h2> 
-                    <form name="from_pseudo">
-                        <input class="form-control" type="text" name = "pseudo" id="pseudo" placeholder="Votre pseudo">
+                    <form name="from_pseudo" method="GET" action="./jeu">
+                        <input class="form-control" type="text" name="pseudo" id="pseudo" placeholder="Votre pseudo">
+                        <input class="form-control" type="text" name="affichage" id="affichage" placeholder="Quel affichage ? (mettre en dropdown)">
+                        <button type="submit">test</button>
                     </form>
                 </div>
                 <button type="button" class="btn btn-dark" id="play">PLAY</button>
