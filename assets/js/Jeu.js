@@ -12,8 +12,15 @@ ECHEC BUG AVEC PION EN ARRIERE
 ROQUE MARCHE AVEC PIECE ENTRE DEUX + SI EN ECHEC
 
 
-+ Changer le système de récupération des infos sur les modèles (avec JQuery + Express (envoi du serveur))
++ Changer le système de récupération des infos sur les modèles (avec JQuery) :
+
+$.getJSON("test.json", function(json) {
+    console.log(json); // this will show the info it in firebug console
+});
+
+
 + Rajouter l'envoi de la bdd dans le menu avec express + jquery aussi
+
 
 
 A vérifier :
