@@ -3,33 +3,52 @@
     <style>
         body { margin: 0; }
         canvas { width: 100%; height: 100% }
-    </style>
+    </style> 
+    <link href="../css/all.css" rel="stylesheet">
+    
 </head>
 <body>
     
     <div class = "AquiDejouer" id = "AquiDejouer"></div>
-    
+
     <div class = "fenetre_coups">
-            <div class="container scstyle-10 sc-overflow">
-                <div class="navbar">
-                    <a class="ecriture_coups">coups blanc:</a>
-                    <a class="ecriture_coups_noir">coups noir:</a>
+        <div class="navbar">
+            <a class="ecriture_coups">coups blanc: </a>
+            <a class="ecriture_coups_noir">coups noir:</a>
+        </div>
+        <div class="container scstyle-10 sc-overflow">
+            <article>
+                <div class="coups_blanc"  id = "coups_blanc">
                 </div>
-                <article>
-                    <div class="coups_blanc"  id = "coups_blanc">
-                    </div>
-                    <div class="coups_noir" id = "coups_noir">
-                    </div>
-                </article>
-            </div>
+<div id="attente" class="modal">
+    <h1>Attente d'un adversaire, veuillez patienter.</h1>
+</div>
+                <div class="coups_noir" id = "coups_noir">
+                </div>
+            </article>
+        </div>
         <form>
             <input  class = "chrono" type=text name=Text_1 value=00:00>
         </form>
     </div>
-</div>
-<div id="attente" class="modal">
-    <h1>Attente d'un adversaire, veuillez patienter.</h1>
-</div>
+    
+    <div id="choix_piece" class="modal">
+        <center>
+            <h2 class="ecriture_choix_piece">Choisissez votre piece :</h2>
+            <button type="button" class="btn btn-default btn-sm" id="bouton_reine">
+                <i class="fas fa-chess-queen"></i>
+            </button>
+            <button type="button" class="btn btn-default btn-sm" id="bouton_fou">
+                <i class="fas fa-chess-bishop"></i>
+            </button>  
+            <button type="button" class="btn btn-default btn-sm" id="bouton_chevalier">
+                <i class="fas fa-chess-knight"></i>
+            </button>
+            <button type="button" class="btn btn-default btn-sm" id="bouton_tour">
+                <i class="fas fa-chess-rook"></i>
+            </button>
+        </center>
+    </div>
 
 <div id="popup" class="modal">
     <h1 id="contenu-popup">Test</h1>
@@ -40,7 +59,9 @@
     <script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r71/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
-
+    <!-- jQuery Modal Plugin -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
     <script type="application/javascript" src="../js/Rendu/OBJLoader.js"></script>
     <script type='text/javascript' src='../js/Rendu/tween.js'></script>
     <script type="application/javascript" src="../js/Rendu/getParams.js"></script>
