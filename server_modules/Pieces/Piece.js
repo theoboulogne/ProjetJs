@@ -1,9 +1,11 @@
 class Piece{
-    constructor(couleur, x, y){
+    constructor(couleur, x, y, id){
         //Coté client
         this.x = x;
         this.y = y;
-        this.couleur = couleur; // couleur de la pièce
+        this.couleur = couleur;
+
+        this.id = id;
         
         this.nom = this.constructor.name;
 
@@ -14,7 +16,7 @@ class Piece{
                                 })
     }
     // méthode générale
-    move(x,y, plateau){ 
+    move(x,y, plateau){
         if(plateau.isInBoard(x,y)){
             if(plateau.board[x][y].playable){
                 plateau.jouer(x, y, this);
@@ -22,9 +24,8 @@ class Piece{
         }
     }
     clone(){
-        //On peut pas le mettre en haut car il s'agit de classe enfant
-        const P = eval("require('./"+this.nom+"')")
-        let tmp = new P(this.couleur, this.x, this.y)
+        const P = eval("require('./"+this.nom+"')") //On peut pas le mettre en haut car il s'agit de classe enfant
+        let tmp = new P(this.couleur, this.x, this.y, this.id)
         tmp.deplacements = JSON.parse(JSON.stringify(this.deplacements));
         return tmp;
         

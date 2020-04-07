@@ -1,3 +1,6 @@
+
+
+/* Non utilisé car on utilise un formulaire HTML désormais
 let BoutonPlay = document.getElementById("play");
 BoutonPlay.addEventListener("click", event=> Menu.Play());
 
@@ -12,4 +15,4 @@ let Menu = (function(){
             //window.location.href = "/jeu";
         },
     }
-})();
+})();*/
