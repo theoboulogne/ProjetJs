@@ -45,7 +45,7 @@ class Roi extends Piece{
 
         if (this.verifierboucle(["Reine","Fou"],[[1,1],[1,-1],[-1,1],[-1,-1]], plateau)) return true;
         if (this.verifierboucle(["Reine","Tour"],[[1,0],[-1,0],[0,1],[0,-1]], plateau)) return true;
-        if (this.verifiercote(["Pion"],[[1*Math.pow(-1,this.couleur + 1),1*Math.pow(-1,this.couleur + 1)],[1*Math.pow(-1,this.couleur + 1),-1*Math.pow(-1,this.couleur + 1)]], plateau)) return true;
+        if (this.verifiercote(["Pion"],[[this.x - 1,(-2*this.couleur) + 1],[this.x + 1,(-2*this.couleur) + 1]], plateau)) return true;
         if (this.verifiercote(["Cavalier"],[[2,1],[2,-1],[-2,1],[-2,-1],[1,2],[1,-2],[-1,2],[-1,-2]], plateau)) return true;
 
         return false;
@@ -76,23 +76,25 @@ class Roi extends Piece{
         
         let tempX = this.x;
         
-        if(this.deplacements.length == 1){
-            for (let j = 0; j < valeurs.length; j++){
-                if(plateau.board[this.x + valeurs[j]][this.y].piece.nom == 'Tour' && plateau.board[this.x + valeurs[j]][this.y].piece.deplacements.length == 1){
-                    let i = 1;
-                    let indiceR = 1;
-                    while (i < Math.abs(valeurs[j]) && (plateau.board[tempX - i][this.y].piece == 0 && indiceR)){
-                        this.x = this.x + (valeurs[j]/Math.abs(valeurs[j]));
-                        if(i < 3){
-                            if(this.echec(plateau)){
-                                indiceR = 0;
+        if(!this.echec(plateau)){
+            if(this.deplacements.length == 1){
+                for (let j = 0; j < valeurs.length; j++){
+                    if(plateau.board[this.x + valeurs[j]][this.y].piece.nom == 'Tour' && plateau.board[this.x + valeurs[j]][this.y].piece.deplacements.length == 1){
+                        let i = 1;
+                        let indiceR = 1;
+                        while (i < Math.abs(valeurs[j]) && (plateau.board[tempX + (valeurs[j]/Math.abs(valeurs[j])*i)][this.y].piece == 0 && indiceR)){
+                            this.x = this.x + (valeurs[j]/Math.abs(valeurs[j]));
+                            if(i < 3){
+                                if(this.echec(plateau)){
+                                    indiceR = 0;
+                                }
                             }
+                            i++;
                         }
-                        i++;
-                    }
-                    this.x = tempX;
-                    if (indiceR){
-                        renvoi[j] = 1;
+                        this.x = tempX;
+                        if (indiceR){
+                            renvoi[j] = 1;
+                        }
                     }
                 }
             }
