@@ -82,12 +82,11 @@ class Roi extends Piece{
                     if(plateau.board[this.x + valeurs[j]][this.y].piece.nom == 'Tour' && plateau.board[this.x + valeurs[j]][this.y].piece.deplacements.length == 1){
                         let i = 1;
                         let indiceR = 1;
-                        while (i < Math.abs(valeurs[j]) && (plateau.board[tempX + (valeurs[j]/Math.abs(valeurs[j])*i)][this.y].piece == 0 && indiceR)){
+                        while (i < Math.abs(valeurs[j]) && indiceR){
+                            if(plateau.board[this.x + 1][this.y].piece == 0) indiceR = 0;
                             this.x = this.x + (valeurs[j]/Math.abs(valeurs[j]));
                             if(i < 3){
-                                if(this.echec(plateau)){
-                                    indiceR = 0;
-                                }
+                                if(this.echec(plateau)) indiceR = 0;
                             }
                             i++;
                         }
