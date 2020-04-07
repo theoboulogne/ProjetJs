@@ -11,8 +11,13 @@ CHANGEMENT DU PION A LA DERNIERE LIGNE (HUD + JEU + 3D)
 ECHEC BUG AVEC PION EN ARRIERE
 ROQUE MARCHE AVEC PIECE ENTRE DEUX + SI EN ECHEC
 
++Premier déplacement du pion check si il y a une piece devant le pion
+
 
 + Changer le système de récupération des infos sur les modèles (avec JQuery) :
+
++ case rouge pour prise en passant graphiquement
++ methode pour indiceechiquier/couleursocket
 
 $.getJSON("test.json", function(json) {
     console.log(json); // this will show the info it in firebug console
@@ -51,7 +56,22 @@ class Jeu{
                         }
                         else {
                             if(Game.echiquier.board[Coo.x][Coo.y].playable) {
-                                socket.emit('move', {piece:Game.echiquier.board[Game.echiquier.select.x][Game.echiquier.select.y].piece, 
+                                if(Game.echiquier.board[Game.echiquier.select.x][Game.echiquier.select.y].piece.nom == "Pion" &&
+                                   ((Game.echiquier.board[Game.echiquier.select.x][Game.echiquier.select.y].piece.couleur + 1) % 2)*7 == Coo.y){
+                                       //si le pion arrive au bout (promotion) :
+                                    let piece = Game.echiquier.board[Game.echiquier.select.x][Game.echiquier.select.y].piece;
+                                    //Appelle fonction HUD a faire ici
+                                    let CheckPromotion = setInterval(function() { // On attend que toutes nos pièces soient 
+                                        if (piece.choix != undefined) {  // chargées avant de commencer à les afficher
+                                            clearInterval(CheckPromotion);
+                                            Hud.CloseAttente();
+                                            socket.emit('move', {piece:piece, 
+                                                                x:Coo.x, 
+                                                                y:Coo.y});
+                                        }
+                                    }, 500);
+                                }
+                                else socket.emit('move', {piece:Game.echiquier.board[Game.echiquier.select.x][Game.echiquier.select.y].piece, 
                                                     x:Coo.x, 
                                                     y:Coo.y});
                             }
@@ -105,12 +125,20 @@ class Jeu{
             Game.echiquier = plateau; // On récupère le nouveau plateau (sans les cases playable)
             //Détermination du roque
             let deplacements = Roque.getDeplacements(deplacement, plateau.board);
+            
+            Game.Move(deplacements, piece_prise);
 
             //Affichage graphique
             if(piece_prise != 0) Game.rendu.moveOut(piece_prise); // On affiche la suppression 
             Game.rendu.movePieces(deplacements); // on lance le déplacement de la ou des pièces en cas de roque
-            
-            Game.Move(deplacements, piece_prise);
+
+            //Détermination de la promotion de pion
+            if(deplacement.piece.nom == "Pion" && ((deplacement.piece.couleur + 1) % 2)*7 == deplacement.y){
+                if(deplacement.piece.choix != undefined){
+                    Game.echiquier[deplacement.x][deplacement.y].piece.nom = deplacement.piece.choix;
+                    //Lancement de la promotion graphiquement
+                }
+            }
             
             //On actualise l'interface
             Hud.Affichage_coups(Game.echiquier.coups[Game.echiquier.coups.length-1],plateau.Nbtour-1);

@@ -65,6 +65,14 @@ class Pion extends Piece {
             }
         }
     }
+
+    promotion(nomPiece){
+        const P = eval("require('./"+nomPiece+"')") //On appelle la pièce demandée
+        let tmp = new P(this.couleur, this.x, this.y, this.id)
+        tmp.deplacements.pop()
+        for(let i=0; i<this.deplacements.length; i++) tmp.deplacements.push(this.deplacements[i])
+        return tmp;
+    }
 }
 
 module.exports = Pion;

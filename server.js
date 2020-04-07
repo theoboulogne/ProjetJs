@@ -124,6 +124,15 @@ io.sockets.on('connection',  (socket) =>{
             //on clone le plateau pour l'envoyer avant le déplacement afin de l'effectuer graphiquement en front
             let plateau = (game.echiquiers[indiceEchiquier]).clone();
             game.echiquiers[indiceEchiquier].board[deplacement.piece.x][deplacement.piece.y].piece.move(deplacement.x,deplacement.y,game.echiquiers[indiceEchiquier])
+
+            if(deplacement.piece.choix != undefined){
+                if(game.echiquiers[indiceEchiquier].board[deplacement.x][deplacement.y].piece.nom == "Pion"&&
+                   game.echiquiers[indiceEchiquier].board[deplacement.x][deplacement.y].piece.y == ((game.echiquiers[indiceEchiquier].board[deplacement.x][deplacement.y].piece.couleur + 1) % 2)*7 ){
+                    let piecePromotion = game.echiquiers[indiceEchiquier].board[deplacement.x][deplacement.y].piece.promotion(deplacement.piece.choix);
+                    game.echiquiers[indiceEchiquier].board[deplacement.x][deplacement.y].piece = piecePromotion;
+                }
+            }
+
             //On détecte la pièce prise en faisant la différence par rapport au tour précédent
             let piece_prise = 0 
             if(game.echiquiers[indiceEchiquier].Joueurs[(couleurSocket+1)%2].pieces_prises.length!=plateau.Joueurs[(couleurSocket+1)%2].pieces_prises.length){

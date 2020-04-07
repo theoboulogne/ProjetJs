@@ -18,7 +18,7 @@ let info = {
         { position: {x:0, y:0}, rotation: {x:0, y:0, z:0} },//Reine
         { position: {x:0.05, y:-0.02}, rotation: {x:0, y:0, z:0} }//Roi
     ]
-};
+}
 
 //Rotation par x : vers le bas a gauche
 //Rotation par y : Circulaire sens anti-horaire
