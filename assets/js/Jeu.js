@@ -1,9 +1,6 @@
 
 
 /*TO-DO :
-(HUD : )
-CHANGEMENT DU PION A LA DERNIERE LIGNE (HUD + JEU + 3D)
-
 (3D : )
 CHANGEMENT DU PION A LA DERNIERE LIGNE (HUD + JEU + 3D)
 
@@ -11,12 +8,9 @@ CHANGEMENT DU PION A LA DERNIERE LIGNE (HUD + JEU + 3D)
 ECHEC BUG AVEC PION EN ARRIERE
 ROQUE MARCHE AVEC PIECE ENTRE DEUX + SI EN ECHEC
 
-+Premier déplacement du pion check si il y a une piece devant le pion
-
 
 + Changer le système de récupération des infos sur les modèles (avec JQuery) :
 
-+ case rouge pour prise en passant graphiquement
 + methode pour indiceechiquier/couleursocket
 
 $.getJSON("test.json", function(json) {
@@ -60,7 +54,7 @@ class Jeu{
                                    ((Game.echiquier.board[Game.echiquier.select.x][Game.echiquier.select.y].piece.couleur + 1) % 2)*7 == Coo.y){
                                        //si le pion arrive au bout (promotion) :
                                     let piece = Game.echiquier.board[Game.echiquier.select.x][Game.echiquier.select.y].piece;
-                                    //Appelle fonction HUD a faire ici
+                                    Hud.choix_piece(piece);
                                     let CheckPromotion = setInterval(function() { // On attend que toutes nos pièces soient 
                                         if (piece.choix != undefined) {  // chargées avant de commencer à les afficher
                                             clearInterval(CheckPromotion);
@@ -135,7 +129,7 @@ class Jeu{
             //Détermination de la promotion de pion
             if(deplacement.piece.nom == "Pion" && ((deplacement.piece.couleur + 1) % 2)*7 == deplacement.y){
                 if(deplacement.piece.choix != undefined){
-                    Game.echiquier[deplacement.x][deplacement.y].piece.nom = deplacement.piece.choix;
+                    Game.echiquier.board[deplacement.x][deplacement.y].piece.nom = deplacement.piece.choix;
                     //Lancement de la promotion graphiquement
                 }
             }

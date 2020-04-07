@@ -200,6 +200,15 @@ class RenduThreeJs{
                 }
             }
         }
+        if(board[CooSelect.x][CooSelect.y].piece.nom == "Pion"){//On gère la prise en passant
+            for(let i=-1; i<2; i+=2) {
+                if(CooSelect.x+i>-1&&CooSelect.x+i<8&&CooSelect.y+(Math.pow(-1,board[CooSelect.x][CooSelect.y].piece.couleur))>-1&&CooSelect.y+(Math.pow(-1,board[CooSelect.x][CooSelect.y].piece.couleur))<8){
+                    if(board[CooSelect.x+i][CooSelect.y+(Math.pow(-1,board[CooSelect.x][CooSelect.y].piece.couleur))].piece == 0 && board[CooSelect.x+i][CooSelect.y+(Math.pow(-1,board[CooSelect.x][CooSelect.y].piece.couleur))].playable){
+                        this.setPlayable(CooSelect.x+i,CooSelect.y+(Math.pow(-1,board[CooSelect.x][CooSelect.y].piece.couleur)), false);
+                    }
+                }
+            }
+        }
         this.setSelect(CooSelect.x, CooSelect.y);
     };
     setPlayable(X, Y, playableType) {
