@@ -83,8 +83,11 @@ class Roi extends Piece{
                         let i = 1;
                         let indiceR = 1;
                         while (i < Math.abs(valeurs[j]) && indiceR){
-                            if(plateau.board[this.x + 1][this.y].piece == 0) indiceR = 0;
+                            
+                            if(plateau.board[this.x + (valeurs[j]/Math.abs(valeurs[j]))][this.y].piece != 0) indiceR = 0;
+
                             this.x = this.x + (valeurs[j]/Math.abs(valeurs[j]));
+
                             if(i < 3){
                                 if(this.echec(plateau)) indiceR = 0;
                             }
