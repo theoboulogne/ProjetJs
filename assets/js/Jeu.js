@@ -1,222 +1,175 @@
 
 
+/*TO-DO :
+(HUD : )
+CHANGEMENT DU PION A LA DERNIERE LIGNE (HUD + JEU + 3D)
+
+(3D : )
+CHANGEMENT DU PION A LA DERNIERE LIGNE (HUD + JEU + 3D)
 
 
+ECHEC BUG AVEC PION EN ARRIERE
+ROQUE MARCHE AVEC PIECE ENTRE DEUX + SI EN ECHEC
 
 
++ Changer le système de récupération des infos sur les modèles (avec JQuery + Express (envoi du serveur))
++ Rajouter l'envoi de la bdd dans le menu avec express + jquery aussi
 
 
-//TO DO :
-//CHANGEMENT DU PION A LA DERNIERE LIGNE
-//RECUPERER PSEUDO DU MENU
-
-
-
-
-
-
-
-
+A vérifier :
+récupération du plateau nécessaire au debut de move ????
+*/
 
 
 class Jeu{
     constructor(){
-
-
         let Game = this; // pour accéder depuis les fonctions
 
-
-
         function onClick(event) {
-            console.log('onClick')
+            console.log('click')
             if(Game.echiquier.Nbtour%2 == Game.couleur){//si son tour
-                console.log('Bon-Tour')
-                if(Game.echiquier.select.x == -1 &&  Game.echiquier.select.y == -1){ //Récup case de la piece pour dmd playable
-                    console.log('Playable')
-                    let intersectPiece = Game.rendu.getClickModels(event, Game.rendu.piecesObj);
-                    if(intersectPiece.length){
-                        let Coo = Game.rendu.getCooSelected(intersectPiece[0]);
-                        if(Game.echiquier.board[Coo.x][Coo.y].piece != 0) {
-                            if(Game.echiquier.board[Coo.x][Coo.y].piece.couleur == Game.couleur) {
-                                console.log('Dmd Playable')
-                                socket.emit('playable', Game.echiquier.board[Coo.x][Coo.y].piece);
+                let intersectPiece = Game.rendu.getClickModels(event, Game.rendu.piecesObj);
+                let intersectCase = Game.rendu.getClickModels(event, Game.rendu.playableCases);
+                if(intersectPiece.length || intersectCase.length){
+                    let Coo;
+                    if(intersectPiece.length) Coo = Game.rendu.getCooSelected(intersectPiece[0]);
+                    else Coo = Game.rendu.getCooSelected(intersectCase[0]);
+                    if(Coo.x>-1 && Coo.y >-1 && Coo.x<8 && Coo.y<8) {
+                        if(Game.echiquier.select.x == -1 &&  Game.echiquier.select.y == -1){
+                            if(Game.echiquier.board[Coo.x][Coo.y].piece != 0) {
+                                if(Game.echiquier.board[Coo.x][Coo.y].piece.couleur == Game.couleur) {
+                                    socket.emit('playable', Game.echiquier.board[Coo.x][Coo.y].piece);
+                                }
                             }
                         }
-                    }
-                }else { // Retirer playable et lancer move si sur case playable
-                    console.log('disable-playable')
-                    let intersectCase = Game.rendu.getClickModels(event, Game.rendu.playableCases);
-                    if(intersectCase.length){
-                        console.log('dmd-move')
-                        let Coo = Game.rendu.getCooSelected(intersectCase[0]);
-                        if(Game.echiquier.board[Coo.x][Coo.y].playable) {
-                            socket.emit('move', {piece:Game.echiquier.board[Game.echiquier.select.x][Game.echiquier.select.y].piece, 
-                                                 x:Coo.x, 
-                                                 y:Coo.y});
+                        else {
+                            if(Game.echiquier.board[Coo.x][Coo.y].playable) {
+                                socket.emit('move', {piece:Game.echiquier.board[Game.echiquier.select.x][Game.echiquier.select.y].piece, 
+                                                    x:Coo.x, 
+                                                    y:Coo.y});
+                            }
+                            else Game.echiquier.select = {x:-1, y:-1};
+                            Game.rendu.removePlayable();
                         }
                     }
-                    else Game.echiquier.select = {x:-1, y:-1} 
-                        // reset coté client pour prochain click
+                }
+                else if(Game.echiquier.select.x != -1) {
+                    Game.echiquier.select = {x:-1, y:-1};
                     Game.rendu.removePlayable();
                 }
             }
-            console.log('End-onClick')
         }
     
 
-        //connection server
+        //connection au serveur
         const socket = io.connect('http://localhost:800');
+
         socket.on('repconnection', (couleur) => {
             console.log('Event - repconnection')
-
-        //Coté Gestion du jeu
-            Game.couleur = couleur;
-            
-            //On retire le renderer du DOM pour reset proprement en cas de reset du serveur
-            if(Game.rendu != undefined) {
-                document.body.removeChild(document.body.lastChild)//on supprime le rendu
-                document.getElementById('infos').parentNode.removeChild(document.getElementById('infos'));
-                //on supprime l'import des infos sur les modèles
-            }
-
-            Game.rendu = new RenduThreeJs(); // prendre la couleur en entrée pour définir la caméra ?
-                                             // la déplacer au moment du start ?
-
-        //Coté UI:
-            // indiquer l'attente d'un autre joueur
+            Game.couleur = couleur;//on stocke la couleur du joueur
+            if(Game.rendu != undefined) Game.rendu.remove(); //On retire le renderer du DOM + infos des modèles pour reset proprement en cas de reset du serveur sans redirection
+            Game.rendu = new RenduThreeJs(couleur); // on lance l'affichage graphique (uniquement le board pour le moment pour signaler l'attente)
+            Hud.OpenAttente();
         });
+
         socket.on('start', (plateau) => {
             console.log('Event - start')
-        //Coté Gestion du Jeu
-            Game.echiquier = plateau;
-
-        //Coté UI
-            // Lancer l'affichage de l'UI
-
-
-        //Coté ThreeJS
-            let loadCheck = setInterval(function() {
-                if (Game.rendu.checkLoadModels()) {
+            Game.echiquier = plateau; // On récupère le plateau à afficher
+            SetInt() // On lance l'affichage du chrono
+            let loadCheck = setInterval(function() { // On attend que toutes nos pièces soient 
+                if (Game.rendu.checkLoadModels()) {  // chargées avant de commencer à les afficher
                     clearInterval(loadCheck);
-
-                    Game.rendu.loadBoardPieces(Game.echiquier.board);
-                    document.body.lastChild.addEventListener("click", onClick, false);
-                    Hud.Affichage_AquiDejouer(0)
+                    Game.rendu.loadBoardPieces(Game.echiquier.board); // On charge les pièces
+                    document.getElementById('RenduThreeJs').addEventListener("click", onClick, false); // On active les events
+                    Hud.Affichage_AquiDejouer(0) // On affiche c'est à qui de jouer
+                    Hud.CloseAttente();
                 }
-            }, 250);
-            
-
+            }, 100);
         });
+
         socket.on('playable', (plateau) => {
             console.log('Event - playable')
+            Game.echiquier = plateau; // On récupère le nouveau plateau (avec les cases playable)
+            if(Game.echiquier.select.x != -1) Game.rendu.setPlayables(Game.echiquier.board, Game.echiquier.select)
+        }); // si il y a au moins une case à afficher on l'affiche
 
-            Game.echiquier = plateau;
-
-        //Coté threejs :
-            // Afficher les couts jouable (autre couleur ?) +  !!!!!!!!! piece selectionnée !!!!!!!!!
-            if(Game.echiquier.select.x != -1) Game.rendu.setPlayables(Game.echiquier.board, Game.couleur)
-
-        //Coté Gestion du jeu
-            // implémenter l'utilisation de selected pour envoyer move ou playable au click en fonction
-            
-
-        });
         socket.on('move', (plateau,deplacement,piece_prise) => { // piece et deplacer en x,y
             console.log('Event - move')
-        //Récupération des données
-            Game.echiquier = plateau;
-        //Détermination du roque
-            let deplacements = [deplacement];
-            let diff = deplacement.x - deplacement.piece.x
-            if(deplacement.piece.name == "Roi" && Math.abs(diff) == 2){
-                deplacements.push({ x:deplacement.x + diff/Math.abs(diff),
-                                    y:deplacement.y,
-                                    piece:plateau.board[deplacement.x + (diff/Math.abs(diff)) * 3.5 + 0.5][deplacement.piece.y]
-                                    });
-            }
+            Game.echiquier = plateau; // On récupère le nouveau plateau (sans les cases playable)
+            //Détermination du roque
+            let deplacements = Roque.getDeplacements(deplacement, plateau.board);
 
-            //On supprime la pièce si nécessaire
-            if(piece_prise != 0){ // RECUPERER LA PIECE COTE CLIENT <-----------------------------------------------------------------------------------------------
-            //Coté Threejs :
-                Game.rendu.moveOut(piece_prise);
-            //Coté Gestion du jeu
-                Game.echiquier.board[piece_prise.x][piece_prise.y].piece = 0;
-                Game.echiquier.Joueurs[piece_prise.couleur].pieces_prises.push(piece_prise);
-            }
+            //Affichage graphique
+            if(piece_prise != 0) Game.rendu.moveOut(piece_prise); // On affiche la suppression 
+            Game.rendu.movePieces(deplacements); // on lance le déplacement de la ou des pièces en cas de roque
             
-        //Coté ThreeJs :
-            if(deplacements.length == 1) Game.rendu.movePiece(deplacement); // si pas de roque
-            else Game.rendu.moveRoque(deplacements);
-
-
-            // on déplace une piece (ou deux si on fait un roque)
-            for(let i = 0; i < deplacements.length; i++){
-                //Déplacement dans le board de la pièce
-                Game.echiquier.board[deplacements[i].x][deplacements[i].y].piece = Game.echiquier.board[deplacements[i].piece.x][deplacements[i].piece.y];
-                Game.echiquier.board[deplacements[i].piece.x][deplacements[i].piece.y] = 0;
-
-                //Changement des Coo de la pièce dans l'objet
-                plateau.board[deplacements[i].x][deplacements[i].y].piece.x = deplacements[i].x;
-                plateau.board[deplacements[i].x][deplacements[i].y].piece.y = deplacements[i].y;
-            }
-
-            //Enregistrement des couts pour l'affichage
-            plateau.couts.push(plateau.board[deplacement.x][deplacement.y].piece);
-
-            //On augmente le nombre de tour pour indiquer que l'on change de joueur et pour l'affichage des couts
-            plateau.Nbtour++;
+            Game.Move(deplacements, piece_prise);
             
-        //Coté UI
-            Hud.Affichage_AquiDejouer(plateau.Nbtour)
-            //Hud.Affichage_coups(plateau.couts,plateau.Nbtour);
-            Hud.Affichage_coups(plateau.couts,Nbtour);
-            // Récupérer les couts joués et actualiser l'ui en conséquence
+            //On actualise l'interface
+            Hud.Affichage_coups(Game.echiquier.coups[Game.echiquier.coups.length-1],plateau.Nbtour-1);
+            Hud.Affichage_AquiDejouer(Game.echiquier.Nbtour)
+            Hud.Affichage_SetChrono(Game.echiquier.chrono)//On rafraichit le chrono en fonction du serveur afin de palier aux problèmes de synchronisation
         });
+
         socket.on('reset', (echiquierReset, couleurReset) => {
-            console.log('Event - reset')
-            
-        //Coté Gestion du jeu
-            Game.couleur = couleurReset;
+            console.log('Event - reset') // On réinitialise en cas d'incohérence dans les envois au serveur
+            Game.couleur = couleurReset; // Les infos de gestion de jeu
             Game.echiquier = echiquierReset;
-            
-        // Coté Threejs
-            // Changer l'affichage en conséquence :
-            // Vider le board des pieces + des playables
-            // appeller LoadBoardPieces
-
-        //Coté UI
-            // Réactualiser tout l'HUD
+            Game.rendu.reloadAll(echiquierReset);//Le coté graphique 3D
+            Hud.reloadAll(echiquierReset);//Le coté HUD
         });
-        socket.on('endGame', (couleurGagnant) => {
 
-        //Coté gestion du Jeu :
-            // enregistrer la partie dans la BDD
+        socket.on('endGame', (couleurGagnant) => { 
+            console.log('Partie terminée')// Fin de partie
 
-        //Coté UI :
-            // afficher un message indiquant si gagné ou perdu
-            // avec un bouton qui execute le code ci dessous
-            window.location.href = "./"
+            let infos;
+            if(couleurGagnant == Game.couleur) infos = "Vous avez gagné !"    
+            else infos = "Vous avez perdu."
+
+            Hud.OpenMenu(infos)
         });
+
         socket.on('deconnection', () => {
             console.log('Redirection vers le menu') // car déconnection de l'adversaire
-
-            //Ajouter une fenetre de l'HUD pour signaler une déconnection de l'adversaire 
-            //avec un bouton qui redirige avec le code ci dessous
-
-            window.location.href = "./"
+            Hud.OpenMenu("Votre adversaire s'est déconnecté.")
         });
         
         socket.on('menu', () => {
-            console.log('Redirection vers le menu') // manque de paramètres (gérer un message d'erreur ?)
-            window.location.href = "./"
+            console.log('Redirection vers le menu') // manque de paramètres
+            Hud.OpenMenu('Il y a au moins un paramètre manquant..')
         });
+    }
+    Move(deplacements, piece_prise){
+        if(piece_prise != 0){
+            this.echiquier.board[piece_prise.x][piece_prise.y].piece = 0; // on applique les transformations au plateau 
+            this.echiquier.Joueurs[piece_prise.couleur].pieces_prises.push(piece_prise); //pour sélectionner derrière
+        }
+        
+        // on lance le déplacement de la ou des pièces en cas de roque
+        for(let i = 0; i < deplacements.length; i++){ // on applique les transformations pour sélectionner derrière
+            //Déplacement dans le board de la pièce
+            this.echiquier.board[deplacements[i].x][deplacements[i].y].piece = this.echiquier.board[deplacements[i].piece.x][deplacements[i].piece.y];
+            this.echiquier.board[deplacements[i].piece.x][deplacements[i].piece.y] = 0;
+
+            //Changement des Coo de la pièce dans l'objet
+            this.echiquier.board[deplacements[i].x][deplacements[i].y].piece.x = deplacements[i].x;
+            this.echiquier.board[deplacements[i].x][deplacements[i].y].piece.y = deplacements[i].y;
+        }
+
+        //Enregistrement des coups pour l'affichage
+        if(deplacements.length == 2){//si roque on détermine lequel pour l'affichage
+            if(deplacements[0].x - deplacements[0].piece.x == 2) this.echiquier.coups.push("G.R");
+            else this.echiquier.coups.push("P.R");
+        }
+        else this.echiquier.coups.push(this.echiquier.board[deplacements[0].x][deplacements[0].y].piece);
+        
+        //On augmente le nombre de tour pour indiquer que l'on change de joueur et pour l'affichage des coups
+        this.echiquier.Nbtour++;
     }
 }
 
 
 (function() {
-    
-
-	let game = new Jeu();
+    let game = new Jeu();
 })();
 

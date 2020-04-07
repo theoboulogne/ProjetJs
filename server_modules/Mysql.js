@@ -36,17 +36,17 @@ module.exports = {
         con.connect(function(err) {
             if (err) throw err;
             console.log("Connecté à la mysql !");
-            let sql = "INSERT INTO `scores`(`pseudo`, `pieces`, `chrono`, `partie`) VALUES ('" + 
-                //On insère les données demandées par l'énoncé
-                    plateau.Joueurs[couleurJoueur].pseudo + "'," +
-                    String(16 - plateau.Joueurs[(couleurJoueur+1)%2].pieces_prises.length) + ",'" +
-                    (plateau.chrono.getChronoTotal()) + "','" +
-                //On insère également la partie en entier afin de pouvoir la replay auto :
-                    JSON.stringify(plateau) + "')";
-            con.query(sql, function (err, result) {
+            let sql = "INSERT INTO `scores`(`pseudo`, `pieces`, `chrono`, `partie`) VALUES ( ?, ?, ?, ? )" 
+            //On insère les données demandées par l'énoncé
+            //On insère également la partie en entier afin de pouvoir la replay auto
+            con.query(sql, [plateau.Joueurs[couleurJoueur].pseudo, 
+                            String(16 - plateau.Joueurs[(couleurJoueur+1)%2].pieces_prises.length), 
+                            (plateau.chrono.getChronoTotal()),
+                            JSON.stringify(plateau)], function (err, result) {
                 if (err) throw err;
                 console.log("Score inséré");
             });
         });
     },
+    
 };

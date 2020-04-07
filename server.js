@@ -14,18 +14,18 @@ const Chrono = require('./server_modules/Chrono');
 //Import des Modules
 const MYSQL = require('./server_modules/Mysql');
 
+//Création de la table score dans la BDD si nécessaire
+MYSQL.CreationScoreBDD()
+
 //Redirection des pages
 app.use(express.static(__dirname + '/assets/'));
 app.get('/', (req, res, next) => {
     res.sendFile(__dirname + '/assets/views/menu.html')
 });
-app.get('/jeu', (req, res, next) => {
-    lastParam = req.query // on récupère les paramètres
-    res.sendFile(__dirname + '/assets/views/jeu.html')
+app.get('/jeu', (request, response, next) => {
+    lastParam = request.query // on récupère les paramètres
+    response.sendFile(__dirname + '/assets/views/jeu.html')
 });
-
-//Création de la table score dans la BDD si nécessaire
-MYSQL.CreationScoreBDD()
 
 //On stocke dans une variable tampon les paramètre du dernier client car on y accède uniquement depuis le app.get
 let lastParam = undefined;
@@ -120,29 +120,22 @@ io.sockets.on('connection',  (socket) =>{
             (game.echiquiers[indiceEchiquier].board[deplacement.x][deplacement.y].playable)){
 
             //On actualise le chrono comme on a un changement de tour :
-            game.echiquiers[indiceEchiquier].chrono.startTour(couleurSocket);
-            //On attribut une couleur afin d'enregistrer le temps de chaque joueur (pour l'affichage principalement)
-            
+            game.echiquiers[indiceEchiquier].chrono.startTour(couleurSocket); //On attribut une couleur afin d'enregistrer le temps de chaque joueur (en prévision pour améliorer l'affichage)
             //on clone le plateau pour l'envoyer avant le déplacement afin de l'effectuer graphiquement en front
             let plateau = (game.echiquiers[indiceEchiquier]).clone();
             game.echiquiers[indiceEchiquier].board[deplacement.piece.x][deplacement.piece.y].piece.move(deplacement.x,deplacement.y,game.echiquiers[indiceEchiquier])
-            game.echiquiers[indiceEchiquier].select = {x:-1, y:-1};
-
-            let piece_prise = 0 //On détecte la pièce prise,
+            //On détecte la pièce prise en faisant la différence par rapport au tour précédent
+            let piece_prise = 0 
             if(game.echiquiers[indiceEchiquier].Joueurs[(couleurSocket+1)%2].pieces_prises.length!=plateau.Joueurs[(couleurSocket+1)%2].pieces_prises.length){
                 piece_prise = game.echiquiers[indiceEchiquier].Joueurs[(couleurSocket+1)%2].pieces_prises[game.echiquiers[indiceEchiquier].Joueurs[(couleurSocket+1)%2].pieces_prises.length - 1].piece
             }
+            // On envoi le déplacement a tout le monde
+            for(let i=0; i<2; i++) io.sockets.sockets[game.echiquiers[indiceEchiquier].Joueurs[i].id].emit('move', plateau, deplacement, piece_prise);
             
-            for(let i=0; i<2; i++){ // On envoi le déplacement a tout le monde
-                io.sockets.sockets[game.echiquiers[indiceEchiquier].Joueurs[i].id].emit('move', plateau, deplacement, piece_prise);
-            }
-            
-            if(true || game.echiquiers[indiceEchiquier].echecEtMat((couleurSocket+1)%2)){//Detection fin de partie
+            if(game.echiquiers[indiceEchiquier].echecEtMat((couleurSocket+1)%2)){//Detection fin de partie
                 console.log('Echec et Mat')
-                
-                //Enregistrement dans la BDD mysql
+                //Enregistrement du score dans la BDD mysql
                 MYSQL.EnvoiScoreBDD(game.echiquiers[indiceEchiquier], couleurSocket);
-
                 //Envoi de l'event aux client pour rediriger vers le menu
                 for(let i=0; i<2; i++) io.sockets.sockets[game.echiquiers[indiceEchiquier].Joueurs[i].id].emit('endGame', couleurSocket);
             }
@@ -150,6 +143,7 @@ io.sockets.on('connection',  (socket) =>{
         else{
             console.log("Réinitialisation d'un client - Move");
             game.echiquiers[indiceEchiquier].reset_playable(); // on reset les playables avant de l'envoyer
+            game.echiquiers[indiceEchiquier].select = {x:-1, y:-1}; // aussi le select car on est dans l'event move donc il est assigné
             socket.emit('reset', game.echiquiers[indiceEchiquier], couleurSocket);
         }
     });
@@ -172,7 +166,7 @@ io.sockets.on('connection',  (socket) =>{
                     io.sockets.sockets[game.echiquiers[indiceEchiquier].Joueurs[j].id].emit('deconnection'); // on change de page 
                 }
             }
-            game.echiquiers.splice(indiceEchiquier, 1); // on retire l'échiquier
+            game.echiquiers.splice(indiceEchiquier, 1); // on retire le plateau
             console.log("Redirection du deuxième joueur sur le menu et suppression de son echiquier");
         }
     });

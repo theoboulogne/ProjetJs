@@ -105,22 +105,16 @@ class Roi extends Piece{
             if(plateau.board[x][y].playable){
                 let diff = x - this.x;
                 if(Math.abs(diff) == 2){
-                    
-                    if (diff == -2) plateau.jouer(x + 1,y,plateau.board[this.x - 3][this.y].piece);
-                    else plateau.jouer(x - 1,y,plateau.board[this.x + 4][this.y].piece);
+                    plateau.jouer(x - (diff/Math.abs(diff)),y,plateau.board[3.5 + ((diff/Math.abs(diff))*3.5)][this.y].piece);
                     plateau.jouer(x,y,this);
 
                     plateau.Nbtour--;
+                    plateau.coups.splice(plateau.coups.length - 2, 2);
 
-                    plateau.couts.splice(plateau.couts.length - 2, 2);
-
-                    if(diff == 2)  plateau.couts.push("G.R");
-                    else plateau.couts.push("P.R");
+                    if(diff == 2)  plateau.coups.push("G.R");
+                    else plateau.coups.push("P.R");
                 }
-                else{ //Déplacement normal
-                    plateau.jouer(x, y, this);
-
-                }
+                else plateau.jouer(x, y, this);//Déplacement normal
                 //On enregistre les coo dans joueur pour pouvoir regarder echec depuis le plateau
                 plateau.Joueurs[this.couleur].roi.x = x;
                 plateau.Joueurs[this.couleur].roi.y = y;

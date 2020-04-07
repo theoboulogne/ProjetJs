@@ -26,21 +26,33 @@
             <input  class = "chrono" type=text name=Text_1 value=00:00>
         </form>
     </div>
+</div>
+<div id="attente" class="modal">
+    <h1>Attente d'un adversaire, veuillez patienter.</h1>
+</div>
+
+<div id="popup" class="modal">
+    <h1 id="contenu-popup">Test</h1>
+    <p>Vous allez être redirigé vers le menu à la fermeture de cette fenêtre.</p>
+</div>
+
         
     <script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r71/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
 
     <script type="application/javascript" src="../js/Rendu/OBJLoader.js"></script>
     <script type='text/javascript' src='../js/Rendu/tween.js'></script>
+    <script type="application/javascript" src="../js/Rendu/getParams.js"></script>
     <script type="application/javascript" src="../js/Rendu/Rendu3D.js"></script>
     
+    <!-- jQuery Modal Plugin -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
+
     <script type="application/javascript" src="../js/Hud/Chrono.js"></script>
-    <script type="application/javascript" src="../js/Hud/Jeu.js"></script>
+    <script type="application/javascript" src="../js/Hud/Game.js"></script>
 
-    <script type="application/javascript" src="../js/getParams.js"></script>
-
+    <script src="../js/Roque.js"></script>
     <script src="../js/Jeu.js"></script>
-
-    <script src="../js/Hud/Chrono.js"></script>
-
 </body>
