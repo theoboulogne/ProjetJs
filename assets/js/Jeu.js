@@ -169,9 +169,6 @@ class Jeu{
         socket.on('menu', () => {
             console.log('Redirection vers le menu')
             window.location.href = "./"
-            if (confirm('texte')){
-                window.location.href = "./"
-            }
         });
         
     }

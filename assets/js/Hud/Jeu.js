@@ -44,6 +44,21 @@ let Hud = (function(){
             div.append(cout);
             cout.appendChild(texte);
         },
+        choix_piece : (piece) =>{
+            $("#choix_piece").modal({
+                escapeClose: false,
+                clickClose: false,
+                showClose: false
+            });
+            let reine = document.getElementById("bouton_reine");
+            let fou = document.getElementById("bouton_fou");
+            let cheval = document.getElementById("bouton_chevalier");
+            let tour = document.getElementById("bouton_tour");
+            reine.addEventListener("click",event => piece.choix = "reine");
+            fou.addEventListener("click", event => piece.choix  = "fou");
+            cheval.addEventListener("click",event => piece.choix = "cheval");
+            tour.addEventListener("click",event => piece.choix = "tour");
+        },
         /*Message_Alerte : (texte)=>{
             alert(texte);
             while(!confirm(texte)){}
@@ -52,16 +67,13 @@ let Hud = (function(){
     }
 })();
 
-
 Hud.Affichage_coups(coups,Nbtour);
 Hud.Affichage_AquiDejouer(Nbtour);
-
-
-coups.push('C3')
+coups.push('B3')
 Nbtour = 1;
 Hud.Affichage_coups(coups,Nbtour);
 
-coups.push('C6')
+coups.push('B6')
 Nbtour = 2;
 Hud.Affichage_coups(coups,Nbtour);
 
@@ -104,5 +116,16 @@ Hud.Affichage_coups(coups,Nbtour);
 coups.push('C6')
 Nbtour = 2;
 Hud.Affichage_coups(coups,Nbtour);
+
+coups.push('C3')
+Nbtour = 1;
+Hud.Affichage_coups(coups,Nbtour);
+
+coups.push('C6')
+Nbtour = 2;
+Hud.Affichage_coups(coups,Nbtour);
+
+let point_fin = {};
+Hud.choix_piece(point_fin);
 
 //Hud.Message_Alerte("test");
