@@ -307,8 +307,8 @@ class RenduThreeJs{
         let light = new THREE.AmbientLight( 0x555555 ); // soft white light
         this.scene.add( light );
  
-        let spotLight = new THREE.SpotLight( 0xffffff );
-        spotLight.position.set( 50, 100, 50 );
+        let spotLight = new THREE.SpotLight( 0xffffff, 0.6 );
+        spotLight.position.set( 0, 200, 200 );
         spotLight.castShadow = true;
         spotLight.shadowMapWidth = 1024;
         spotLight.shadowMapHeight = 1024;

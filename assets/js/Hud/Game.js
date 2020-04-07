@@ -61,8 +61,8 @@ let Hud = (function(){
             let coupString = "";
             if(typeof(piece) == "string") coupString = piece; // gestion de l'affichage des roques
             else {
-                coupString += String.fromCharCode(("A").charCodeAt(0) + piece.x)
-                coupString += String(8-piece.y)
+                coupString += String.fromCharCode(("A").charCodeAt(0) + (7-piece.x))
+                coupString += String(1+piece.y)
             }
 
             var texte = document.createTextNode(coupString);
