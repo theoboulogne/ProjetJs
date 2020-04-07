@@ -14,7 +14,7 @@ class Roi extends Piece{
             if (plateau.isInBoard(x,y)) while(boucle){
                 if(plateau.check_piece(x,y)){
                     if(plateau.board[x][y].piece.couleur == this.couleur) boucle = false;
-                    else for (let j = 0; j < pieceName.length; j++) if (plateau.board[x][y].piece.nom == pieceName[j]) return true;
+                    else for (let j = 0; j < pieceName.length; j++) if (plateau.board[x][y].piece.nom == pieceName) return true;
                 }
                 x += sens[i][0]
                 y += sens[i][1]
@@ -26,15 +26,11 @@ class Roi extends Piece{
 
     verifiercote(pieceName,sens, plateau){
         for(let i = 0; i < sens.length; i++){
-            let x = this.x + sens[i][0];
-            let y = this.y + sens[i][1];
-
-            if(plateau.check_piece(x,y)){
-                 if(plateau.board[x][y].piece.couleur != this.couleur){
-                    for (let j = 0; j < pieceName.length; j++) if (plateau.board[x][y].piece.nom == pieceName[j]) return true;
+            if(plateau.check_piece(sens[i][0],sens[i][1])){
+                if(plateau.board[sens[i][0]][sens[i][1]].piece.couleur != this.couleur){
+                    if (plateau.board[sens[i][0]][sens[i][1]].piece.nom == pieceName) return true;
                 }
             }
-            
         }
         return false;
     }
@@ -45,8 +41,9 @@ class Roi extends Piece{
 
         if (this.verifierboucle(["Reine","Fou"],[[1,1],[1,-1],[-1,1],[-1,-1]], plateau)) return true;
         if (this.verifierboucle(["Reine","Tour"],[[1,0],[-1,0],[0,1],[0,-1]], plateau)) return true;
-        if (this.verifiercote(["Pion"],[[this.x - 1,(-2*this.couleur) + 1],[this.x + 1,(-2*this.couleur) + 1]], plateau)) return true;
-        if (this.verifiercote(["Cavalier"],[[2,1],[2,-1],[-2,1],[-2,-1],[1,2],[1,-2],[-1,2],[-1,-2]], plateau)) return true;
+        if (this.verifiercote("Pion",[[this.x - 1,this.y + (-2*this.couleur + 1)],[this.x + 1,this.y + (-2*this.couleur + 1)]], plateau)) return true;
+        if (this.verifiercote("Cavalier",[[2,1],[2,-1],[-2,1],[-2,-1],[1,2],[1,-2],[-1,2],[-1,-2]], plateau)) return true;
+        if (this.verifiercote("Roi", [[this.x,this.y + 1],[this.x,this.y - 1],[this.x + 1,this.y],[this.x - 1,this.y],[this.x + 1,this.y + 1],[this.x - 1,this.y - 1],[this.x + 1,this.y - 1],[this.x - 1,this.y + 1]], plateau)) return true;
 
         return false;
     }
@@ -82,12 +79,14 @@ class Roi extends Piece{
                     if(plateau.board[this.x + valeurs[j]][this.y].piece.nom == 'Tour' && plateau.board[this.x + valeurs[j]][this.y].piece.deplacements.length == 1){
                         let i = 1;
                         let indiceR = 1;
-                        while (i < Math.abs(valeurs[j]) && (plateau.board[tempX + (valeurs[j]/Math.abs(valeurs[j])*i)][this.y].piece == 0 && indiceR)){
+                        while (i < Math.abs(valeurs[j]) && indiceR){
+
+                            if(plateau.board[this.x + (valeurs[j]/Math.abs(valeurs[j]))][this.y].piece != 0) indiceR = 0;
+
                             this.x = this.x + (valeurs[j]/Math.abs(valeurs[j]));
+
                             if(i < 3){
-                                if(this.echec(plateau)){
-                                    indiceR = 0;
-                                }
+                                if(this.echec(plateau)) indiceR = 0;
                             }
                             i++;
                         }
