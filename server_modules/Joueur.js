@@ -11,8 +11,6 @@ class Joueur{
         this.id = id; // l'id correspond à l'id de la socket correspondante
         this.pseudo = pseudo // le pseudo est enregistré pour l'enregistrement des scores
 
-        this.pieces = 16; // 16 au debut de la partie  
-        this.couleur = couleur // 0 ou 1, blanc/noir 
         this.roi = {x:3, y:couleur*7}
 
         this.pieces_prises = new Array()

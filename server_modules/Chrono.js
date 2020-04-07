@@ -6,15 +6,14 @@ class Chrono{
     }
 
     startTour(couleur){
-        let Tour = new Date();
+        let TourPrec = {m:this.Precedent.getMinutes(), s:this.Precedent.getSeconds()}
+        this.Precedent = new Date();
 
         let TempsEcoule = {
-            m: Math.abs(Tour.getMinutes() - this.Precedent.getMinutes()),
-            s: Math.abs(Tour.getSeconds() - this.Precedent.getSeconds())
+            m: Math.abs(TourPrec.m - this.Precedent.getMinutes()),
+            s: Math.abs(TourPrec.s - this.Precedent.getSeconds())
         };
         this.Chrono[couleur] = this.addChrono(this.Chrono[couleur], TempsEcoule);
-
-        this.Precedent = Tour;
     }
     addChrono(a, b){
         let renvoi = {m:(a.m + b.m), s:(a.s + b.s)};

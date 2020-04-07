@@ -1,4 +1,6 @@
-//Chronometre repris sur internet : https://codes-sources.commentcamarche.net/source/45122-chronometre-en-javascript
+//Chronometre repris sur internet : 
+//https://codes-sources.commentcamarche.net/source/45122-chronometre-en-javascript
+//***********************************************************************************************************
 var One=true;
 var Int;
 function Chrono(){

@@ -1,21 +1,17 @@
 class RenduThreeJs{
-    constructor(){
+    constructor(couleur){
         //Pour appel du raycast des variables
         let Rendu = this;
         //Initialisation de la scène
         this.scene = new THREE.Scene();
         this.camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight);
-        this.camera.position.x = 3.5;
-        this.camera.rotation.y = ( 50* (Math.PI / 180));
-        this.camera.rotation.z = ( 90* (Math.PI / 180));
-        this.camera.position.z = 3;
-        //this.camera.position.y = 0.5;
+        this.PositionCamera(couleur); // On positionne la caméra en fonction de la couleur
         //Ajout du rendu
         let renderer = new THREE.WebGLRenderer();
         renderer.setSize( window.innerWidth, window.innerHeight );
+        renderer.domElement.id = 'RenduThreeJs';
         document.body.appendChild( renderer.domElement );
-        
-        // auto game resize
+        // Redimensionnement du jeu auto
         window.addEventListener( 'resize', function() {
             let width = window.innerWidth;
             let height = window.innerHeight;
@@ -24,19 +20,21 @@ class RenduThreeJs{
             Rendu.camera.updateProjectionMatrix();
         });
 
-        //Chargement et stockage des modèles réutilisés
-        let objLoader = new THREE.OBJLoader();
+        //Gestion des objets
+        let objLoader = new THREE.OBJLoader(); // Chargement des modèles
+        this.raycaster = new THREE.Raycaster(); //Gestion de la détection des clicks (Events)
+        
         // Cases jouables
+        this.materialCases = [
+            new THREE.MeshBasicMaterial( {color: 0x000000, opacity: 0, transparent: true} ),   // transparent
+            new THREE.MeshBasicMaterial( {color: 0x4ca3dd, opacity: 0.8, transparent: true} ), // select (bleu)
+            new THREE.MeshBasicMaterial( {color: 0x00ff00, opacity: 0.5, transparent: true} ), // vert
+            new THREE.MeshBasicMaterial( {color: 0xff0000, opacity: 0.5, transparent: true} )  // rouge
+        ]
         this.playableCases = [];
-        this.vert = new THREE.MeshBasicMaterial( {color: 0x00ff00, opacity: 0.5, transparent: true} )
-        this.rouge = new THREE.MeshBasicMaterial( {color: 0xff0000, opacity: 0.5, transparent: true} )
-        this.playableCase = new THREE.Mesh( new THREE.BoxGeometry( 0.5, 0.5, 0.02 ), this.vert);
+        this.playableCase = new THREE.Mesh( new THREE.BoxGeometry( 0.5, 0.5, 0.02 ), this.materialCases[0]);
+        
         // Pièces
-        this.piecesId = [];
-        this.piecesObj = [];
-        // Pièces mangés
-        this.piecesOut = [[], []];
-
         this.models = [ // définition des nom de modèles en dur
             {nom:"Pion", obj:undefined},
             {nom:"Fou", obj:undefined},
@@ -45,10 +43,9 @@ class RenduThreeJs{
             {nom:"Reine", obj:undefined},
             {nom:"Roi", obj:undefined}
         ];
-
         //Récupération du type de modèles utilisé :
         let ModelType = getParams(window.location.href).affichage;
-        if(ModelType == "") ModelType = "Classic"; // on redéfinit par sécurité si l'argument est manquant
+        if(ModelType == "" || ModelType == undefined) ModelType = "Classic"; // on redéfinit par sécurité si l'argument est manquant
         console.log("Affichage : " + ModelType)
         //On charge les infos sur les modèles utilisés dynamiquement
         let script = document.createElement('script');
@@ -68,26 +65,27 @@ class RenduThreeJs{
             }
         };
         document.head.appendChild(script)
+        //Stockages des pièces de la scène
+        this.piecesId = [];
+        this.piecesObj = [];
+        // Pièces mangées (blanc, noir)
+        this.piecesOut = [[], []];
 
         //Board
         this.GenerateBoard();
-        //Gestion du rendu (lumière+camera+renderFunction)
+        //Gestion des lumières
         this.GenerateLight();
-
+        //Gestion des animations
         function render() {
             requestAnimationFrame( render );
             TWEEN.update();
             renderer.render( Rendu.scene, Rendu.camera );
         }
         render();
-        
-        //Gestion de la détection des clicks (Events)
-        this.raycaster = new THREE.Raycaster();
     }
 
-    //Module a faire avec fonction interne + tile
+    //Méthode commune d'utilisation de Tween pour déplacer une pièce
     Tween(piece, targets, delai) {
-        console.log('Piece Tween')
         let position = piece.position;
         let target = new Object;
         for(let i=0; i<targets.length; i++) target[targets[i].Axis] = position[targets[i].Axis] + targets[i].Offset;
@@ -109,6 +107,7 @@ class RenduThreeJs{
         tweenUp.start();
     }
 
+    //Utilisée lors des tests pour déplacer une pièce au click directement
     /*animateSelectedPiece(piece, X, Y) {
         let tweenUp = this.Tween(piece, [{Axis:'y', Offset:40}], 1000)
         let tweenMove = this.Tween(piece, [{Axis:'x', Offset:20*X}, 
@@ -119,13 +118,20 @@ class RenduThreeJs{
         tweenUp.start();
     }*/
 
-    //entrée : tableau taille 2 avec deplacement dedans
-        //deplacement : piece(x, y, couleur, nom), x, y
+    //Méthodes de déplacement de pièce
+    movePieces(deplacements) {
+        let Rendu = this;
+        let loadCheck = setInterval(function() { // On attend que toutes nos pièces soient 
+            if (Rendu.checkLoadModels()) {  // chargées avant de commencer à les déplacer afin 
+                clearInterval(loadCheck);   // d'éviter les bugs liés à la synchronisation
 
-
+                if(deplacements.length == 1) Rendu.movePiece(deplacements[0]); // si pas de roque
+                else Rendu.moveRoque(deplacements);
+            }
+        }, 100);
+    }
     movePiece(deplacement) {
         let pieceIdx = this.getPieceIdx(deplacement.piece)
-
 
         if(pieceIdx>-1){
             this.animatePiece(this.piecesObj[pieceIdx], deplacement.y-deplacement.piece.y, deplacement.x-deplacement.piece.x);
@@ -133,10 +139,6 @@ class RenduThreeJs{
     }
     moveOut(piece) {
         let pieceIdx = this.getPieceIdx(piece)
-        console.log("moveoutdebut");
-        console.log(piece);
-        console.log(pieceIdx);
-
         if(pieceIdx>-1){
             let tweenUp = this.Tween(this.piecesObj[pieceIdx], [{Axis:'z', Offset:3}], 1200); 
             tweenUp.start();            // on lève la pièce
@@ -145,27 +147,30 @@ class RenduThreeJs{
 
             setTimeout(function(){
                 Rendu.removePiece(pieceIdx);    // on supprime la piece mangé du plateau
-                Rendu.LoadPieceOut(piece);   // on la recharge dans la scene
+                Rendu.LoadPieceOut(piece, 3);   // on la recharge dans la scene en hauteur pour faire croire qu'on l'a juste déplacée
                 let tweenDown = Rendu.Tween(Rendu.piecesOut[piece.couleur][Rendu.piecesOut[piece.couleur].length-1], [{Axis:'z', Offset:-3}],1200);
                 tweenDown.start();           // on la fait redescendre sur le coté du plateau*/
             }, 1200);
         }
     }
     moveRoque(deplacements) {
+        let Rendu = this;
         // ROI
-        this.movePiece(deplacements[0]);
+        Rendu.movePiece(deplacements[0]);
         // TOUR
-        let pieceIdx = this.getPieceIdx(piece)
-        if(pieceIdx>-1){
-            let tweenMove = this.Tween(this.piecesObj[pieceIdx], [{Axis:'x', Offset:0.5*deplacements[1].x}], 300*Math.max(Math.abs(X),Math.abs(Y))) // calcul delai en fonction distance ?
-            tweenMove.start();           // on la fait redescendre sur le coté du plateau*/
-        }
+        setTimeout(function(){
+            Rendu.movePiece(deplacements[1]);
+        }, 1400); // on prend le temps de déplacement du roi moins le temps de descente
     }
 
-
-    removePlayable() {
-        for (let i = 0; i < this.playableCases.length; i++) this.removeObject(this.playableCases[i])
-        this.playableCases.length = 0;
+    //Méthodes de suppression de pièce
+    removePiecesOut() {
+        for(let i=0; i<2; i++){
+            for(let j=0; j<this.piecesOut[i].length; j++){
+                this.removeObject(this.piecesOut[i][j]);
+            }
+            this.piecesOut[i].length = 0;
+        }
     }
     removePieces() {
         for(let i=0; i<this.piecesObj.length; i++){
@@ -183,20 +188,11 @@ class RenduThreeJs{
         this.scene.remove(piece);
     }
 
-    setPlayable(X, Y, playableType) {
-        let tmpPlayableCase = this.playableCase.clone();
-
-        if (playableType) { tmpPlayableCase.material = this.vert/*.color.setHex(0x00ff00);*/ }
-        else { tmpPlayableCase.material = this.rouge/*.color.setHex(0xff0000);*/ }
-
-        tmpPlayableCase.position.set( (Y-4)/2 + 0.25, (X-4)/2 + 0.25, 0 );
-
-        this.playableCases.push(tmpPlayableCase) // on enregistre pour pouvoir les retirer
-
-        this.scene.add( tmpPlayableCase );
-    };
-
-    setPlayables(board) {
+    //Gestion des Cases
+    removePlayable() {
+        for (let i = 0; i < this.playableCases.length; i++) this.playableCases[i].material = this.materialCases[0]
+    }
+    setPlayables(board, CooSelect) {
         for (let i = 0; i < board.length; i++) {
             for (let j = 0; j < board.length; j++) {
                 if (board[i][j].playable) {
@@ -204,11 +200,38 @@ class RenduThreeJs{
                 }
             }
         }
+        this.setSelect(CooSelect.x, CooSelect.y);
     };
+    setPlayable(X, Y, playableType) {
+        let materiel;
+        if (playableType) { materiel = this.materialCases[2]/*.color.setHex(0x00ff00);*/ }
+        else { materiel = this.materialCases[3]/*.color.setHex(0xff0000);*/ }
+        this.setCase(X, Y, materiel)
+    };
+    setSelect(X, Y) {
+        this.setCase(X, Y, this.materialCases[1]);
+    };
+    setTransparent(X, Y){
+        this.setCase(X, Y, this.materialCases[0]);
+    }
+    setCase(X, Y, materiel){
+        let CooCheck = (this.getCooObject(this.playableCases[(8*X) + Y]))
+        if(CooCheck.x != X || CooCheck.y != Y) this.ResetCases()//reset playables
 
-    //Module avec arrowFunction a faire
+        this.playableCases[(8*X)+Y].material = materiel;
+    }
+    createCase(X, Y){
+        let tmpPlayableCase = this.playableCase.clone();
+
+        tmpPlayableCase.material = this.materialCases[0]
+        tmpPlayableCase.position.set( (Y-4)/2 + 0.25, (X-4)/2 + 0.25, 0 );
+
+        this.playableCases.push(tmpPlayableCase) // on enregistre pour pouvoir les retirer
+        this.scene.add( tmpPlayableCase );
+    }
+
+    //Méthodes de sélection d'objets
     getPieceIdx(piece){
-        console.log(this.piecesId)
         for(let i=0; i<this.piecesId.length; i++){ // on parcours toutes les pièces pour trouver la bonne à défault d'une meilleure méthode
             if(this.piecesId[i] == piece.id){
                 return i;
@@ -228,6 +251,7 @@ class RenduThreeJs{
         Coo.y = Math.trunc(2*(position.x + 2));
         return Coo;
     }
+    //Méthode du RayCast
     getClickModels(event, TabModels) {
         let mouse = new THREE.Vector2();
         mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
@@ -237,7 +261,7 @@ class RenduThreeJs{
         return this.raycaster.intersectObjects(TabModels, true); //array avec objets
     }
 
-
+    //Génération du terrain de jeu (Board+Light+Camera)
     GenerateBoard(){
         let boardTexture = new THREE.ImageUtils.loadTexture("../../img/board-pattern.png");
         boardTexture.repeat.set(4,4);
@@ -256,7 +280,6 @@ class RenduThreeJs{
         );
         this.scene.add( board );
     }
-
     GenerateLight(){
         let light = new THREE.AmbientLight( 0x555555 ); // soft white light
         this.scene.add( light );
@@ -271,12 +294,41 @@ class RenduThreeJs{
         spotLight.shadowCameraFov = 30;
         this.scene.add( spotLight );
     }
+    PositionCamera(couleur){
+        if(couleur){
+            this.camera.position.x = 3.5;
+            this.camera.position.z = 3;
+            this.camera.rotation.y = ( 50* (Math.PI / 180));
+            this.camera.rotation.z = ( 90* (Math.PI / 180));
+        }
+        else{
+            this.camera.position.x = -3.5;
+            this.camera.position.z = 3;
+            this.camera.rotation.y = ( 310* (Math.PI / 180));
+            this.camera.rotation.z = ( 270* (Math.PI / 180));
+        }
+    }
 
+    //Méthodes de gestion d'erreurs des cases
+    ResetCases(){ // Suppression + Regénération des cases pour garder l'ordre des indices
+        for (let i = 0; i < this.playableCases.length; i++) this.removeObject(this.playableCases[i])
+        this.playableCases.length = 0;
+        this.GenerateCases();
+    }
+    GenerateCases(){
+        for(let i=0; i<8; i++){
+            for(let j=0; j<8; j++){
+                this.createCase(i,j);
+            }
+        }
+        //On récupère donc les coo des case avec 8*x + y selon l'ordre de génération
+    }
 
+    //Méthodes de génération du board (coté modèle)
     loadBoardPieces(board){
         this.LoadPieces(this.getBoardPieces(board))
+        this.GenerateCases();
     }
-    
     getBoardPieces(board){
         let tmpPieces = [];
         for(let i=0; i<8; i++){
@@ -289,11 +341,12 @@ class RenduThreeJs{
         return tmpPieces
     }
 
-    checkLoadModels(){
+    checkLoadModels(){ // fonction de vérification de l'état de chargement des modèles
         for(let i=0; i<this.models.length; i++) if(this.models[i].obj == undefined) return false;
         return true;
     }
 
+    //Méthode de génération des pièces du board
     LoadPieces(Pieces){
         for(let i=0; i<6; i++){
             for(let couleur=0; couleur<2; couleur++){
@@ -340,41 +393,15 @@ class RenduThreeJs{
         }
     }
 
-    LoadPiecesOut(piecesOut) {
-        for(let i=0; i<this.piecesOut.length; i++){
-            let obj = (this.piecesOut[i].obj).clone()
-            obj.traverse( function ( child ) {
-                if (child instanceof THREE.Mesh) {
-                    // on définit la couleur
-                    if(couleur) child.material = new THREE.MeshLambertMaterial({color: 0x555555});
-                    else child.material = new THREE.MeshLambertMaterial({color: 0xFFFFFF});
-                }
-            });
-
-            for(let j=0; j<piecesOut.length; j++){
-        
-                if (piece.couleur) obj.position.set(5-this.piecesOut.indexOf(obj), -2.3, 3);   // z hors champs de caméra
-                else obj.position.set( 3+this.piecesOut.indexOf(obj), 2.3, 3);                 // z hors champs de caméra
-
-                // taille / orientation
-                obj.scale.set(.015, .015, .015);
-                obj.rotation.x = 1.57;
-
-                // on l'affiche
-                this.scene.add(obj);
+    //Méthodes de génération des pièces supprimées
+    LoadPiecesOut(plateau) {
+        for(let i=0; i<2; i++){
+            for(let j=0; j<plateau.Joueurs[i].pieces_prises.length; j++){
+                this.LoadPieceOut(plateau.Joueurs[i].pieces_prises[j].piece, 0)
             }
         }
     }
-
-    reloadAll() {
-        this.removePieces();
-        this.removePlayables();
-        this.LoadPieces(pieces);
-        this.LoadPiecesOut(this.piecesOut);
-    }
-	
-	
-    LoadPieceOut(piece){
+    LoadPieceOut(piece, hauteur){
         let idx = -1;
         for(let i=0; i<this.models.length; i++) {
             let NomPiece = this.models[i].nom;
@@ -392,20 +419,13 @@ class RenduThreeJs{
         });
 
         let OffSet = info.Offset[idx + (piece.couleur * 6)];
-            
-            //obj.position.set( 5-this.piecesOut.indexOf(obj), -2.3, 3);   // z hors champs de caméra
-
-            //obj.position.set( 3+this.piecesOut.indexOf(obj), 2.3, 3);                  // z hors champs de caméra
-
-        if (piece.couleur) obj.position.set(5-this.piecesOut.indexOf(obj) + OffSet.position.x,
-                            -2.3 + OffSet.position.y
-                            ,3);
-        else obj.position.set( 3+this.piecesOut.indexOf(obj) + OffSet.position.x,
-                                2.3 + OffSet.position.y
-                                ,3);
+        
+        obj.position.set((Math.pow(-1, piece.couleur) * (-1.7 + (0.4 * (this.piecesOut[piece.couleur].length/2)))) + OffSet.position.x,
+                        (Math.pow(-1, piece.couleur+1)*(2.6 + (0.4 * (this.piecesOut[piece.couleur].length%2)))) + OffSet.position.y,
+                        hauteur);
+        obj.scale.set(info.scale*0.6, info.scale*0.6, info.scale*0.6);
         
         // taille / orientation
-        obj.scale.set(info.scale*0.6, info.scale*0.6, info.scale*0.6);
         obj.rotation.x = 1.57 + OffSet.rotation.x;
         obj.rotation.y = OffSet.rotation.y;
         obj.rotation.z = OffSet.rotation.z;
@@ -415,5 +435,19 @@ class RenduThreeJs{
         // on l'affiche
         this.scene.add(obj);
     }
-}
 
+    //Méthode de reset entier du coté graphique
+    reloadAll(plateau) {
+        this.removePieces();
+        this.removePiecesOut();
+        this.ResetCases();
+        this.LoadPieces(this.getBoardPieces(plateau.board))
+        this.LoadPiecesOut(plateau); // A REFAIRE
+    }	
+
+    //Méthode de suppression du rendu
+    remove(){
+        document.body.removeChild(document.body.lastChild)//on supprime le rendu
+        document.getElementById('infos').parentNode.removeChild(document.getElementById('infos'));//on supprime l'import des infos sur les modèles
+    }
+}

@@ -46,7 +46,7 @@ class Plateau{
         }
 
         this.Joueurs = new Array()
-        this.couts = new Array()
+        this.coups = new Array()
 
         //Case sélectionnée du playable
         this.select = {x:-1, y:-1};
@@ -103,20 +103,20 @@ class Plateau{
         piece.x = x
         piece.y = y
 
-        this.couts.push(piece)
+        this.coups.push(piece)
 
         this.board[x][y].piece = piece
 
         this.Nbtour++;
 
+        this.select = {x:-1, y:-1};
         this.reset_playable(); // Vérifier que l'on ne répète pas ça <-----------------------------------------------------
     }
     supprimer(x,y){
         if(this.check_piece(x, y)){
             let piece_prise = {Nbtour:this.Nbtour, piece:this.board[x][y].piece}//Enregistrement pièce prise
             this.Joueurs[this.board[x][y].piece.couleur].pieces_prises.push(piece_prise);
-
-            this.Joueurs[this.board[x][y].piece.couleur].pieces--;//Retrait de la pièce du board
+            //Retrait de la pièce du board
             this.board[x][y].piece = 0;
         }
     }
@@ -166,7 +166,10 @@ class Plateau{
             }
         }
         tmp.Joueurs = JSON.parse(JSON.stringify(this.Joueurs));
-        tmp.couts = JSON.parse(JSON.stringify(this.couts));
+        tmp.coups = JSON.parse(JSON.stringify(this.coups));
+
+        tmp.chrono = JSON.parse(JSON.stringify(this.chrono.Chrono))
+
         return tmp;
 
         //Ancienne méthode de clone, non conservée car inutile
@@ -174,9 +177,9 @@ class Plateau{
         //for(let i=0; i<this.Joueurs.length; i++){
         //    tmp.Joueurs.push(this.Joueurs[i].clone())
         //}
-        //for(let i=0; i<this.couts.length; i++){
-        //    if(typeof(this.couts[i])=='String') tmp.couts.push(this.couts[i])
-        //    else tmp.couts.push(this.couts[i].clone())
+        //for(let i=0; i<this.coups.length; i++){
+        //    if(typeof(this.coups[i])=='String') tmp.coups.push(this.coups[i])
+        //    else tmp.coups.push(this.coups[i].clone())
         //}
         //tmp.select.x = this.select.x
         //tmp.select.y = this.select.y
@@ -251,22 +254,22 @@ class Plateau{
     cancel_jouer(x,y){
         this.Nbtour--;
 
-        this.couts[this.Nbtour].x = this.couts[this.Nbtour].deplacements[this.couts[this.Nbtour].deplacements.length-2].x
-        this.couts[this.Nbtour].y = this.couts[this.Nbtour].deplacements[this.couts[this.Nbtour].deplacements.length-2].y
-        this.couts[this.Nbtour].deplacements.splice(this.couts[this.Nbtour].deplacements.length - 1, 1);
+        this.coups[this.Nbtour].x = this.coups[this.Nbtour].deplacements[this.coups[this.Nbtour].deplacements.length-2].x
+        this.coups[this.Nbtour].y = this.coups[this.Nbtour].deplacements[this.coups[this.Nbtour].deplacements.length-2].y
+        this.coups[this.Nbtour].deplacements.splice(this.coups[this.Nbtour].deplacements.length - 1, 1);
         
 
-        if(this.couts[this.Nbtour].nom=="Roi"){
-            this.Joueurs[this.couts[this.Nbtour].couleur].roi.x = this.couts[this.Nbtour].x;
-            this.Joueurs[this.couts[this.Nbtour].couleur].roi.y = this.couts[this.Nbtour].y;
+        if(this.coups[this.Nbtour].nom=="Roi"){
+            this.Joueurs[this.coups[this.Nbtour].couleur].roi.x = this.coups[this.Nbtour].x;
+            this.Joueurs[this.coups[this.Nbtour].couleur].roi.y = this.coups[this.Nbtour].y;
         }
 
 
-        this.board[this.couts[this.Nbtour].x][this.couts[this.Nbtour].y].piece=this.couts[this.Nbtour]; 
+        this.board[this.coups[this.Nbtour].x][this.coups[this.Nbtour].y].piece=this.coups[this.Nbtour]; 
         this.board[x][y].piece = 0
 
-        this.cancel_supprimer(this.Nbtour, (this.couts[this.Nbtour].couleur+1)%2)
-        this.couts.splice(this.couts, 1)
+        this.cancel_supprimer(this.Nbtour, (this.coups[this.Nbtour].couleur+1)%2)
+        this.coups.splice(this.coups, 1)
     }
     cancel_supprimer(Nbtour, couleur){ // en fonction du nombre de tour pour la prise en passant..
         if(this.Joueurs[couleur].pieces_prises.length > 0){
