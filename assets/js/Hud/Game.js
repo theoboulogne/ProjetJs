@@ -38,7 +38,8 @@ let Hud = (function(){
         OpenMenu:(info) => {
             document.getElementById('contenu-popup').innerHTML = info;
             $("#popup").modal({
-                fadeDuration: 100
+                fadeDuration: 100,
+                showClose: false
             });
             $('#popup').on($.modal.BEFORE_CLOSE, function(event, modal) {
                 window.location.href = "./"

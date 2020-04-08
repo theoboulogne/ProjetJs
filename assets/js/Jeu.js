@@ -1,23 +1,8 @@
 
 
 /*TO-DO :
-(3D : )
-CHANGEMENT DU PION A LA DERNIERE LIGNE (HUD + JEU + 3D)
-
-
-ECHEC BUG AVEC PION EN ARRIERE
-ROQUE MARCHE AVEC PIECE ENTRE DEUX + SI EN ECHEC
-
-RETIRER LA CROIX DES MODAL POUR EVITER LA GENERATION D'ERREUR AU CLICK
-
-
-+ Changer le système de récupération des infos sur les modèles (avec JQuery) :
 
 + methode pour indiceechiquier/couleursocket
-
-$.getJSON("test.json", function(json) {
-    console.log(json); // this will show the info it in firebug console
-});
 
 
 + Rajouter l'envoi de la bdd dans le menu avec express + jquery aussi
@@ -121,12 +106,16 @@ class Jeu{
             Game.echiquier = plateau; // On récupère le nouveau plateau (sans les cases playable)
             //Détermination du roque
             let deplacements = Roque.getDeplacements(deplacement, plateau.board);
-            console.log(deplacements)
-            Game.Move(deplacements, piece_prise);
 
             //Affichage graphique
             if(piece_prise != 0) Game.rendu.moveOut(piece_prise); // On affiche la suppression 
-            Game.rendu.movePieces(deplacements); // on lance le déplacement de la ou des pièces en cas de roque
+
+            Game.rendu.movePieces(JSON.parse(JSON.stringify(deplacements))); 
+            // on lance le déplacement de la ou des pièces en cas de roque
+            // on effectue une copie du déplacement car le déplacement est asynchrone et que l'on veut garder les bonnes infos
+
+            Game.Move(deplacements, piece_prise);
+
             //Détermination de la promotion de pion
             if(deplacement.piece.nom == "Pion" && ((deplacement.piece.couleur + 1) % 2)*7 == deplacement.y){
                 if(deplacement.piece.choix != undefined){
@@ -170,6 +159,7 @@ class Jeu{
         });
     }
     Move(deplacements, piece_prise){
+
         if(piece_prise != 0){
             this.echiquier.board[piece_prise.x][piece_prise.y].piece = 0; // on applique les transformations au plateau 
             this.echiquier.Joueurs[piece_prise.couleur].pieces_prises.push(piece_prise); //pour sélectionner derrière
