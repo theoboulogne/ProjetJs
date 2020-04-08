@@ -148,7 +148,7 @@ class Jeu{
         // on lance le déplacement de la ou des pièces en cas de roque
         for(let i = 0; i < deplacements.length; i++){ // on applique les transformations pour sélectionner derrière
             //Déplacement dans le board de la pièce
-            this.echiquier.board[deplacements[i].x][deplacements[i].y].piece = this.echiquier.board[deplacements[i].piece.x][deplacements[i].piece.y];
+            this.echiquier.board[deplacements[i].x][deplacements[i].y].piece = this.echiquier.board[deplacements[i].piece.x][deplacements[i].piece.y].piece;
             this.echiquier.board[deplacements[i].piece.x][deplacements[i].piece.y] = 0;
 
             //Changement des Coo de la pièce dans l'objet
