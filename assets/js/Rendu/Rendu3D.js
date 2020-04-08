@@ -382,6 +382,36 @@ class RenduThreeJs{
                         // on définit la couleur
                         if(couleur) child.material = new THREE.MeshLambertMaterial({color: 0x666666});
                         else child.material = new THREE.MeshLambertMaterial({color: 0xFFFFFF});
+                        
+                        /*
+                        if(couleur) child.material = new THREE.MeshStandardMaterial( {
+
+                            color: 0x555555,
+                        
+                            //roughness: 1,
+                            //metalness: 0.5,
+                        
+                            //roughnessMap: 1,
+                            //metalnessMap: 1,
+                        
+                            //envMap: 1, // important -- especially for metals!
+                            //envMapIntensity: 0.5
+                        
+                        } );
+                        else child.material = new THREE.MeshStandardMaterial( {
+
+                            color: 0xFFFFFF,
+                        
+                            //roughness: 1,
+                            //metalness: 0.5,
+                        
+                            //roughnessMap: 1,
+                            //metalnessMap: 1,
+                        
+                            //envMap: 1, // important -- especially for metals!
+                            //envMapIntensity: 0.5
+                        
+                        } );*/
                     }
                 });
                 //On récupère le bon nom si nécessaire

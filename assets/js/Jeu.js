@@ -4,9 +4,6 @@
 
 + methode pour indiceechiquier/couleursocket
 
-
-+ Rajouter l'envoi de la bdd dans le menu avec express + jquery aussi
-
 + voir changer hauteur déplacement
 
 

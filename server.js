@@ -6,6 +6,15 @@ const express = require('express');
 const app = express();
 const server = require('http').createServer(app);
 const io =  require('socket.io')(server);
+const mysql = require('mysql');
+
+//Info de connection à la BDD
+const InfoConnectionBDD = { 
+  host: "localhost",
+  user: "root",
+  password: "",
+  database: "echecs"
+};
 
 //Import des classes
 const Plateau = require('./server_modules/Plateau');
@@ -15,7 +24,7 @@ const Chrono = require('./server_modules/Chrono');
 const MYSQL = require('./server_modules/Mysql');
 
 //Création de la table score dans la BDD si nécessaire
-MYSQL.CreationScoreBDD()
+MYSQL.CreationScoreBDD(InfoConnectionBDD)
 
 //Redirection des pages
 app.use(express.static(__dirname + '/assets/'));
@@ -23,12 +32,25 @@ app.get('/', (req, res, next) => {
     res.sendFile(__dirname + '/assets/views/menu.html')
 });
 app.get('/jeu', (request, response, next) => {
-    lastParam = request.query // on récupère les paramètres
+    lastPseudo = request.query.pseudo // on récupère les paramètres
     response.sendFile(__dirname + '/assets/views/jeu.html')
 });
 
+app.get("/scores", function(req,res){ // On est obligé de se connecter à la BDD dans le fichier server car la récupération des infos est asynchrone..
+    let con = mysql.createConnection(InfoConnectionBDD);
+    con.connect(function(err) {
+        if (err) throw err;
+        console.log("Connecté à la mysql !");
+        let sql = "SELECT * FROM `scores` LIMIT 100" // On récupère les données, on limite à 100 scores pour 
+        con.query(sql, function (err, result) {     // éviter les problèmes en cas de trop grand nombre d'infos
+            if (err) throw err;
+            return res.send(result);
+        });
+    });
+  });
+
 //On stocke dans une variable tampon les paramètre du dernier client car on y accède uniquement depuis le app.get
-let lastParam = undefined;
+let lastPseudo = undefined;
 //On enregistre nos plateaux et nos joueurs avec leur socket
 this.echiquiers = new Array();
 // on stocke la variable pour pouvoir accéder de nos définitions d'event aux échiquiers
@@ -36,13 +58,12 @@ let game = this;
 
 io.sockets.on('connection',  (socket) =>{
     console.log('Nouvelle Connection Client')
-    if(lastParam!=undefined){
-        console.log('Pseudo du Client : ' + lastParam.pseudo)
-        console.log("Choix d'affichage : " + lastParam.affichage)
+    if(lastPseudo!=undefined){
+        console.log('Pseudo du Client : ' + lastPseudo)
     }
 
-    //si un paramètre n'est pas définit on redirige au menu (au redémarrage du serveur uniquement):
-    if(lastParam == undefined || lastParam.pseudo == "") socket.emit('menu')
+    //si un paramètre n'est pas définit on redirige au menu (au redémarrage du serveur principalement):
+    if(lastPseudo == undefined || lastPseudo == "") socket.emit('menu')
     else { // sinon on lance la partie
 
         //Gestion de l'ajout de plateau si nécessaire
@@ -50,7 +71,7 @@ io.sockets.on('connection',  (socket) =>{
         else if(this.echiquiers[this.echiquiers.length-1].Joueurs.length==2) this.echiquiers.push(new Plateau());
 
         //Gestion de l'ajout de joueur      
-        this.echiquiers[this.echiquiers.length-1].Joueurs.push(new Joueur(this.echiquiers[this.echiquiers.length-1].Joueurs.length, socket.id, lastParam.pseudo));//On définit la couleur avec le nombre de joueur sur le plateau et on rajoute un joueur
+        this.echiquiers[this.echiquiers.length-1].Joueurs.push(new Joueur(this.echiquiers[this.echiquiers.length-1].Joueurs.length, socket.id, lastPseudo));//On définit la couleur avec le nombre de joueur sur le plateau et on rajoute un joueur
         socket.emit('repconnection', game.echiquiers[game.echiquiers.length-1].Joueurs.length-1)// on informe le client que la connection est effectuée et on lui donne sa couleur
 
         //Gestion du lancement de la partie
@@ -146,7 +167,7 @@ io.sockets.on('connection',  (socket) =>{
                 if(game.echiquiers[indiceEchiquier].echecEtMat((couleurSocket+1)%2)){//Detection fin de partie
                     console.log('Echec et Mat')
                     //Enregistrement du score dans la BDD mysql
-                    MYSQL.EnvoiScoreBDD(game.echiquiers[indiceEchiquier], couleurSocket);
+                    MYSQL.EnvoiScoreBDD(game.echiquiers[indiceEchiquier], couleurSocket, InfoConnectionBDD);
                     //Envoi de l'event aux client pour rediriger vers le menu
                     for(let i=0; i<2; i++) io.sockets.sockets[game.echiquiers[indiceEchiquier].Joueurs[i].id].emit('endGame', couleurSocket);
                 }
