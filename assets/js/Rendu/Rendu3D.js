@@ -318,6 +318,21 @@ class RenduThreeJs{
         }
     }
 
+    /*PositionCamera(couleur){
+        if(couleur){
+            this.camera.position.x = 2;
+            this.camera.position.z = 5;
+            this.camera.rotation.y = ( 20* (Math.PI / 180));
+            this.camera.rotation.z = ( 90* (Math.PI / 180));
+        }
+        else{
+            this.camera.position.x = -2;
+            this.camera.position.z = 5;
+            this.camera.rotation.y = ( 350* (Math.PI / 180));
+            this.camera.rotation.z = ( 270* (Math.PI / 180));
+        }
+    }*/
+
     //Méthodes de gestion d'erreurs des cases
     ResetCases(){ // Suppression + Regénération des cases pour garder l'ordre des indices
         for (let i = 0; i < this.playableCases.length; i++) this.removeObject(this.playableCases[i])
