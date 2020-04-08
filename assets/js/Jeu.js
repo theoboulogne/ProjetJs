@@ -8,6 +8,8 @@ CHANGEMENT DU PION A LA DERNIERE LIGNE (HUD + JEU + 3D)
 ECHEC BUG AVEC PION EN ARRIERE
 ROQUE MARCHE AVEC PIECE ENTRE DEUX + SI EN ECHEC
 
+RETIRER LA CROIX DES MODAL POUR EVITER LA GENERATION D'ERREUR AU CLICK
+
 
 + Changer le système de récupération des infos sur les modèles (avec JQuery) :
 
@@ -119,18 +121,17 @@ class Jeu{
             Game.echiquier = plateau; // On récupère le nouveau plateau (sans les cases playable)
             //Détermination du roque
             let deplacements = Roque.getDeplacements(deplacement, plateau.board);
-            
+            console.log(deplacements)
             Game.Move(deplacements, piece_prise);
 
             //Affichage graphique
             if(piece_prise != 0) Game.rendu.moveOut(piece_prise); // On affiche la suppression 
             Game.rendu.movePieces(deplacements); // on lance le déplacement de la ou des pièces en cas de roque
-
             //Détermination de la promotion de pion
             if(deplacement.piece.nom == "Pion" && ((deplacement.piece.couleur + 1) % 2)*7 == deplacement.y){
                 if(deplacement.piece.choix != undefined){
                     Game.echiquier.board[deplacement.x][deplacement.y].piece.nom = deplacement.piece.choix;
-                    //Lancement de la promotion graphiquement
+                    Game.rendu.switchPawn(Game.echiquier.board[deplacement.x][deplacement.y].piece)//Lancement de la promotion graphiquement
                 }
             }
             
@@ -177,7 +178,7 @@ class Jeu{
         // on lance le déplacement de la ou des pièces en cas de roque
         for(let i = 0; i < deplacements.length; i++){ // on applique les transformations pour sélectionner derrière
             //Déplacement dans le board de la pièce
-            this.echiquier.board[deplacements[i].x][deplacements[i].y].piece = this.echiquier.board[deplacements[i].piece.x][deplacements[i].piece.y];
+            this.echiquier.board[deplacements[i].x][deplacements[i].y].piece = this.echiquier.board[deplacements[i].piece.x][deplacements[i].piece.y].piece;
             this.echiquier.board[deplacements[i].piece.x][deplacements[i].piece.y] = 0;
 
             //Changement des Coo de la pièce dans l'objet

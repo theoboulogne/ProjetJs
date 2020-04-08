@@ -165,16 +165,16 @@ class RenduThreeJs{
         }, 1400); // on prend le temps de déplacement du roi moins le temps de descente
     }
     switchPawn(piece) {
-        let idx = getPieceIdx(piece);
-        let tweenUp = this.Tween(this.piecesObj[pieceIdx], [{Axis:'z', Offset:3}], 1200); 
-        tweenUp.start();    // on lève la pièce
         let Rendu = this;
+        let idx = Rendu.getPieceIdx(piece);
+        let tweenUp = Rendu.Tween(Rendu.piecesObj[idx], [{Axis:'z', Offset:3}], 800); 
+        tweenUp.start();// on lève la pièce
         setTimeout(function() {
             Rendu.removePiece(idx); // indice du pion
             setTimeout(function() {
                 Rendu.LoadPieces([piece]);
-            }, 200)
-        }, 1200)
+            }, 50)//On attend légèrement après que la pièce soit supprimée pour éviter de supprimer la nouvelle car elles ont le même id
+        }, 800) // on attend que la pièce soit levée
     }
 
     //Méthodes de suppression de pièce
