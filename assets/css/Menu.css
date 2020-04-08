@@ -1,6 +1,8 @@
 .Info {
-position:relative;
+position:absolute;
 margin-top:6%;
+margin-left: 40%;
+width: 20%;
 }
 
 body {
@@ -24,12 +26,22 @@ body {
     margin-top: 2%;
     font-family: monospace;
 }
-
-.entrer_pseudo{
-    margin-left: 40%;
-    margin-right: 40%;
-}
-
 #play{
     margin-top: 3%;
+}
+.btn{
+margin-top: 2%;
+}
+.piece_formulaire{
+    margin-top: 2%;
+}
+.tableau_score{
+    margin-left: 1%;
+    height : 50%;
+    width : 20%;
+    position: absolute;
+    z-index: 2;
+}
+.btn_tableau{
+    width: 100%;
 }
