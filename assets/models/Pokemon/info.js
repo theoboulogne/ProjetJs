@@ -1,3 +1,5 @@
+// Non utilisé actuellement, uniquement pour la production (pour utiliser PI dans le calcul)
+
 let info = {
     chemin : 'Pokemon', 
     scale : .011, 

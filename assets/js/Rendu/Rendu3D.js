@@ -52,7 +52,7 @@ class RenduThreeJs{
         console.log("Affichage : " + ModelType)
         document.body.style.background = "url('../../img/"+ModelType+".png') no-repeat center center";
 
-        $.getJSON("../../models/"+ModelType+"/info.json", function(json) {
+        $.getJSON("../../JSON/"+ModelType+".json", function(json) {
             Rendu.info = json;
             if(Rendu.info.couleur){ // si on a un modèle différent pour les blancs et les noirs
                 for(let i=0; i<6; i++){// on vient doubler le nombre de modèle à charger et on change les noms
