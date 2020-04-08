@@ -5,7 +5,7 @@ let Roque = (function(){
         return {
             y:deplacement.y,
             x:deplacement.x - (diff/Math.abs(diff)),
-            piece:board[3.5 + ((diff/Math.abs(diff))*3.5)][deplacement.piece.y].piece
+            piece:board[deplacement.piece.x + ((diff/Math.abs(diff))*3.5) + 0.5][deplacement.piece.y].piece
         }
     };
     return {
