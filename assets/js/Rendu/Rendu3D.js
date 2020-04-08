@@ -372,6 +372,7 @@ class RenduThreeJs{
 
     //Méthode de génération des pièces du board
     LoadPieces(Pieces){
+        console.log(JSON.stringify(info)) // on récupère les infos en format JSON
         for(let i=0; i<6; i++){
             for(let couleur=0; couleur<2; couleur++){
 
