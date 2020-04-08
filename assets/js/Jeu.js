@@ -1,26 +1,10 @@
 
 
 /*TO-DO :
-(HUD : )
-CHANGEMENT DU PION A LA DERNIERE LIGNE (HUD + JEU + 3D)
 
-(3D : )
-CHANGEMENT DU PION A LA DERNIERE LIGNE (HUD + JEU + 3D)
++ methode pour indiceechiquier/couleursocket
 
-
-ECHEC BUG AVEC PION EN ARRIERE
-ROQUE MARCHE AVEC PIECE ENTRE DEUX + SI EN ECHEC
-
-
-+ Changer le système de récupération des infos sur les modèles (avec JQuery) :
-
-$.getJSON("test.json", function(json) {
-    console.log(json); // this will show the info it in firebug console
-});
-
-
-+ Rajouter l'envoi de la bdd dans le menu avec express + jquery aussi
-
++ voir changer hauteur déplacement
 
 
 A vérifier :
@@ -51,7 +35,22 @@ class Jeu{
                         }
                         else {
                             if(Game.echiquier.board[Coo.x][Coo.y].playable) {
-                                socket.emit('move', {piece:Game.echiquier.board[Game.echiquier.select.x][Game.echiquier.select.y].piece, 
+                                if(Game.echiquier.board[Game.echiquier.select.x][Game.echiquier.select.y].piece.nom == "Pion" &&
+                                   ((Game.echiquier.board[Game.echiquier.select.x][Game.echiquier.select.y].piece.couleur + 1) % 2)*7 == Coo.y){
+                                       //si le pion arrive au bout (promotion) :
+                                    let piece = Game.echiquier.board[Game.echiquier.select.x][Game.echiquier.select.y].piece;
+                                    Hud.choix_piece(piece);
+                                    let CheckPromotion = setInterval(function() { // On attend que toutes nos pièces soient 
+                                        if (piece.choix != undefined) {  // chargées avant de commencer à les afficher
+                                            clearInterval(CheckPromotion);
+                                            Hud.CloseAttente();
+                                            socket.emit('move', {piece:piece, 
+                                                                x:Coo.x, 
+                                                                y:Coo.y});
+                                        }
+                                    }, 500);
+                                }
+                                else socket.emit('move', {piece:Game.echiquier.board[Game.echiquier.select.x][Game.echiquier.select.y].piece, 
                                                     x:Coo.x, 
                                                     y:Coo.y});
                             }
@@ -108,9 +107,20 @@ class Jeu{
 
             //Affichage graphique
             if(piece_prise != 0) Game.rendu.moveOut(piece_prise); // On affiche la suppression 
-            Game.rendu.movePieces(deplacements); // on lance le déplacement de la ou des pièces en cas de roque
-            
+
+            Game.rendu.movePieces(JSON.parse(JSON.stringify(deplacements))); 
+            // on lance le déplacement de la ou des pièces en cas de roque
+            // on effectue une copie du déplacement car le déplacement est asynchrone et que l'on veut garder les bonnes infos
+
             Game.Move(deplacements, piece_prise);
+
+            //Détermination de la promotion de pion
+            if(deplacement.piece.nom == "Pion" && ((deplacement.piece.couleur + 1) % 2)*7 == deplacement.y){
+                if(deplacement.piece.choix != undefined){
+                    Game.echiquier.board[deplacement.x][deplacement.y].piece.nom = deplacement.piece.choix;
+                    Game.rendu.switchPawn(Game.echiquier.board[deplacement.x][deplacement.y].piece)//Lancement de la promotion graphiquement
+                }
+            }
             
             //On actualise l'interface
             Hud.Affichage_coups(Game.echiquier.coups[Game.echiquier.coups.length-1],plateau.Nbtour-1);
@@ -130,7 +140,7 @@ class Jeu{
             console.log('Partie terminée')// Fin de partie
 
             let infos;
-            if(couleurGagnant == Game.couleur) infos = "Vous avez gagné !"    
+            if(couleurGagnant == Game.couleur) infos = "Vous avez gagné !"
             else infos = "Vous avez perdu."
 
             Hud.OpenMenu(infos)
@@ -147,6 +157,7 @@ class Jeu{
         });
     }
     Move(deplacements, piece_prise){
+
         if(piece_prise != 0){
             this.echiquier.board[piece_prise.x][piece_prise.y].piece = 0; // on applique les transformations au plateau 
             this.echiquier.Joueurs[piece_prise.couleur].pieces_prises.push(piece_prise); //pour sélectionner derrière
@@ -155,8 +166,8 @@ class Jeu{
         // on lance le déplacement de la ou des pièces en cas de roque
         for(let i = 0; i < deplacements.length; i++){ // on applique les transformations pour sélectionner derrière
             //Déplacement dans le board de la pièce
-            this.echiquier.board[deplacements[i].x][deplacements[i].y].piece = this.echiquier.board[deplacements[i].piece.x][deplacements[i].piece.y];
-            this.echiquier.board[deplacements[i].piece.x][deplacements[i].piece.y] = 0;
+            this.echiquier.board[deplacements[i].x][deplacements[i].y].piece = this.echiquier.board[deplacements[i].piece.x][deplacements[i].piece.y].piece;
+            this.echiquier.board[deplacements[i].piece.x][deplacements[i].piece.y].piece = 0;
 
             //Changement des Coo de la pièce dans l'objet
             this.echiquier.board[deplacements[i].x][deplacements[i].y].piece.x = deplacements[i].x;

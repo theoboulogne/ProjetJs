@@ -52,7 +52,7 @@ class RenduThreeJs{
         console.log("Affichage : " + ModelType)
         document.body.style.background = "url('../../img/"+ModelType+".png') no-repeat center center";
 
-        $.getJSON("../../models/"+ModelType+"/info.json", function(json) {
+        $.getJSON("../../JSON/"+ModelType+".json", function(json) {
             Rendu.info = json;
             if(Rendu.info.couleur){ // si on a un modèle différent pour les blancs et les noirs
                 for(let i=0; i<6; i++){// on vient doubler le nombre de modèle à charger et on change les noms
@@ -165,16 +165,16 @@ class RenduThreeJs{
         }, 1400); // on prend le temps de déplacement du roi moins le temps de descente
     }
     switchPawn(piece) {
-        let idx = getPieceIdx(piece);
-        let tweenUp = this.Tween(this.piecesObj[pieceIdx], [{Axis:'z', Offset:3}], 1200); 
-        tweenUp.start();    // on lève la pièce
         let Rendu = this;
+        let idx = Rendu.getPieceIdx(piece);
+        let tweenUp = Rendu.Tween(Rendu.piecesObj[idx], [{Axis:'z', Offset:3}], 800); 
+        tweenUp.start();// on lève la pièce
         setTimeout(function() {
             Rendu.removePiece(idx); // indice du pion
             setTimeout(function() {
                 Rendu.LoadPieces([piece]);
-            }, 200)
-        }, 1200)
+            }, 50)//On attend légèrement après que la pièce soit supprimée pour éviter de supprimer la nouvelle car elles ont le même id
+        }, 800) // on attend que la pièce soit levée
     }
 
     //Méthodes de suppression de pièce
@@ -211,6 +211,15 @@ class RenduThreeJs{
             for (let j = 0; j < board.length; j++) {
                 if (board[i][j].playable) {
                     this.setPlayable(i,j,(board[i][j].piece == 0));
+                }
+            }
+        }
+        if(board[CooSelect.x][CooSelect.y].piece.nom == "Pion"){//On gère la prise en passant
+            for(let i=-1; i<2; i+=2) {
+                if(CooSelect.x+i>-1&&CooSelect.x+i<8&&CooSelect.y+(Math.pow(-1,board[CooSelect.x][CooSelect.y].piece.couleur))>-1&&CooSelect.y+(Math.pow(-1,board[CooSelect.x][CooSelect.y].piece.couleur))<8){
+                    if(board[CooSelect.x+i][CooSelect.y+(Math.pow(-1,board[CooSelect.x][CooSelect.y].piece.couleur))].piece == 0 && board[CooSelect.x+i][CooSelect.y+(Math.pow(-1,board[CooSelect.x][CooSelect.y].piece.couleur))].playable){
+                        this.setPlayable(CooSelect.x+i,CooSelect.y+(Math.pow(-1,board[CooSelect.x][CooSelect.y].piece.couleur)), false);
+                    }
                 }
             }
         }
@@ -298,8 +307,8 @@ class RenduThreeJs{
         let light = new THREE.AmbientLight( 0x555555 ); // soft white light
         this.scene.add( light );
  
-        let spotLight = new THREE.SpotLight( 0xffffff );
-        spotLight.position.set( 50, 100, 50 );
+        let spotLight = new THREE.SpotLight( 0xffffff, 0.6 );
+        spotLight.position.set( 0, 200, 200 );
         spotLight.castShadow = true;
         spotLight.shadowMapWidth = 1024;
         spotLight.shadowMapHeight = 1024;
@@ -373,6 +382,36 @@ class RenduThreeJs{
                         // on définit la couleur
                         if(couleur) child.material = new THREE.MeshLambertMaterial({color: 0x666666});
                         else child.material = new THREE.MeshLambertMaterial({color: 0xFFFFFF});
+                        
+                        /*
+                        if(couleur) child.material = new THREE.MeshStandardMaterial( {
+
+                            color: 0x555555,
+                        
+                            //roughness: 1,
+                            //metalness: 0.5,
+                        
+                            //roughnessMap: 1,
+                            //metalnessMap: 1,
+                        
+                            //envMap: 1, // important -- especially for metals!
+                            //envMapIntensity: 0.5
+                        
+                        } );
+                        else child.material = new THREE.MeshStandardMaterial( {
+
+                            color: 0xFFFFFF,
+                        
+                            //roughness: 1,
+                            //metalness: 0.5,
+                        
+                            //roughnessMap: 1,
+                            //metalnessMap: 1,
+                        
+                            //envMap: 1, // important -- especially for metals!
+                            //envMapIntensity: 0.5
+                        
+                        } );*/
                     }
                 });
                 //On récupère le bon nom si nécessaire

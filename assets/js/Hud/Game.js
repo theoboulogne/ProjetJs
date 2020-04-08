@@ -38,7 +38,8 @@ let Hud = (function(){
         OpenMenu:(info) => {
             document.getElementById('contenu-popup').innerHTML = info;
             $("#popup").modal({
-                fadeDuration: 100
+                fadeDuration: 100,
+                showClose: false
             });
             $('#popup').on($.modal.BEFORE_CLOSE, function(event, modal) {
                 window.location.href = "./"
@@ -61,8 +62,8 @@ let Hud = (function(){
             let coupString = "";
             if(typeof(piece) == "string") coupString = piece; // gestion de l'affichage des roques
             else {
-                coupString += String.fromCharCode(("A").charCodeAt(0) + piece.x)
-                coupString += String(8-piece.y)
+                coupString += String.fromCharCode(("A").charCodeAt(0) + (7-piece.x))
+                coupString += String(1+piece.y)
             }
 
             var texte = document.createTextNode(coupString);
@@ -98,6 +99,21 @@ let Hud = (function(){
             }
             if(temps.m>99) temps.m = 99; // on définit une limite de temps car on à un affichage sur 2 chiffres
             document.forms[0].Text_1.value=Trans(temps.m)+":"+Trans(temps.s); // on applique le changement
+        },
+        choix_piece : (piece) =>{
+            $("#choix_piece").modal({
+                escapeClose: false,
+                clickClose: false,
+                showClose: false
+            });
+            let reine = document.getElementById("bouton_reine");
+            let fou = document.getElementById("bouton_fou");
+            let cheval = document.getElementById("bouton_chevalier");
+            let tour = document.getElementById("bouton_tour");
+            reine.addEventListener("click",event => piece.choix = "Reine");
+            fou.addEventListener("click", event => piece.choix  = "Fou");
+            cheval.addEventListener("click",event => piece.choix = "Cavalier");
+            tour.addEventListener("click",event => piece.choix = "Tour");
         }
         /*Message_Alerte : (texte)=>{
             alert(texte);
