@@ -100,10 +100,10 @@ class RenduThreeJs{
         return tween;
     };
     animatePiece(piece, X, Y) {
-        let tweenUp = this.Tween(piece, [{Axis:'z', Offset:1}], 800)
+        let tweenUp = this.Tween(piece, [{Axis:'z', Offset:1}], 300)
         let tweenMove = this.Tween(piece, [{Axis:'x', Offset:0.5*X}, 
-                                           {Axis:'y', Offset:0.5*Y}], 300*Math.max(Math.abs(X),Math.abs(Y))) // calcul delai en fonction distance ?
-        let tweenDown = this.Tween(piece, [{Axis:'z', Offset:0}], 800)
+                                           {Axis:'y', Offset:0.5*Y}], 100*Math.max(Math.abs(X),Math.abs(Y))) // calcul delai en fonction distance ?
+        let tweenDown = this.Tween(piece, [{Axis:'z', Offset:0}], 300)
         tweenUp.chain(tweenMove);
         tweenMove.chain(tweenDown);
         tweenUp.start();
