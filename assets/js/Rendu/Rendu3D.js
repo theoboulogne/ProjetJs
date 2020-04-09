@@ -5,7 +5,6 @@ class RenduThreeJs{
         //Initialisation de la scène
         this.scene = new THREE.Scene();
         this.camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight);
-        this.PositionCamera(couleur); // On positionne la caméra en fonction de la couleur
     
         //Ajout du rendu
         let renderer = new THREE.WebGLRenderer({
@@ -26,7 +25,13 @@ class RenduThreeJs{
         //Gestion des objets
         let objLoader = new THREE.OBJLoader(); // Chargement des modèles
         this.raycaster = new THREE.Raycaster(); //Gestion de la détection des clicks (Events)
-        
+
+        this.controls = new THREE.OrbitControls( this.camera, renderer.domElement );
+        this.controls.enableZoom = false;
+        this.controls.enablePan = false;
+        this.controls.enableDamping = true;
+        this.PositionCamera(couleur); // On positionne la caméra en fonction de la couleur
+
         // Cases jouables
         this.materialCases = [
             new THREE.MeshBasicMaterial( {color: 0x000000, opacity: 0, transparent: true} ),   // transparent
@@ -506,58 +511,95 @@ class RenduThreeJs{
     }	
 
     
-    replay(board, coups, pieces_prises) {
-        this.loadBoardPieces(this.getBoardPieces(board));
+    replay() {
         let Rendu = this;
-        let j=0;
-        for (let i=0; i<coups.length; i) {
-            if (typeof coups[i] != 'string') {
-                setTimeout(function(){
+        
+        $( document ).ready(function() {
+            $.ajax({//Reprise avec modification de : https://grokonez.com/node-js/integrate-nodejs-express-jquery-ajax-post-get-bootstrap-view
+            type : "GET",
+            url : window.location.origin+window.location.pathname+"/replay", // on reconstitue l'url car on a des arguments dans l'url actuelle
+            success: function(result){
+                console.log(result)
+                let board = result.board;
+                let coups = JSON.parse(result.data[0].coups)
+                let pieces_prises = [JSON.parse(result.data[0].pieces_prises_blanc), JSON.parse(result.data[0].pieces_prises_noir)]
 
-                    let tmpPiece = coups[i];
-                    tmpPiece.x = coups[i].deplacements[coups[i].deplacements.length-2].x
-                    tmpPiece.y = coups[i].deplacements[coups[i].deplacements.length-2].y
+                console.log(board)
+                console.log(coups)
+                console.log(pieces_prises)
+                let loadCheck = setInterval(function() { // On attend que toutes nos pièces soient 
+                    if (Rendu.checkLoadModels()) {  // chargées avant de commencer à les afficher
+                        clearInterval(loadCheck);
+                        Rendu.loadBoardPieces(board);
+                        let j=0;
+                        setTimeout(function(){
+                            for (let i=0; i<coups.length; i) {
+                                if (typeof coups[i] != 'string') {
+                                    setTimeout(function(){
 
-                    let deplacement = {
-                        x:coups[i].x,
-                        y:coups[i].y,
-                        piece:tmpPiece
+                                        let tmpPiece = coups[i];
+                                        tmpPiece.x = coups[i].deplacements[coups[i].deplacements.length-2].x
+                                        tmpPiece.y = coups[i].deplacements[coups[i].deplacements.length-2].y
+
+                                        let deplacement = {
+                                            x:coups[i].x,
+                                            y:coups[i].y,
+                                            piece:tmpPiece
+                                        }
+
+                                        Rendu.movePiece(deplacement);
+
+                                        //si promotion
+                                        if(coups[i].choix != undefined){
+                                            let tmpPiecePromotion = coups[i]
+                                            tmpPiecePromotion.nom = coups[i].choix
+                                            Rendu.switchPawn(tmpPiecePromotion);
+                                        }
+
+
+                                        if(pieces_prises[i%2].length>j) if (pieces_prises[i%2][j].nbTours == i) {
+                                            Rendu.moveOut(pieces_prises[i%2][j].piece);
+                                            j++;
+                                        }
+
+                                        i++;
+                                    }, 2500 );
+                                }
+                                else{
+                                    let decalage;
+                                    if(coups[i] == "G.R") decalage = 2; 
+                                    else decalage = -2;
+
+                                    let Roi = board[3][i%2*7].piece;
+                                    let deplacement = ({
+                                        x:Roi.x+decalage,
+                                        y:Roi.y,
+                                        piece:Roi
+                                    })
+                                    
+                                    let deplacements = (Roque.getDeplacements(deplacement, board))
+                                    Rendu.moveRoque(JSON.parse(JSON.stringify(deplacements)));
+                                    i++;
+                                }
+                            }
+                        }, 500 );
                     }
+                }, 300);
+            },
+            error : function(e) {
+                //Afficher erreur et redirection au menu
+                $("#popup").modal({
+                    fadeDuration: 100,
+                    showClose: false
+                });
+                $('#popup').on($.modal.BEFORE_CLOSE, function(event, modal) {
+                    window.location.href = "./"
+                });
 
-                    Rendu.movePiece(deplacement);
-
-                    //si promotion
-                    if(coups[i].choix != undefined){
-                        let tmpPiecePromotion = coups[i]
-                        tmpPiecePromotion.nom = coups[i].choix
-                        Rendu.switchPawn(tmpPiecePromotion);
-                    }
-
-
-                    if (pieces_prises[i%2][j].nbTours == i) {
-                        Rendu.moveOut(pieces_prises[i%2][j].piece);
-                        j++;
-                    }
-
-                    i++;
-                }, 2500 );
+                console.log("ERROR: ", e);
             }
-            else{
-
-                if(coups[i] == "G.R") decalage = 2; 
-                else decalage = -2;
-
-                let Roi = board[3][i%2*7].piece;
-                let deplacement = ({
-                    x:Roi.x+decalage,
-                    y:Roi.y,
-                    piece:Roi
-                })
-                
-                let deplacements = (Roque.getDeplacements(deplacement, board))
-                Rendu.moveRoque(JSON.parse(JSON.stringify(deplacements)));
-            }
-        }
+            });  
+        })
     }
 
     //Méthode de suppression du rendu
