@@ -1,14 +1,3 @@
-/*document.getElementById('pieces').innerHTML = "";
-for(let i = 0; i < test.length; i++){
-    let img = document.createElement("img");
-    img.src = "../textures/piece-chess/"+test[i]+".png";
-    let src = document.getElementById("pieces");
-    src.appendChild(img);
-    img.className = "image";
-}*/
-
-
-
 coups = new Array()
 coups.push('B8')
 let Nbtour = 0;
@@ -34,7 +23,7 @@ let Hud = (function(){
             document.getElementById("AquiDejouer").innerHTML = "";
             let div = document.getElementById("AquiDejouer");
             let cout = document.createElement("h1");
-            cout.setAttribute("class","ecriture");
+            cout.setAttribute("class","ecriture_titre");
             if(Nbtour % 2 == 0){
                 var texte = document.createTextNode("C'est aux blancs de jouer !");
             }
@@ -125,7 +114,5 @@ coups.push('C6')
 Nbtour = 2;
 Hud.Affichage_coups(coups,Nbtour);
 
-let point_fin = {};
-Hud.choix_piece(point_fin);
 
 //Hud.Message_Alerte("test");
