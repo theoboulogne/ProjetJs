@@ -62,7 +62,7 @@ app.get("/jeu/replay", function(req,res){ // On est obligé de se connecter à l
                 envoi.data = result;
                 let tmpPlateau = new Plateau();
                 envoi.board = tmpPlateau.board;
-                return res.send(result);
+                return res.send(envoi);
             });
         });
     }

@@ -20,9 +20,6 @@ class Jeu{
         this.mode = 0
         if(getParams(window.location.href).ia!=undefined) this.mode = 1;
 
-
-
-
         function onClick(event) {
             if(Game.echiquier.Nbtour%2 == Game.couleur){//si son tour
                 let intersectPiece = Game.rendu.getClickModels(event, Game.rendu.piecesObj);
@@ -202,6 +199,11 @@ class Jeu{
 
 
 (function() {
-    let game = new Jeu();
+    let game;
+    if(getParams(window.location.href).replay!=undefined){
+        let Rendu = new RenduThreeJs(0);
+        Rendu.replay();
+    }
+    else game = new Jeu();
 })();
 
