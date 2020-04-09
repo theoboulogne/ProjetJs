@@ -6,7 +6,6 @@
 
 + voir changer hauteur déplacement
 
-
 A vérifier :
 récupération du plateau nécessaire au debut de move ????
 */

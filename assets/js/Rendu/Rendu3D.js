@@ -100,10 +100,10 @@ class RenduThreeJs{
         return tween;
     };
     animatePiece(piece, X, Y) {
-        let tweenUp = this.Tween(piece, [{Axis:'z', Offset:1}], 300)
+        let tweenUp = this.Tween(piece, [{Axis:'z', Offset:1}], 200)
         let tweenMove = this.Tween(piece, [{Axis:'x', Offset:0.5*X}, 
                                            {Axis:'y', Offset:0.5*Y}], 100*Math.max(Math.abs(X),Math.abs(Y))) // calcul delai en fonction distance ?
-        let tweenDown = this.Tween(piece, [{Axis:'z', Offset:0}], 300)
+        let tweenDown = this.Tween(piece, [{Axis:'z', Offset:0}], 200)
         tweenUp.chain(tweenMove);
         tweenMove.chain(tweenDown);
         tweenUp.start();
@@ -489,10 +489,64 @@ class RenduThreeJs{
         this.ResetCases();
         this.LoadPieces(this.getBoardPieces(plateau.board))
         this.LoadPiecesOut(plateau); // A REFAIRE
-    }	
+    }
+
+    replay(board, coups, pieces_prises) {
+        this.loadBoardPieces(this.getBoardPieces(board));
+        let Rendu = this;
+        let j=0;
+        for (let i=0; i<coups.length; i) {
+            if (typeof coups[i] != 'string') {
+                setTimeout(function(){
+
+                    let tmpPiece = coups[i];
+                    tmpPiece.x = coups[i].deplacements[coups[i].deplacements.length-2].x
+                    tmpPiece.y = coups[i].deplacements[coups[i].deplacements.length-2].y
+
+                    let deplacement = {
+                        x:coups[i].x,
+                        y:coups[i].y,
+                        piece:tmpPiece
+                    }
+
+                    Rendu.movePiece(deplacement);
+
+                    //si promotion
+                    if(coups[i].choix != undefined){
+                        let tmpPiecePromotion = coups[i]
+                        tmpPiecePromotion.nom = coups[i].choix
+                        Rendu.switchPawn(tmpPiecePromotion);
+                    }
+
+
+                    if (pieces_prises[i%2][j].nbTours == i) {
+                        Rendu.moveOut(pieces_prises[i%2][j].piece);
+                        j++;
+                    }
+
+                    i++;
+                }, 2500 );
+            }
+            else{
+
+                if(coups[i] == "G.R") decalage = 2; 
+                else decalage = -2;
+
+                let Roi = board[3][i%2*7].piece;
+                let deplacement = ({
+                    x:Roi.x+decalage,
+                    y:Roi.y,
+                    piece:Roi
+                })
+                
+                let deplacements = (Roque.getDeplacements(deplacement, board))
+                Rendu.moveRoque(JSON.parse(JSON.stringify(deplacements)));
+            }
+        }
+    }
 
     //Méthode de suppression du rendu
-    remove(){
+    remove() {
         document.body.removeChild(document.body.lastChild)//on supprime le rendu
         document.getElementById('infos').parentNode.removeChild(document.getElementById('infos'));//on supprime l'import des infos sur les modèles
     }
