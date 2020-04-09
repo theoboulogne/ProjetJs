@@ -14,6 +14,14 @@ récupération du plateau nécessaire au debut de move ????
 class Jeu{
     constructor(){
         let Game = this; // pour accéder depuis les fonctions
+        //On regarde si le mode IA est enclenché et si oui on le définit dans une 
+        //variable pour éviter de devoir acceder aux paramètres à chaque fois
+
+        this.mode = 0
+        if(getParams(window.location.href).ia!=undefined) this.mode = 1;
+
+
+
 
         function onClick(event) {
             console.log('click')
@@ -39,19 +47,27 @@ class Jeu{
                                        //si le pion arrive au bout (promotion) :
                                     let piece = Game.echiquier.board[Game.echiquier.select.x][Game.echiquier.select.y].piece;
                                     Hud.choix_piece(piece);
-                                    let CheckPromotion = setInterval(function() { // On attend que toutes nos pièces soient 
-                                        if (piece.choix != undefined) {  // chargées avant de commencer à les afficher
+                                    let CheckPromotion = setInterval(function() { // On attend que l'utilisateur sélectionne sa pièce
+                                        if (piece.choix != undefined) {
                                             clearInterval(CheckPromotion);
                                             Hud.CloseAttente();
                                             socket.emit('move', {piece:piece, 
                                                                 x:Coo.x, 
                                                                 y:Coo.y});
+
+                                            if(Game.mode) setTimeout(() => {  socket.emit('move', {}); }, 100);
+                                            //si IA active on envoi un deuxième déplacement après un court délai
                                         }
                                     }, 500);
                                 }
-                                else socket.emit('move', {piece:Game.echiquier.board[Game.echiquier.select.x][Game.echiquier.select.y].piece, 
+                                else {
+                                    socket.emit('move', {piece:Game.echiquier.board[Game.echiquier.select.x][Game.echiquier.select.y].piece, 
                                                     x:Coo.x, 
                                                     y:Coo.y});
+
+                                    if(Game.mode) setTimeout(() => {  socket.emit('move', {}); }, 100);
+                                    //si IA active on envoi un deuxième déplacement après un court délai
+                                }
                             }
                             else Game.echiquier.select = {x:-1, y:-1};
                             Game.rendu.removePlayable();
@@ -124,7 +140,6 @@ class Jeu{
             //On actualise l'interface
             Hud.Affichage_coups(Game.echiquier.coups[Game.echiquier.coups.length-1],plateau.Nbtour-1);
             Hud.Affichage_AquiDejouer(Game.echiquier.Nbtour)
-            Hud.Affichage_SetChrono(Game.echiquier.chrono)//On rafraichit le chrono en fonction du serveur afin de palier aux problèmes de synchronisation
         });
 
         socket.on('reset', (echiquierReset, couleurReset) => {
@@ -155,6 +170,7 @@ class Jeu{
             Hud.OpenMenu('Il y a au moins un paramètre manquant..')
         });
     }
+
     Move(deplacements, piece_prise){
 
         if(piece_prise != 0){

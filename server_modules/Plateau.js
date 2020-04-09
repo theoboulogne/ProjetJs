@@ -10,6 +10,8 @@ const Case = require('./Case');
 class Plateau{
     constructor(){
 
+        this.ia = 0 //variable pour signaler le mode IA ou non 
+
         this.Nbtour = 0;
         this.board = new Array(8)
         for(let i = 0; i<8; i++){
@@ -168,7 +170,7 @@ class Plateau{
         tmp.Joueurs = JSON.parse(JSON.stringify(this.Joueurs));
         tmp.coups = JSON.parse(JSON.stringify(this.coups));
 
-        tmp.chrono = JSON.parse(JSON.stringify(this.chrono.Chrono))
+        tmp.chrono = JSON.parse(JSON.stringify(this.chrono))
 
         return tmp;
 

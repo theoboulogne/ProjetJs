@@ -307,12 +307,12 @@ class RenduThreeJs{
         let light = new THREE.AmbientLight( 0x555555 ); // soft white light
         this.scene.add( light );
  
-        let spotLight = new THREE.SpotLight( 0xffffff, 0.6 );
-        spotLight.position.set( 0, 200, 200 );
+        let spotLight = new THREE.SpotLight( 0xffffff, 0.8 );
+        spotLight.position.set( 0, 0, 50 );
         spotLight.castShadow = true;
         spotLight.shadowMapWidth = 1024;
         spotLight.shadowMapHeight = 1024;
-        spotLight.shadowCameraNear = 500;
+        spotLight.shadowCameraNear = 10;
         spotLight.shadowCameraFar = 4000;
         spotLight.shadowCameraFov = 30;
         this.scene.add( spotLight );
@@ -488,9 +488,10 @@ class RenduThreeJs{
         this.removePiecesOut();
         this.ResetCases();
         this.LoadPieces(this.getBoardPieces(plateau.board))
-        this.LoadPiecesOut(plateau); // A REFAIRE
-    }
+        this.LoadPiecesOut(plateau); 
+    }	
 
+    
     replay(board, coups, pieces_prises) {
         this.loadBoardPieces(this.getBoardPieces(board));
         let Rendu = this;
