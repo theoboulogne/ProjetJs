@@ -75,16 +75,16 @@ let Hud = (function(){
         Affichage_AquiDejouer : (Nbtour) => {
             document.getElementById("AquiDejouer").innerHTML = "";
             let div = document.getElementById("AquiDejouer");
-            let coup = document.createElement("h1");
-            coup.setAttribute("class","ecriture");
+            let cout = document.createElement("h1");
+            cout.setAttribute("class","ecriture_titre");
             if(Nbtour % 2 == 0){
                 var texte = document.createTextNode("C'est aux blancs de jouer !");
             }
             if(Nbtour % 2 == 1){
                 var texte = document.createTextNode("C'est aux noirs de jouer !");
             }
-            div.append(coup);
-            coup.appendChild(texte);
+            div.append(cout);
+            cout.appendChild(texte);
         },
 
         Affichage_SetChrono(chrono){
