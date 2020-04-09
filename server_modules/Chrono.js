@@ -18,7 +18,7 @@ class Chrono{
     addChrono(a, b){
         let renvoi = {m:(a.m + b.m), s:(a.s + b.s)};
         
-        while(renvoi.s >= 60){
+        if(renvoi.s >= 60){
             renvoi.m += 1;
             renvoi.s -= 60;
         }
@@ -31,7 +31,7 @@ class Chrono{
         let ChronoTotal = this.addChrono(this.Chrono[0], this.Chrono[1]);
 
         ChronoTotal.h = 0 // on rajoute les heures uniquement pour l'enregistrement en BDD
-        while(ChronoTotal.m >= 60){
+        if(ChronoTotal.m >= 60){
             ChronoTotal.h += 1;
             ChronoTotal.m -= 60;
         }
