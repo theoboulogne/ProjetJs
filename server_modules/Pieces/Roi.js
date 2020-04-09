@@ -1,8 +1,8 @@
 const Piece = require('./Piece');
 
 class Roi extends Piece{
-    constructor(couleur, x, y){
-        super(couleur, x, y)
+    constructor(couleur, x, y, id){
+        super(couleur, x, y, id)
     }
 
     verifierboucle(pieceName,sens, plateau){
@@ -30,11 +30,10 @@ class Roi extends Piece{
             let y = this.y + sens[i][1];
 
             if(plateau.check_piece(x,y)){
-                 if(plateau.board[x][y].piece.couleur != this.couleur){
-                    for (let j = 0; j < pieceName.length; j++) if (plateau.board[x][y].piece.nom == pieceName[j]) return true;
+                if(plateau.board[x][y].piece.couleur != this.couleur){
+                    if (plateau.board[x][y].piece.nom == pieceName) return true;
                 }
             }
-            
         }
         return false;
     }
@@ -45,8 +44,9 @@ class Roi extends Piece{
 
         if (this.verifierboucle(["Reine","Fou"],[[1,1],[1,-1],[-1,1],[-1,-1]], plateau)) return true;
         if (this.verifierboucle(["Reine","Tour"],[[1,0],[-1,0],[0,1],[0,-1]], plateau)) return true;
-        if (this.verifiercote(["Pion"],[[1*Math.pow(-1,this.couleur + 1),1*Math.pow(-1,this.couleur + 1)],[1*Math.pow(-1,this.couleur + 1),-1*Math.pow(-1,this.couleur + 1)]], plateau)) return true;
-        if (this.verifiercote(["Cavalier"],[[2,1],[2,-1],[-2,1],[-2,-1],[1,2],[1,-2],[-1,2],[-1,-2]], plateau)) return true;
+        if (this.verifiercote("Pion",[[-1,(-2*this.couleur) + 1],[1,(-2*this.couleur) + 1]], plateau)) return true;
+        if (this.verifiercote("Cavalier",[[2,1],[2,-1],[-2,1],[-2,-1],[1,2],[1,-2],[-1,2],[-1,-2]], plateau)) return true;
+        if (this.verifiercote("Roi", [[0,1],[0,-1],[1,0],[-1,0],[1,1],[-1,-1],[1,-1],[-1,1]], plateau)) return true;
 
         return false;
     }
@@ -64,39 +64,64 @@ class Roi extends Piece{
                 }
             }
         }
+        let roque = this.roquePlayable(plateau);
+        for (let k = 0; k < roque.length; k++){
+            if (roque[k]) plateau.playable(this.x + (4*k-2), this.y, this);
+        }
     }
 
-    roque(plateau){
-        let renvoi = []
-        if(this.deplacements.length == 0){
-            if(plateau.board[this.x - 4][this.y].piece.nom == 'Tour' && plateau.board[this.x - 4][this.y].piece.couleur == this.couleur){
-                if(plateau.board[this.x - 4][this.y].piece.deplacements.length == 0){
-                    let i = 1;
-                    while (i < 4 && !this.isEnEcheque(this.x - i,y) && (plateau.board[this.x - i][this.y].piece == 0)) i++;
-                    if (i == 4){
-                        renvoi.push([this.x - 4, this.x, this.y]);
+    roquePlayable(plateau){
+        let renvoi = [false,false];
+        let valeurs = [-3,4];
+        
+        let tempX = this.x;
+        
+        if(!this.echec(plateau)){
+            if(this.deplacements.length == 1){
+                for (let j = 0; j < valeurs.length; j++){
+                    if(plateau.board[this.x + valeurs[j]][this.y].piece.nom == 'Tour' && plateau.board[this.x + valeurs[j]][this.y].piece.deplacements.length == 1){
+                        let i = 1;
+                        let indiceR = true;
+                        while (i < (Math.abs(valeurs[j])) && indiceR){ // on regarde 2 cases dans les deux sens
+                            // si y'a une piece devant ton roi on coupe
+                            if(plateau.board[this.x + (valeurs[j]/Math.abs(valeurs[j]))][this.y].piece != 0) indiceR = false;
+                            else {
+                                // si y'a pas de piece on décalle le roi
+                                this.x += (valeurs[j]/Math.abs(valeurs[j]));
+                                // si en echec on coupe (limite de 3 car le roi se déplace de max 2 cases)
+                                if(i<3) if(this.echec(plateau)) indiceR = false;
+                                // puis on passe a la case suivante
+                                i++;
+                            }
+                        }
+                        // on reset les coo de x, on enregistre si c'est bon et on passe au roque suivant
+                        this.x = tempX;
+                        if (indiceR){
+                            renvoi[j] = true;
+                        }
                     }
                 }
-            }
-            if(plateau.board[this.x + 3][this.y].piece.nom == 'Tour' && plateau.board[this.x + 3][this.y].piece.couleur == this.couleur){
-                if(plateau.board[this.x + 3][this.y].piece.deplacements.length == 0){
-                    let i = 1;
-                    while (i < 3 && !this.isEnEcheque(this.x + i,y) && (board[this.x + i][this.y].piece == 0)) i++;
-                    if (i == 3){
-                        renvoi.push([this.x + 3, this.x, this.y]);
-                    }
-                 }
             }
         }
         return renvoi;
     }
 
-
     move(x,y, plateau){ 
         if(plateau.isInBoard(x,y)){
             if(plateau.board[x][y].playable){
-                plateau.jouer(x, y, this); // appeler méthode du parent ?
+                let diff = x - this.x;
+                if(Math.abs(diff) == 2){
+                    plateau.jouer(x - (diff/Math.abs(diff)),y,plateau.board[3.5 + ((diff/Math.abs(diff))*3.5)][this.y].piece);
+                    plateau.jouer(x,y,this);
 
+                    plateau.Nbtour--;
+                    plateau.coups.splice(plateau.coups.length - 2, 2);
+
+                    if(diff == 2)  plateau.coups.push("G.R");
+                    else plateau.coups.push("P.R");
+                }
+                else plateau.jouer(x, y, this);//Déplacement normal
+                //On enregistre les coo dans joueur pour pouvoir regarder echec depuis le plateau
                 plateau.Joueurs[this.couleur].roi.x = x;
                 plateau.Joueurs[this.couleur].roi.y = y;
             }

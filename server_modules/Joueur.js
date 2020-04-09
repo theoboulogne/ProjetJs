@@ -3,19 +3,20 @@
 
 
 // GARDER LA COULEUR ????????????????????????????????? utilité à vérifier
-
+// pareil pour pieces
 
 
 class Joueur{
-    constructor(couleur, id){
-        this.id = id;
+    constructor(couleur, id, pseudo){
+        this.id = id; // l'id correspond à l'id de la socket correspondante
+        this.pseudo = pseudo // le pseudo est enregistré pour l'enregistrement des scores
 
-        this.pieces = 16; // 16 au debut de la partie   utilité aussi ????? 
-        this.couleur = couleur // 0 ou 1, blanc/noir // utilité ???????? <------------------------------------------
         this.roi = {x:3, y:couleur*7}
 
         this.pieces_prises = new Array()
     }
+    //Méthode pour le clonage du plateau, non utilisée finalement pour réduire le nombre d'opération lors du clone
+    // (on se contente d'une recopie avec JSON.parse/stringlify car on a pas besoin des méthodes de la classe)
     //clone(){
     //    let tmp = new Joueur();
     //    tmp.id = this.id

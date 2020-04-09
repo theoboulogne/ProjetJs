@@ -1,21 +1,14 @@
 const Piece = require('./Piece');
 
 class Pion extends Piece {
-    constructor(couleur, x, y){
-        super(couleur, x, y)
+    constructor(couleur, x, y, id){
+        super(couleur, x, y, id)
     }
 
     playable(plateau){
-
-        //optimisation avec boucle de direction a faire..
-
-        //rajouter fonction de verification de sortie de plateau sur les coordonnées
-
-        // forcer le canmove lors du click sur la piece et jouer au relachement du click 
-        //(piece qui suit la souris avec l'animation)
         if(this.deplacements.length == 1) { //si jms jouée
             if(plateau.isInBoard(this.x,this.y+(Math.pow(-1,this.couleur)*(2)))){
-                if(plateau.check_vide(this.x,this.y+(Math.pow(-1,this.couleur)*(2)))) {
+                if(plateau.check_vide(this.x,this.y+(Math.pow(-1,this.couleur)*(2)))&&plateau.check_vide(this.x,this.y+(Math.pow(-1,this.couleur)))) {
                     plateau.playable(this.x,this.y+(Math.pow(-1,this.couleur)*(2)),this)
                 }
             }
@@ -38,11 +31,13 @@ class Pion extends Piece {
             }
             //prise en passant
             if(plateau.isInBoard(this.x + i, this.y)){
-                if(plateau.getBoard(this.x + i,this.y).piece.nom==this.nom){ //regarder la class directement?
+                if(plateau.getBoard(this.x + i,this.y).piece.nom==this.nom){ 
                     if(plateau.getBoard(this.x+i,this.y).piece.deplacements.length == 2 && this.y == plateau.getBoard(this.x+i,this.y).piece.deplacements[1].y){
-                        if(plateau.isInBoard(this.x + i,this.y+(Math.pow(-1,this.couleur)*(1)))){
-                            if(plateau.check_vide(this.x + i,this.y+(Math.pow(-1,this.couleur)*(1)))){
-                                plateau.playable(this.x + i,this.y+(Math.pow(-1,this.couleur)*(1)), this)
+                        if(Math.abs(plateau.getBoard(this.x+i,this.y).piece.deplacements[1].y-plateau.getBoard(this.x+i,this.y).piece.deplacements[0].y)==2){
+                            if(plateau.isInBoard(this.x + i,this.y+(Math.pow(-1,this.couleur)*(1)))){
+                                if(plateau.check_vide(this.x + i,this.y+(Math.pow(-1,this.couleur)*(1)))){
+                                    plateau.playable(this.x + i,this.y+(Math.pow(-1,this.couleur)*(1)), this)
+                                }
                             }
                         }
                     }
@@ -68,9 +63,17 @@ class Pion extends Piece {
                         }
                     }
                 }
-                plateau.jouer(x, y, this); // rajouter le changement de piece sur la derniere ligne
+                plateau.jouer(x, y, this);
             }
         }
+    }
+
+    promotion(nomPiece){
+        const P = eval("require('./"+nomPiece+"')") //On appelle la pièce demandée
+        let tmp = new P(this.couleur, this.x, this.y, this.id)
+        tmp.deplacements.pop()
+        for(let i=0; i<this.deplacements.length; i++) tmp.deplacements.push(this.deplacements[i])
+        return tmp;
     }
 }
 

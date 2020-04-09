@@ -3,6 +3,11 @@ body {
     overflow: hidden;
   }
 
+
+.RenduThreeJs {
+  background-size: cover;
+}
+
 .AquiDejouer{
     height : 10%;
     width : 24%;
