@@ -1,12 +1,9 @@
 <head>
-    <link rel="stylesheet" href="../css/Jeu.css">
-    <style>
-        body { margin: 0; }
-        canvas { width: 100%; height: 100% }
-    </style> 
-    <link href="../css/all.css" rel="stylesheet">
     <title>Echecs</title>
-    
+    <!-- Include des fichiers de style -->
+    <link rel="stylesheet" href="../css/all.css">
+    <link rel="stylesheet" href="../css/Jeu.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
 </head>
 <body>
     
@@ -49,30 +46,44 @@
     </div>
 
     <div id="attente" class="modal">
-        <h1>Attente d'un adversaire, veuillez patienter.</h1>
-    </div>
-    <div id="popup" class="modal">
-        <h1 id="contenu-popup">Test</h1>
-        <p>Vous allez être redirigé vers le menu à la fermeture de cette fenêtre.</p>
+        <center>
+            <h1>Attente d'un adversaire, veuillez patienter.</h1>
+        </center>
     </div>
 
-        
-    <script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r71/three.min.js"></script>
+    <div id="popup" class="modal">
+        <center>
+            <h1 id="contenu-popup">Erreur.</h1>
+        </center>
+        <p>Vous allez être redirigé vers le menu en cliquant en dehors de cette fenêtre.</p>
+    </div>
+
+</body>
+<footer>
+    <!-- Includes de threeJs et des librairies utilisées -->
+    <script src="../js/libs/three.min.js"></script>
+    <script src="../js/libs/OrbitControls.js"></script>
+    <script src="../js/libs/OBJLoader.js"></script>
+    <script src='../js/libs/tween.js'></script>
+
+    <!-- Includes de JQuery et les plugins liés -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
-    <script src="/socket.io/socket.io.js"></script>
     <!-- jQuery Modal Plugin -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
+
+    <!-- Include de Socket.io -->
+    <script src="/socket.io/socket.io.js"></script>
     
-    <script type="application/javascript" src="../js/Rendu/OBJLoader.js"></script>
-    <script type='text/javascript' src='../js/Rendu/tween.js'></script>
-    <script type="application/javascript" src="../js/Rendu/getParams.js"></script>
+    <!-- Include d'autres codes repris et réadaptés -->
+    <script src="../js/libs/getParams.js"></script>
+    <script src="../js/libs/Chrono.js"></script>
 
+    <!-- Include du RenduThreeJS -->
     <script type="application/javascript" src="../js/Rendu/Rendu3D.js"></script>
-
-    <script type="application/javascript" src="../js/Hud/Chrono.js"></script>
+    <!-- Include de l'HUD -->
     <script type="application/javascript" src="../js/Hud/Game.js"></script>
 
-    <script src="../js/Roque.js"></script>
+    <!-- Include des fichiers de gestion du jeu -->
+    <script src="../js/Modules/Roque.js"></script>
     <script src="../js/Jeu.js"></script>
-</body>
+</footer>

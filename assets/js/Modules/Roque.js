@@ -13,7 +13,6 @@ let Roque = (function(){
             let deplacements = [deplacement];
             if(check(deplacement)) {
                 deplacements.push(deplacementTour(deplacement, board))
-                console.log(JSON.parse(JSON.stringify(deplacements)))
             }
             return deplacements;
         },
