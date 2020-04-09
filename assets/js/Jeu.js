@@ -141,7 +141,6 @@ class Jeu{
             //On actualise l'interface
             Hud.Affichage_coups(Game.echiquier.coups[Game.echiquier.coups.length-1],plateau.Nbtour-1);
             Hud.Affichage_AquiDejouer(Game.echiquier.Nbtour)
-            Hud.Affichage_SetChrono(Game.echiquier.chrono.Chrono)//On rafraichit le chrono en fonction du serveur afin de palier aux problèmes de synchronisation
         });
 
         socket.on('reset', (echiquierReset, couleurReset) => {

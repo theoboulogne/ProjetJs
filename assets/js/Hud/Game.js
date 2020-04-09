@@ -86,20 +86,6 @@ let Hud = (function(){
             div.append(cout);
             cout.appendChild(texte);
         },
-
-        Affichage_SetChrono(chrono){
-            let temps = {m:0, s:0}
-            for(let i=0; i<2; i++){
-                temps.m += chrono[i].m
-                temps.s += chrono[i].s
-            }
-            while(temps.s>=60){
-                temps.m++;
-                temps.s-=60;
-            }
-            if(temps.m>99) temps.m = 99; // on définit une limite de temps car on à un affichage sur 2 chiffres
-            document.forms[0].Text_1.value=Trans(temps.m)+":"+Trans(temps.s); // on applique le changement
-        },
         choix_piece : (piece) =>{
             $("#choix_piece").modal({
                 escapeClose: false,

@@ -1,10 +1,27 @@
 
 class Chrono{
     constructor(){ 
-        this.Precedent = new Date();
-        this.Chrono = [{m:0, s:0},{m:0, s:0}]
+        this.Debut = new Date();
+        this.Chrono = {m:0, s:0};
     }
 
+    CalcChrono(){
+        let Fin = new Date();
+
+        let TempsDebut = {m:this.Debut.getMinutes(), s:this.Debut.getSeconds()}
+        let TempsFin = {m:Fin.getMinutes(), s:Fin.getSeconds()}
+
+        let TempsEcoule = {
+            m: Math.abs(TempsDebut.m - TempsFin.m),
+            s: Math.abs(TempsDebut.s - TempsFin.s)
+        };
+
+        return this.getChronoTotal(TempsEcoule)
+    }
+
+
+
+/*
     startTour(couleur){
         let TourPrec = {m:this.Precedent.getMinutes(), s:this.Precedent.getSeconds()}
         this.Precedent = new Date();
@@ -24,13 +41,13 @@ class Chrono{
         }
 
         return renvoi;
-    }
+    }*/
 
 
-    getChronoTotal(){
-        let ChronoTotal = this.addChrono(this.Chrono[0], this.Chrono[1]);
+    getChronoTotal(Chrono){
+        let ChronoTotal = {h:0, m:Chrono.m, s:Chrono.s}
 
-        ChronoTotal.h = 0 // on rajoute les heures uniquement pour l'enregistrement en BDD
+        // on rajoute les heures uniquement pour l'enregistrement en BDD
         if(ChronoTotal.m >= 60){
             ChronoTotal.h += 1;
             ChronoTotal.m -= 60;

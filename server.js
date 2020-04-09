@@ -42,13 +42,31 @@ app.get("/scores", function(req,res){ // On est obligé de se connecter à la BD
     con.connect(function(err) {
         if (err) throw err;
         console.log("Connecté à la mysql !");
-        let sql = "SELECT * FROM `scores` LIMIT 100" // On récupère les données, on limite à 100 scores pour 
+        let sql = "SELECT `id`, `pseudo`, `pieces`, `chrono` FROM `scores` LIMIT 100" // On récupère les données, on limite à 100 scores pour 
         con.query(sql, function (err, result) {     // éviter les problèmes en cas de trop grand nombre d'infos
             if (err) throw err;
             return res.send(result);
         });
     });
   });
+app.get("/jeu/replay", function(req,res){ // On est obligé de se connecter à la BDD dans le fichier server car la récupération des infos est asynchrone..
+    if(lastParam!=undefined && lastParam.replay != undefined){
+        let con = mysql.createConnection(InfoConnectionBDD);
+        con.connect(function(err) {
+            if (err) throw err;
+            console.log("Connecté à la mysql !");
+            let sql = "SELECT `gagnant`, `coups`, `pieces_prises_blanc`, `pieces_prises_noir` FROM `scores` WHERE `id`="+String(lastParam.replay)+" LIMIT 1" // On récupère les données, on limite à 100 scores pour 
+            con.query(sql, function (err, result) {     // éviter les problèmes en cas de trop grand nombre d'infos
+                if (err) throw err;
+                let envoi = {};
+                envoi.data = result;
+                let tmpPlateau = new Plateau();
+                envoi.board = tmpPlateau.board;
+                return res.send(result);
+            });
+        });
+    }
+});
 
 //On stocke dans une variable tampon les paramètre du dernier client car on y accède uniquement depuis le app.get
 let lastParam = undefined;
@@ -182,11 +200,10 @@ io.sockets.on('connection',  (socket) =>{
                 (deplacement.piece.x == game.echiquiers[indiceEchiquier].select.x) &&
                 (deplacement.piece.y == game.echiquiers[indiceEchiquier].select.y) &&
                 (game.echiquiers[indiceEchiquier].board[deplacement.x][deplacement.y].playable)){
-
-                //On actualise le chrono comme on a un changement de tour :
-                game.echiquiers[indiceEchiquier].chrono.startTour(game.echiquiers[indiceEchiquier].Nbtour%2); //On attribut une couleur afin d'enregistrer le temps de chaque joueur (en prévision pour améliorer l'affichage)
+                
                 //on clone le plateau pour l'envoyer avant le déplacement afin de l'effectuer graphiquement en front
                 let plateau = (game.echiquiers[indiceEchiquier]).clone();
+                if(deplacement.piece.choix != undefined) game.echiquiers[indiceEchiquier].board[deplacement.piece.x][deplacement.piece.y].piece.choix = deplacement.piece.choix;
                 game.echiquiers[indiceEchiquier].board[deplacement.piece.x][deplacement.piece.y].piece.move(deplacement.x,deplacement.y,game.echiquiers[indiceEchiquier])
 
                 if(deplacement.piece.choix != undefined){
@@ -205,7 +222,7 @@ io.sockets.on('connection',  (socket) =>{
                 // On envoi le déplacement a tout le monde
                 for(let i=0; i<(2-game.echiquiers[indiceEchiquier].ia); i++) io.sockets.sockets[game.echiquiers[indiceEchiquier].Joueurs[i].id].emit('move', plateau, deplacement, piece_prise);
                 
-                if(game.echiquiers[indiceEchiquier].echecEtMat(((plateau.Nbtour%2)+1)%2)){//Detection fin de partie
+                if(true || game.echiquiers[indiceEchiquier].echecEtMat(((plateau.Nbtour%2)+1)%2)){//Detection fin de partie
                     console.log('Echec et Mat')
                     //On désactive l'IA au cas où pour éviter que le serveur crash lors d'une victoire
                     game.echiquiers[indiceEchiquier].ia = 0;
