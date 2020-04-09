@@ -2,6 +2,7 @@
 <html>
 <head>
     <link type="text/css" rel="stylesheet" href="../css/Menu.css" />
+    <link href="../css/all.css" rel="stylesheet">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <meta charset="UTF-8">
     <title>Echec</title>
@@ -31,7 +32,9 @@
                                 <option value=Minion>Minion</option>
                            </select>
                         </div>
-                       
+                        <div class= "ia_check">
+                            <label class="checkbox-inline ecriture"><input type="checkbox" name = "IA" value="1" id = "IA">&nbsp IA </label>
+                        </div>
                     </form>
                 </div>
                 <button class="btn btn-dark" id="play">PLAY</button>
@@ -45,6 +48,7 @@
                         <th scope="col" class = "ecriture">Pseudo</th>
                         <th scope="col" class = "ecriture">Pièces</th>
                         <th scope="col" class = "ecriture">temps</th>
+                        <th scope="col" class = "ecriture">Replays</th>
                     </tr>
                 </thead>
                 <tbody  id="tableau_score_affichage" class = "ecriture">
@@ -52,11 +56,12 @@
                 <tfoot>
                     <tr>
                         <td>
-                        <button class="btn btn-dark btn_tableau" id="tableau_page_precedente"><h1 class="ecriture"><-</h1></button>
+                        <button class="btn btn-dark btn_tableau" id="tableau_page_precedente"><h1 class="ecriture"><i class="far fa-arrow-alt-circle-left"></i></h1></button>
                         </td>
                         <td></td>
+                        <td></td>
                         <td>
-                        <button class="btn btn-dark btn_tableau" id="tableau_page_suivante"><h1 class="ecriture">-></h1></button>
+                        <button class="btn btn-dark btn_tableau" id="tableau_page_suivante"><h1 class="ecriture"><i class="far fa-arrow-alt-circle-right"></i></h1></button>
                         </td>
                     </tr>
                 </tfoot>

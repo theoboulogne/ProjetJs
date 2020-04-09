@@ -14,11 +14,17 @@ let Menu = (function(){
             event.preventDefault();
             let pseudo = document.getElementById("pseudo").value;
             let affichage = document.getElementById("pieces_choix").value;
-            window.location.href = "jeu?pseudo=" + pseudo + "&affichage=" + affichage
+            let IA = document.getElementById("IA").value;
+            let IA_check = document.getElementsByName("IA")[0].checked;
+            if(IA_check){
+                window.location.href = "jeu?pseudo=" + pseudo + "&affichage=" + affichage + "&IA=" +IA
+            }
+            else{
+                window.location.href = "jeu?pseudo=" + pseudo + "&affichage=" + affichage
+            }
         },
         AjoutScore : (pseudo, nbpiece_restante, temps) =>{
             let tableau = document.getElementById("tableau_score_affichage");
-            //add tr
             var tr = document.createElement('tr');
             tableau.appendChild(tr);
             let pseudo_Tabableau = document.createElement('td');
@@ -33,7 +39,18 @@ let Menu = (function(){
             tr.appendChild(temps_Tabableau);
             let temps_Tabableau_valeur = document.createTextNode(temps);
             temps_Tabableau.appendChild(temps_Tabableau_valeur);
-            
+            let replay = document.createElement('td');
+            tr.appendChild(replay);
+            let replay_bouton = document.createElement("BUTTON");
+            let t = document.createElement("i"); 
+            t.setAttribute("class","fas fa-sync-alt");
+            let zone_texte = document.createElement("h1");
+            zone_texte.setAttribute("class","ecriture");
+            replay_bouton.setAttribute("class","btn btn-dark btn_tableau");
+            zone_texte.appendChild(t);   
+            replay_bouton.appendChild(zone_texte);   
+            replay.appendChild(replay_bouton);
+            replay_bouton.addEventListener("click", event=> console.log("test"));
         },
         AjoutTableauScore : (tableau, i_suplementaire) =>{
             if(i+i_suplementaire < tableau.length && i+i_suplementaire > -1){
