@@ -4,7 +4,7 @@ module.exports = {
     ia(plateau, couleur){
     let tmpPlateau = plateau.clone(); // on clone le plateau en amount par sécurité
 
-    let coup = evaluation_joueur(tmpPlateau, couleur, couleur, 5) 
+    let coup = evaluation_joueur(tmpPlateau, couleur, couleur, 2) 
     // on sélectionne les 3 meilleurs coups uniquement pour éviter un trop grand nombre d'appels 
     //(faire varier pour augmenter la puissance de l'ia au détriment de la vitesse
     return coup;
@@ -159,12 +159,12 @@ let valeurPieces = [
 function Prise(piecePrise){ 
     if(0!=piecePrise){
         //prise de la piece
-        for(let i=0; i<valeurPieces; i++){if(valeurPieces[i].name == piecePrise.nom) return valeurPieces[i].valeur;};
+        for(let i=0; i<valeurPieces.length; i++){if(valeurPieces[i].name == piecePrise.nom) return valeurPieces[i].valeur;};
     }
     return 0
 }
 
-function verifierboucle(pieceName,sens, plateau, piece, piecesDangeureuses, piecesAlliées){
+function verifierboucle(pieceName,sens, plateau, piece, piecesPortee){
     for(let i = 0; i < sens.length; i++){
         let x = piece.x + sens[i][0];
         let y = piece.y + sens[i][1];
@@ -173,9 +173,9 @@ function verifierboucle(pieceName,sens, plateau, piece, piecesDangeureuses, piec
         if (plateau.isInBoard(x,y)) while(boucle){
             if(plateau.check_piece(x,y)){
                 for (let j = 0; j < pieceName.length; j++) if (plateau.board[x][y].piece.nom == pieceName[j]){
-                    for(let i=0; i<valeurPieces; i++) { if(valeurPieces[i].name == pieceName[j]) {
-                        if(plateau.board[x][y].piece.couleur == piece.couleur) piecesAlliées.push({piece:plateau.board[x][y].piece, valeur:valeurPieces[i].valeur});
-                        else piecesDangeureuses.push({piece:plateau.board[x][y].piece, valeur:valeurPieces[i].valeur});
+                    for(let i=0; i<valeurPieces.length; i++) { if(valeurPieces[i].name == pieceName[j]) {
+                        if(plateau.board[x][y].piece.couleur == piece.couleur) piecesPortee[0].push({piece:plateau.board[x][y].piece, valeur:valeurPieces[i].valeur});
+                        else piecesPortee[1].push({piece:plateau.board[x][y].piece, valeur:valeurPieces[i].valeur});
                     }}
                 }
                 if(plateau.board[x][y].piece.couleur == piece.couleur) boucle = false;
@@ -185,61 +185,61 @@ function verifierboucle(pieceName,sens, plateau, piece, piecesDangeureuses, piec
             if(!plateau.isInBoard(x,y)) boucle = false;
         }
     }
+    return piecesPortee;
 }
 
-function verifiercote(pieceName,sens, plateau, piece, piecesDangeureuses, piecesAlliées){
+function verifiercote(pieceName,sens, plateau, piece, piecesPortee){
     for(let i = 0; i < sens.length; i++){
         let x = piece.x + sens[i][0];
         let y = piece.y + sens[i][1];
 
         if(plateau.check_piece(x,y)){
             for (let j = 0; j < pieceName.length; j++) if (plateau.board[x][y].piece.nom == pieceName[j]){
-                for(let i=0; i<valeurPieces; i++) { if(valeurPieces[i].name == pieceName[j]) {
-                    if(plateau.board[x][y].piece.couleur == piece.couleur) piecesAlliées.push({piece:plateau.board[x][y].piece, valeur:valeurPieces[i].valeur});
-                    else piecesDangeureuses.push({piece:plateau.board[x][y].piece, valeur:valeurPieces[i].valeur});
+                for(let i=0; i<valeurPieces.length; i++) { if(valeurPieces[i].name == pieceName[j]) {
+                    if(plateau.board[x][y].piece.couleur == piece.couleur) piecesPortee[0].push({piece:plateau.board[x][y].piece, valeur:valeurPieces[i].valeur});
+                    else piecesPortee[1].push({piece:plateau.board[x][y].piece, valeur:valeurPieces[i].valeur});
                 }}
             }
         }
     }
+    return piecesPortee;
 }
 
 
 function Menace(piece, plateau){
+    return 0
 
-    let valeur = 0
+    let piecesPortee = [[],[]] // indice 0 allié / indice 1 ennemi
+    let valPieces = [0,0]
 
-    let piecesDangeureuses = [];
-    let piecesAlliées = [];
+    piecesPortee = verifierboucle(["Reine","Fou"],[[1,1],[1,-1],[-1,1],[-1,-1]], plateau, piece, piecesPortee)
+    piecesPortee = verifierboucle(["Reine","Tour"],[[1,0],[-1,0],[0,1],[0,-1]], plateau, piece, piecesPortee)
+    piecesPortee = verifiercote("Pion",[[-1,(-2*piece.couleur) + 1],[1,(-2*piece.couleur) + 1]], plateau, piece, piecesPortee)
+    piecesPortee = verifiercote("Cavalier",[[2,1],[2,-1],[-2,1],[-2,-1],[1,2],[1,-2],[-1,2],[-1,-2]], plateau, piece, piecesPortee)
+    //piecesPortee = verifiercote("Roi", [[0,1],[0,-1],[1,0],[-1,0],[1,1],[-1,-1],[1,-1],[-1,1]], plateau, piece, piecesPortee)
 
-    verifierboucle(["Reine","Fou"],[[1,1],[1,-1],[-1,1],[-1,-1]], plateau, piece, piecesDangeureuses, piecesAlliées)
-    verifierboucle(["Reine","Tour"],[[1,0],[-1,0],[0,1],[0,-1]], plateau, piece, piecesDangeureuses, piecesAlliées)
-    verifiercote("Pion",[[-1,(-2*piece.couleur) + 1],[1,(-2*piece.couleur) + 1]], plateau, piece, piecesDangeureuses, piecesAlliées)
-    verifiercote("Cavalier",[[2,1],[2,-1],[-2,1],[-2,-1],[1,2],[1,-2],[-1,2],[-1,-2]], plateau, piece, piecesDangeureuses, piecesAlliées)
-    //(verifiercote("Roi", [[0,1],[0,-1],[1,0],[-1,0],[1,1],[-1,-1],[1,-1],[-1,1]], plateau, piece, piecesDangeureuses, piecesAlliées))
+    for(let i=0; i<2; i++) piecesPortee[i].sort((a, b) => a.valeur - b.valeur)
 
-    piecesAlliées.sort((a, b) => a.valeur - b.valeur)
-    piecesDangeureuses.sort((a, b) => a.valeur - b.valeur)
-
-    if(piecesAlliées.length !=0 ||piecesDangeureuses.length !=0){
-        console.log(piecesAlliées)
-        console.log(piecesDangeureuses)
+    if(piecesPortee[0].length !=0 || piecesPortee[1].length !=0){
+        console.log('-  -  -')
+        console.log(piecesPortee[0])
+        console.log('-')
+        console.log(piecesPortee[1])
+        console.log('-  -')
     }
 
-    let valAlli = 0
-    let valEnnem = 0
 
-    for(let i=0; i<Math.min(piecesDangeureuses.length, piecesAlliées.length); i++) {
-        valAlli+= piecesAlliées.valeur
-        valEnnem+= piecesDangeureuses.valeur
+    for(let i=0; i<Math.min(piecesPortee[1].length, piecesPortee[0].length); i++) {
+        for(let j=0; j<2; j++) valPieces[j]+= piecesPortee[j][i].valeur
     }
-    valeur += valEnnem-valAlli
+    let valeur = valPieces[1]-valPieces[0]
 
-    if(valAlli>=valEnnem || (piecesDangeureuses.length>0&&piecesAlliées.length==0)){
-        if(piecesAlliées.length<=piecesDangeureuses.length) for(let i=0; i<valeurPieces; i++){if(valeurPieces[i].name == piece.nom) valeur -= valeurPieces[i].valeur;};
+    if(valPieces[0]>=valPieces[1] || (piecesPortee[1].length>0&&piecesPortee[0].length==0)){
+        if(piecesPortee[0].length<=piecesPortee[1].length) for(let i=0; i<valeurPieces.length; i++){if(valeurPieces[i].name == piece.nom) valeur += valeurPieces[i].valeur;};
     }
     else {
-        if(piecesAlliées.length>=piecesDangeureuses.length) for(let i=0; i<valeurPieces; i++){if(valeurPieces[i].name == piece.nom) valeur += valeurPieces[i].valeur;};
+        if(piecesPortee[0].length>=piecesPortee[1].length) for(let i=0; i<valeurPieces.length; i++){if(valeurPieces[i].name == piece.nom) valeur -= valeurPieces[i].valeur;};
     }
-    if(valeur != 0) console.log('Menace : '+String(valeur))
+    if(piecesPortee[0].length !=0 || piecesPortee[1].length !=0){ console.log('Menace : '+String(valeur)) }
     return valeur
 }

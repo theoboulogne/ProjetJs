@@ -166,15 +166,17 @@ class RenduThreeJs{
     }
     switchPawn(piece) {
         let Rendu = this;
-        let idx = Rendu.getPieceIdx(piece);
-        let tweenUp = Rendu.Tween(Rendu.piecesObj[idx], [{Axis:'z', Offset:3}], 800); 
-        tweenUp.start();// on lève la pièce
         setTimeout(function() {
-            Rendu.removePiece(idx); // indice du pion
+            let idx = Rendu.getPieceIdx(piece);
+            let tweenUp = Rendu.Tween(Rendu.piecesObj[idx], [{Axis:'z', Offset:3}], 800); 
+            tweenUp.start();// on lève la pièce
             setTimeout(function() {
-                Rendu.LoadPieces([piece]);
-            }, 50)//On attend légèrement après que la pièce soit supprimée pour éviter de supprimer la nouvelle car elles ont le même id
-        }, 800) // on attend que la pièce soit levée
+                Rendu.removePiece(idx); // indice du pion
+                setTimeout(function() {
+                    Rendu.LoadPieces([piece]);
+                }, 100)//On attend légèrement après que la pièce soit supprimée pour éviter de supprimer la nouvelle car elles ont le même id
+            }, 800) // on attend que la pièce soit levée
+        }, 1250) // On attend la fin de tout les autres mouvements avant 
     }
 
     //Méthodes de suppression de pièce
@@ -319,6 +321,18 @@ class RenduThreeJs{
     }
     PositionCamera(couleur){
         if(couleur){
+            this.camera.position.x = 3.2;
+            this.camera.position.z = 4;
+            this.camera.rotation.y = ( 40* (Math.PI / 180));
+            this.camera.rotation.z = ( 90* (Math.PI / 180));
+        }
+        else{
+            this.camera.position.x = -3.2;
+            this.camera.position.z = 4;
+            this.camera.rotation.y = ( 320* (Math.PI / 180));
+            this.camera.rotation.z = ( 270* (Math.PI / 180));
+        }
+        /*if(couleur){
             this.camera.position.x = 3.5;
             this.camera.position.z = 3;
             this.camera.rotation.y = ( 50* (Math.PI / 180));
@@ -329,7 +343,7 @@ class RenduThreeJs{
             this.camera.position.z = 3;
             this.camera.rotation.y = ( 310* (Math.PI / 180));
             this.camera.rotation.z = ( 270* (Math.PI / 180));
-        }
+        }*/
     }
 
     //Méthodes de gestion d'erreurs des cases

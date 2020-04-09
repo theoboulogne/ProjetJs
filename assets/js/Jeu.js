@@ -24,7 +24,6 @@ class Jeu{
 
 
         function onClick(event) {
-            console.log('click')
             if(Game.echiquier.Nbtour%2 == Game.couleur){//si son tour
                 let intersectPiece = Game.rendu.getClickModels(event, Game.rendu.piecesObj);
                 let intersectCase = Game.rendu.getClickModels(event, Game.rendu.playableCases);
