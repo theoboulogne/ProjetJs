@@ -488,8 +488,63 @@ class RenduThreeJs{
         this.removePiecesOut();
         this.ResetCases();
         this.LoadPieces(this.getBoardPieces(plateau.board))
-        this.LoadPiecesOut(plateau); // A REFAIRE
+        this.LoadPiecesOut(plateau); 
     }	
+
+    
+    replay(board, coups, pieces_prises) {
+        this.loadBoardPieces(this.getBoardPieces(board));
+        let Rendu = this;
+        let j=0;
+        for (let i=0; i<coups.length; i) {
+            if (typeof coups[i] != 'string') {
+                setTimeout(function(){
+
+                    let tmpPiece = coups[i];
+                    tmpPiece.x = coups[i].deplacements[coups[i].deplacements.length-2].x
+                    tmpPiece.y = coups[i].deplacements[coups[i].deplacements.length-2].y
+
+                    let deplacement = {
+                        x:coups[i].x,
+                        y:coups[i].y,
+                        piece:tmpPiece
+                    }
+
+                    Rendu.movePiece(deplacement);
+
+                    //si promotion
+                    if(coups[i].choix != undefined){
+                        let tmpPiecePromotion = coups[i]
+                        tmpPiecePromotion.nom = coups[i].choix
+                        Rendu.switchPawn(tmpPiecePromotion);
+                    }
+
+
+                    if (pieces_prises[i%2][j].nbTours == i) {
+                        Rendu.moveOut(pieces_prises[i%2][j].piece);
+                        j++;
+                    }
+
+                    i++;
+                }, 2500 );
+            }
+            else{
+
+                if(coups[i] == "G.R") decalage = 2; 
+                else decalage = -2;
+
+                let Roi = board[3][i%2*7].piece;
+                let deplacement = ({
+                    x:Roi.x+decalage,
+                    y:Roi.y,
+                    piece:Roi
+                })
+                
+                let deplacements = (Roque.getDeplacements(deplacement, board))
+                Rendu.moveRoque(JSON.parse(JSON.stringify(deplacements)));
+            }
+        }
+    }
 
     //Méthode de suppression du rendu
     remove(){
