@@ -4,19 +4,19 @@ let info = {
     couleur : 1,
     Offset: [
         //Blancs
-        { position: {x:0.08, y:0}, rotation: {x:0, y:( 90* (Math.PI / 180)), z:0} },//Pion
-        { position: {x:0.01, y:-0.02}, rotation: {x:0, y:( 90* (Math.PI / 180)), z:0} },//Fou
-        { position: {x:0.1, y:-0.02}, rotation: {x:0, y:( 90* (Math.PI / 180)), z:0} },//Cavalier
+        { position: {x:-0.4, y:0.51}, rotation: {x:0, y:( 90* (Math.PI / 180)), z:0} },//Pion
+        { position: {x:-0.25, y:0.14}, rotation: {x:0, y:( 90* (Math.PI / 180)), z:0} },//Fou
+        { position: {x:-0.3, y:-0.2}, rotation: {x:0, y:( 90* (Math.PI / 180)), z:0} },//Cavalier
         { position: {x:-0.15, y:-0.09}, rotation: {x:0, y:( 270* (Math.PI / 180)), z:0} },//Tour
-        { position: {x:0.01, y:-0.01}, rotation: {x:0, y:( 90* (Math.PI / 180)), z:0} },//Reine
-        { position: {x:0.1, y:-0.01}, rotation: {x:0, y:( 90* (Math.PI / 180)), z:0} },//Roi
+        { position: {x:0.42, y:-0.05}, rotation: {x:0, y:0, z:0} },//Reine
+        { position: {x:-0.57, y:0.33}, rotation: {x:0, y:( 90* (Math.PI / 180)), z:0} },//Roi
         //Noirs
-        { position: {x:-0.05, y:0}, rotation: {x:0, y:( 270* (Math.PI / 180)), z:0} },//Pion
-        { position: {x:-0.3, y:0.06}, rotation: {x:0, y:( 270* (Math.PI / 180)), z:0} },//Fou
-        { position: {x:-0.05, y:0}, rotation: {x:0, y:( 270* (Math.PI / 180)), z:0} },//Cavalier
+        { position: {x:0.27, y:0.26}, rotation: {x:0, y:( 270* (Math.PI / 180)), z:0} },//Pion
+        { position: {x:0, y:-0.07}, rotation: {x:0, y:( 270* (Math.PI / 180)), z:0} },//Fou
+        { position: {x:0.25, y:-0.25}, rotation: {x:0, y:( 270* (Math.PI / 180)), z:0} },//Cavalier
         { position: {x:0, y:0}, rotation: {x:0, y:( 90* (Math.PI / 180)), z:0} },//Tour
-        { position: {x:-0.02, y:-0.02}, rotation: {x:0, y:( 270* (Math.PI / 180)), z:0} },//Reine
-        { position: {x:-0.3, y:-0.02}, rotation: {x:0, y:( 270* (Math.PI / 180)), z:0} }//Roi
+        { position: {x:0.25, y:-0.02}, rotation: {x:0, y:( 270* (Math.PI / 180)), z:0} },//Reine
+        { position: {x:0.62, y:-0.05}, rotation: {x:0, y:( 270* (Math.PI / 180)), z:0} }//Roi
     ]
 };
 

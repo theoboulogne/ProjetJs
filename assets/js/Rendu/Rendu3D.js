@@ -423,16 +423,14 @@ class RenduThreeJs{
 
                     if(Pieces[j].nom == NomPiece && Pieces[j].couleur == couleur) {
                         let tmpobj = (obj).clone();
-                        let OffSet = this.info.Offset[i + (couleur * 6)];
  
                         // la position / taille / orientation
-                        tmpobj.position.set(-1.75 + (0.5 * Pieces[j].y) + OffSet.position.x,
-                                            -1.75 + (0.5 * Pieces[j].x) + OffSet.position.y
+                        tmpobj.position.set(-1.75 + (0.5 * Pieces[j].y),
+                                            -1.75 + (0.5 * Pieces[j].x)
                                             ,0);
                         tmpobj.scale.set(this.info.scale, this.info.scale, this.info.scale);
-                        tmpobj.rotation.x = 1.57 + OffSet.rotation.x;
-                        tmpobj.rotation.y = OffSet.rotation.y;
-                        tmpobj.rotation.z = OffSet.rotation.z;
+                        tmpobj.rotation.x = 1.57;
+                        if (couleur != 0) {tmpobj.rotation.y = 3.1}
  
                         //On enregistre pour la détection de click
                         this.piecesId.push(Pieces[j].id)
@@ -469,19 +467,14 @@ class RenduThreeJs{
                 if(piece.couleur) child.material = new THREE.MeshLambertMaterial({color: 0x555555});
                 else child.material = new THREE.MeshLambertMaterial({color: 0xFFFFFF});
             }
-        });
-
-        let OffSet = this.info.Offset[idx + (piece.couleur * 6)];
-        
-        obj.position.set((Math.pow(-1, piece.couleur) * (-1.7 + (0.4 * (this.piecesOut[piece.couleur].length/2)))) + OffSet.position.x,
-                        (Math.pow(-1, piece.couleur+1)*(2.6 + (0.4 * (this.piecesOut[piece.couleur].length%2)))) + OffSet.position.y,
+        });        
+        obj.position.set((Math.pow(-1, piece.couleur) * (-1.7 + (0.4 * (this.piecesOut[piece.couleur].length/2)))),
+                        (Math.pow(-1, piece.couleur+1)*(2.6 + (0.4 * (this.piecesOut[piece.couleur].length%2)))),
                         hauteur);
         obj.scale.set(this.info.scale*0.6, this.info.scale*0.6, this.info.scale*0.6);
         
         // taille / orientation
-        obj.rotation.x = 1.57 + OffSet.rotation.x;
-        obj.rotation.y = OffSet.rotation.y;
-        obj.rotation.z = OffSet.rotation.z;
+        obj.rotation.x = 1.57;
 
         // add tableau
         this.piecesOut[piece.couleur].push(obj);
