@@ -90,6 +90,8 @@ io.sockets.on('connection',  (socket) =>{
             this.echiquiers.push(new Plateau);
             let indiceEchiquier = this.echiquiers.length-1
             this.echiquiers[indiceEchiquier].ia = 1;
+            this.echiquiers[indiceEchiquier].ModeIA = true;
+
 
             //Gestion de l'ajout de joueur (Blanc toujours contre l'IA pour laisser le temps de charger les modèles)
             this.echiquiers[indiceEchiquier].Joueurs.push(new Joueur(0, socket.id, lastParam.pseudo));
@@ -222,23 +224,25 @@ io.sockets.on('connection',  (socket) =>{
                 // On envoi le déplacement a tout le monde
                 for(let i=0; i<(2-game.echiquiers[indiceEchiquier].ia); i++) io.sockets.sockets[game.echiquiers[indiceEchiquier].Joueurs[i].id].emit('move', plateau, deplacement, piece_prise);
                 
-                if(true || game.echiquiers[indiceEchiquier].echecEtMat(((plateau.Nbtour%2)+1)%2)){//Detection fin de partie
+                if(game.echiquiers[indiceEchiquier].echecEtMat(((plateau.Nbtour%2)+1)%2)){//Detection fin de partie
                     console.log('Echec et Mat')
-                    //On désactive l'IA au cas où pour éviter que le serveur crash lors d'une victoire
-                    game.echiquiers[indiceEchiquier].ia = 0;
                     //Enregistrement du score dans la BDD mysql
                     MYSQL.EnvoiScoreBDD(game.echiquiers[indiceEchiquier], (plateau.Nbtour%2), InfoConnectionBDD);
                     //Envoi de l'event aux client pour rediriger vers le menu
                     for(let i=0; i<(2-game.echiquiers[indiceEchiquier].ia); i++) io.sockets.sockets[game.echiquiers[indiceEchiquier].Joueurs[i].id].emit('endGame', (plateau.Nbtour%2));
+                    //On désactive l'IA au cas où pour éviter que le serveur crash lors d'une victoire
+                    game.echiquiers[indiceEchiquier].ia = 0;
                 }
 
 
             }
             else{
-                console.log("Réinitialisation d'un client - Move");
-                game.echiquiers[indiceEchiquier].reset_playable(); // on reset les playables avant de l'envoyer
-                game.echiquiers[indiceEchiquier].select = {x:-1, y:-1}; // aussi le select car on est dans l'event move donc il est assigné
-                socket.emit('reset', game.echiquiers[indiceEchiquier], couleurSocket);
+                if(!(game.echiquiers[indiceEchiquier].ModeIA && game.echiquiers[indiceEchiquier].ia == 0)){ // on reset pas si modeIA actif alors que ia désactivée ( fin de partie contre IA )
+                    console.log("Réinitialisation d'un client - Move");
+                    game.echiquiers[indiceEchiquier].reset_playable(); // on reset les playables avant de l'envoyer
+                    game.echiquiers[indiceEchiquier].select = {x:-1, y:-1}; // aussi le select car on est dans l'event move donc il est assigné
+                    socket.emit('reset', game.echiquiers[indiceEchiquier], couleurSocket);
+                }
             }
         }
     });
