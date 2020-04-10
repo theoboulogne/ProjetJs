@@ -71,7 +71,7 @@ class Roi extends Piece{
     }
 
     roquePlayable(plateau){
-        let renvoi = [0,0];
+        let renvoi = [false,false];
         let valeurs = [-3,4];
         
         let tempX = this.x;
@@ -81,21 +81,23 @@ class Roi extends Piece{
                 for (let j = 0; j < valeurs.length; j++){
                     if(plateau.board[this.x + valeurs[j]][this.y].piece.nom == 'Tour' && plateau.board[this.x + valeurs[j]][this.y].piece.deplacements.length == 1){
                         let i = 1;
-                        let indiceR = 1;
-                        while (i < Math.abs(valeurs[j]) && indiceR){
-
-                            if(plateau.board[this.x + (valeurs[j]/Math.abs(valeurs[j]))][this.y].piece != 0) indiceR = 0;
-
-                            this.x = this.x + (valeurs[j]/Math.abs(valeurs[j]));
-
-                            if(i < 3){
-                                if(this.echec(plateau)) indiceR = 0;
+                        let indiceR = true;
+                        while (i < (Math.abs(valeurs[j])) && indiceR){ // on regarde 2 cases dans les deux sens
+                            // si y'a une piece devant ton roi on coupe
+                            if(plateau.board[this.x + (valeurs[j]/Math.abs(valeurs[j]))][this.y].piece != 0) indiceR = false;
+                            else {
+                                // si y'a pas de piece on décalle le roi
+                                this.x += (valeurs[j]/Math.abs(valeurs[j]));
+                                // si en echec on coupe (limite de 3 car le roi se déplace de max 2 cases)
+                                if(i<3) if(this.echec(plateau)) indiceR = false;
+                                // puis on passe a la case suivante
+                                i++;
                             }
-                            i++;
                         }
+                        // on reset les coo de x, on enregistre si c'est bon et on passe au roque suivant
                         this.x = tempX;
                         if (indiceR){
-                            renvoi[j] = 1;
+                            renvoi[j] = true;
                         }
                     }
                 }

@@ -3,16 +3,21 @@ let Roque = (function(){
     let deplacementTour = (deplacement, board) => {
         let diff = deplacement.x - deplacement.piece.x
         return {
-            y:deplacement.y,
+            piece:board[deplacement.piece.x + ((diff/Math.abs(diff))*3.5) + 0.5][deplacement.piece.y].piece,
             x:deplacement.x - (diff/Math.abs(diff)),
-            piece:board[deplacement.piece.x + ((diff/Math.abs(diff))*3.5) + 0.5][deplacement.piece.y].piece
+            y:deplacement.y
         }
     };
     return {
         getDeplacements : (deplacement, board) => {
             let deplacements = [deplacement];
-            if(check(deplacement)) deplacements.push(deplacementTour(deplacement, board))
+            if(check(deplacement)) {
+                deplacements.push(deplacementTour(deplacement, board))
+                console.log(JSON.parse(JSON.stringify(deplacements)))
+            }
             return deplacements;
         },
     }
 })();
+
+//plateau.playable(this.x + (4*k-2), this.y, this);

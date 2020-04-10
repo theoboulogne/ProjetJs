@@ -6,8 +6,11 @@ class RenduThreeJs{
         this.scene = new THREE.Scene();
         this.camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight);
         this.PositionCamera(couleur); // On positionne la caméra en fonction de la couleur
+    
         //Ajout du rendu
-        let renderer = new THREE.WebGLRenderer();
+        let renderer = new THREE.WebGLRenderer({
+            alpha: true,
+          });
         renderer.setSize( window.innerWidth, window.innerHeight );
         renderer.domElement.id = 'RenduThreeJs';
         document.body.appendChild( renderer.domElement );
@@ -47,24 +50,23 @@ class RenduThreeJs{
         let ModelType = getParams(window.location.href).affichage;
         if(ModelType == "" || ModelType == undefined) ModelType = "Classic"; // on redéfinit par sécurité si l'argument est manquant
         console.log("Affichage : " + ModelType)
-        //On charge les infos sur les modèles utilisés dynamiquement
-        let script = document.createElement('script');
-        script.id = "infos"
-        script.src = "../../models/"+ModelType+"/info.js"
-        script.onload = function () {
-            if(info.couleur){ // si on a un modèle différent pour les blancs et les noirs
+        document.body.style.background = "url('../../img/"+ModelType+".png') no-repeat center center";
+
+        $.getJSON("../../JSON/"+ModelType+".json", function(json) {
+            Rendu.info = json;
+            if(Rendu.info.couleur){ // si on a un modèle différent pour les blancs et les noirs
                 for(let i=0; i<6; i++){// on vient doubler le nombre de modèle à charger et on change les noms
-                    Rendu.models.push({nom:Rendu.models[i].nom+"Noir", obj:undefined}) 
-                    Rendu.models[i].nom += "Blanc"
+                    Rendu.models.push({nom:Rendu.models[i].nom+"Noir", obj:undefined});
+                    Rendu.models[i].nom += "Blanc";
                 }
             }
             for(let i=0; i<Rendu.models.length; i++){
-                objLoader.load("../models/"+ info.chemin + "/" + Rendu.models[i].nom + ".obj", function(object) {
+                objLoader.load("../models/"+ Rendu.info.chemin + "/" + Rendu.models[i].nom + ".obj", function(object) {
                     Rendu.models[i].obj = (object);
                 });
             }
-        };
-        document.head.appendChild(script)
+        });
+        
         //Stockages des pièces de la scène
         this.piecesId = [];
         this.piecesObj = [];
@@ -98,10 +100,10 @@ class RenduThreeJs{
         return tween;
     };
     animatePiece(piece, X, Y) {
-        let tweenUp = this.Tween(piece, [{Axis:'z', Offset:1}], 800)
+        let tweenUp = this.Tween(piece, [{Axis:'z', Offset:1}], 300)
         let tweenMove = this.Tween(piece, [{Axis:'x', Offset:0.5*X}, 
-                                           {Axis:'y', Offset:0.5*Y}], 300*Math.max(Math.abs(X),Math.abs(Y))) // calcul delai en fonction distance ?
-        let tweenDown = this.Tween(piece, [{Axis:'z', Offset:0}], 800)
+                                           {Axis:'y', Offset:0.5*Y}], 100*Math.max(Math.abs(X),Math.abs(Y))) // calcul delai en fonction distance ?
+        let tweenDown = this.Tween(piece, [{Axis:'z', Offset:0}], 300)
         tweenUp.chain(tweenMove);
         tweenMove.chain(tweenDown);
         tweenUp.start();
@@ -162,6 +164,18 @@ class RenduThreeJs{
             Rendu.movePiece(deplacements[1]);
         }, 1400); // on prend le temps de déplacement du roi moins le temps de descente
     }
+    switchPawn(piece) {
+        let Rendu = this;
+        let idx = Rendu.getPieceIdx(piece);
+        let tweenUp = Rendu.Tween(Rendu.piecesObj[idx], [{Axis:'z', Offset:3}], 800); 
+        tweenUp.start();// on lève la pièce
+        setTimeout(function() {
+            Rendu.removePiece(idx); // indice du pion
+            setTimeout(function() {
+                Rendu.LoadPieces([piece]);
+            }, 50)//On attend légèrement après que la pièce soit supprimée pour éviter de supprimer la nouvelle car elles ont le même id
+        }, 800) // on attend que la pièce soit levée
+    }
 
     //Méthodes de suppression de pièce
     removePiecesOut() {
@@ -197,6 +211,15 @@ class RenduThreeJs{
             for (let j = 0; j < board.length; j++) {
                 if (board[i][j].playable) {
                     this.setPlayable(i,j,(board[i][j].piece == 0));
+                }
+            }
+        }
+        if(board[CooSelect.x][CooSelect.y].piece.nom == "Pion"){//On gère la prise en passant
+            for(let i=-1; i<2; i+=2) {
+                if(CooSelect.x+i>-1&&CooSelect.x+i<8&&CooSelect.y+(Math.pow(-1,board[CooSelect.x][CooSelect.y].piece.couleur))>-1&&CooSelect.y+(Math.pow(-1,board[CooSelect.x][CooSelect.y].piece.couleur))<8){
+                    if(board[CooSelect.x+i][CooSelect.y+(Math.pow(-1,board[CooSelect.x][CooSelect.y].piece.couleur))].piece == 0 && board[CooSelect.x+i][CooSelect.y+(Math.pow(-1,board[CooSelect.x][CooSelect.y].piece.couleur))].playable){
+                        this.setPlayable(CooSelect.x+i,CooSelect.y+(Math.pow(-1,board[CooSelect.x][CooSelect.y].piece.couleur)), false);
+                    }
                 }
             }
         }
@@ -284,12 +307,12 @@ class RenduThreeJs{
         let light = new THREE.AmbientLight( 0x555555 ); // soft white light
         this.scene.add( light );
  
-        let spotLight = new THREE.SpotLight( 0xffffff );
-        spotLight.position.set( 50, 100, 50 );
+        let spotLight = new THREE.SpotLight( 0xffffff, 0.8 );
+        spotLight.position.set( 0, 0, 50 );
         spotLight.castShadow = true;
         spotLight.shadowMapWidth = 1024;
         spotLight.shadowMapHeight = 1024;
-        spotLight.shadowCameraNear = 500;
+        spotLight.shadowCameraNear = 10;
         spotLight.shadowCameraFar = 4000;
         spotLight.shadowCameraFov = 30;
         this.scene.add( spotLight );
@@ -353,33 +376,61 @@ class RenduThreeJs{
 
 
                 //On rajoute un décallage de 6 en fonction de la couleur si nécessaire
-                let obj = (this.models[i + (info.couleur * couleur * 6)].obj).clone()
+                let obj = (this.models[i + (this.info.couleur * couleur * 6)].obj).clone()
                 obj.traverse( function ( child ) {
                     if (child instanceof THREE.Mesh) {
                         // on définit la couleur
-                        if(couleur) child.material = new THREE.MeshLambertMaterial({color: 0x555555});
+                        if(couleur) child.material = new THREE.MeshLambertMaterial({color: 0x666666});
                         else child.material = new THREE.MeshLambertMaterial({color: 0xFFFFFF});
+                        
+                        /*
+                        if(couleur) child.material = new THREE.MeshStandardMaterial( {
+
+                            color: 0x555555,
+                        
+                            //roughness: 1,
+                            //metalness: 0.5,
+                        
+                            //roughnessMap: 1,
+                            //metalnessMap: 1,
+                        
+                            //envMap: 1, // important -- especially for metals!
+                            //envMapIntensity: 0.5
+                        
+                        } );
+                        else child.material = new THREE.MeshStandardMaterial( {
+
+                            color: 0xFFFFFF,
+                        
+                            //roughness: 1,
+                            //metalness: 0.5,
+                        
+                            //roughnessMap: 1,
+                            //metalnessMap: 1,
+                        
+                            //envMap: 1, // important -- especially for metals!
+                            //envMapIntensity: 0.5
+                        
+                        } );*/
                     }
                 });
                 //On récupère le bon nom si nécessaire
                 let NomPiece = this.models[i].nom;
-                if(info.couleur) NomPiece = NomPiece.slice(0, NomPiece.length-5); 
+                if(this.info.couleur) NomPiece = NomPiece.slice(0, NomPiece.length-5); 
                 
                 for(let j=0; j<Pieces.length; j++){
                     // si on gère les couleurs on retire le 'blanc' à la fin du nom de la pièce pour comparer au nom original
 
                     if(Pieces[j].nom == NomPiece && Pieces[j].couleur == couleur) {
                         let tmpobj = (obj).clone();
-                        let OffSet = info.Offset[i + (couleur * 6)];
  
                         // la position / taille / orientation
-                        tmpobj.position.set(-1.75 + (0.5 * Pieces[j].y) + OffSet.position.x,
-                                            -1.75 + (0.5 * Pieces[j].x) + OffSet.position.y
+                        tmpobj.position.set(-1.75 + (0.5 * Pieces[j].y),
+                                            -1.75 + (0.5 * Pieces[j].x)
                                             ,0);
-                        tmpobj.scale.set(info.scale, info.scale, info.scale);
-                        tmpobj.rotation.x = 1.57 + OffSet.rotation.x;
-                        tmpobj.rotation.y = OffSet.rotation.y;
-                        tmpobj.rotation.z = OffSet.rotation.z;
+                        tmpobj.scale.set(this.info.scale, this.info.scale, this.info.scale);
+                        tmpobj.rotation.x = 1.57;
+                        if (couleur != 0) {tmpobj.rotation.y = 3.1}
  
                         //On enregistre pour la détection de click
                         this.piecesId.push(Pieces[j].id)
@@ -405,30 +456,25 @@ class RenduThreeJs{
         let idx = -1;
         for(let i=0; i<this.models.length; i++) {
             let NomPiece = this.models[i].nom;
-            if(info.couleur) NomPiece = NomPiece.slice(0, NomPiece.length-5); 
+            if(this.info.couleur) NomPiece = NomPiece.slice(0, NomPiece.length-5); 
             if(NomPiece == piece.nom) idx = i;
         }
 
-        let obj = (this.models[idx + (info.couleur * piece.couleur * 6)].obj).clone()
+        let obj = (this.models[idx + (this.info.couleur * piece.couleur * 6)].obj).clone()
         obj.traverse( function ( child ) {
             if (child instanceof THREE.Mesh) {
                 // on définit la couleur
                 if(piece.couleur) child.material = new THREE.MeshLambertMaterial({color: 0x555555});
                 else child.material = new THREE.MeshLambertMaterial({color: 0xFFFFFF});
             }
-        });
-
-        let OffSet = info.Offset[idx + (piece.couleur * 6)];
-        
-        obj.position.set((Math.pow(-1, piece.couleur) * (-1.7 + (0.4 * (this.piecesOut[piece.couleur].length/2)))) + OffSet.position.x,
-                        (Math.pow(-1, piece.couleur+1)*(2.6 + (0.4 * (this.piecesOut[piece.couleur].length%2)))) + OffSet.position.y,
+        });        
+        obj.position.set((Math.pow(-1, piece.couleur) * (-1.7 + (0.4 * (this.piecesOut[piece.couleur].length/2)))),
+                        (Math.pow(-1, piece.couleur+1)*(2.6 + (0.4 * (this.piecesOut[piece.couleur].length%2)))),
                         hauteur);
-        obj.scale.set(info.scale*0.6, info.scale*0.6, info.scale*0.6);
+        obj.scale.set(this.info.scale*0.6, this.info.scale*0.6, this.info.scale*0.6);
         
         // taille / orientation
-        obj.rotation.x = 1.57 + OffSet.rotation.x;
-        obj.rotation.y = OffSet.rotation.y;
-        obj.rotation.z = OffSet.rotation.z;
+        obj.rotation.x = 1.57;
 
         // add tableau
         this.piecesOut[piece.couleur].push(obj);
@@ -442,8 +488,63 @@ class RenduThreeJs{
         this.removePiecesOut();
         this.ResetCases();
         this.LoadPieces(this.getBoardPieces(plateau.board))
-        this.LoadPiecesOut(plateau); // A REFAIRE
+        this.LoadPiecesOut(plateau); 
     }	
+
+    
+    replay(board, coups, pieces_prises) {
+        this.loadBoardPieces(this.getBoardPieces(board));
+        let Rendu = this;
+        let j=0;
+        for (let i=0; i<coups.length; i) {
+            if (typeof coups[i] != 'string') {
+                setTimeout(function(){
+
+                    let tmpPiece = coups[i];
+                    tmpPiece.x = coups[i].deplacements[coups[i].deplacements.length-2].x
+                    tmpPiece.y = coups[i].deplacements[coups[i].deplacements.length-2].y
+
+                    let deplacement = {
+                        x:coups[i].x,
+                        y:coups[i].y,
+                        piece:tmpPiece
+                    }
+
+                    Rendu.movePiece(deplacement);
+
+                    //si promotion
+                    if(coups[i].choix != undefined){
+                        let tmpPiecePromotion = coups[i]
+                        tmpPiecePromotion.nom = coups[i].choix
+                        Rendu.switchPawn(tmpPiecePromotion);
+                    }
+
+
+                    if (pieces_prises[i%2][j].nbTours == i) {
+                        Rendu.moveOut(pieces_prises[i%2][j].piece);
+                        j++;
+                    }
+
+                    i++;
+                }, 2500 );
+            }
+            else{
+
+                if(coups[i] == "G.R") decalage = 2; 
+                else decalage = -2;
+
+                let Roi = board[3][i%2*7].piece;
+                let deplacement = ({
+                    x:Roi.x+decalage,
+                    y:Roi.y,
+                    piece:Roi
+                })
+                
+                let deplacements = (Roque.getDeplacements(deplacement, board))
+                Rendu.moveRoque(JSON.parse(JSON.stringify(deplacements)));
+            }
+        }
+    }
 
     //Méthode de suppression du rendu
     remove(){

@@ -2,32 +2,77 @@
 <html>
 <head>
     <link type="text/css" rel="stylesheet" href="../css/Menu.css" />
+    <link href="../css/all.css" rel="stylesheet">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <meta charset="UTF-8">
-    <title>Echec</title>
-    
+    <title>Echecs</title>
 </head>
 
 
 <body style="background-color:rgb(45, 133, 92);">
+
     <center>
         <h1 class="ecriture_titre"> CHESS GAME</h1>
-        <h1 class="ecriture"> projet CIR2</h1>
+        <h1 class="ecriture"> projet CIR²</h1>
     </center>
         <div class="Info" id="menu">
             <center>
-                <div class="entrer_pseudo">
+                <div class="info" id="div_form">
                     <h2 class= "ecriture">Entrer votre nom d'utilisateur :</h2> 
-                    <form name="from_pseudo" method="GET" action="./jeu">
-                        <input class="form-control" type="text" name="pseudo" id="pseudo" placeholder="Votre pseudo">
-                        <input class="form-control" type="text" name="affichage" id="affichage" placeholder="Quel affichage ? (mettre en dropdown)">
-                        <button type="submit">test</button>
+                    <form name="formulaire">
+                        <div class="pseudo_formulaire">
+                            <input class="form-control" type="text" name="pseudo" id="pseudo" placeholder="Votre pseudo">
+                        </div>
+                        <div class="piece_formulaire">
+                            <h2 class= "ecriture">Choisissez votre style de pièces :</h2> 
+                            <select class="form-control" name="pieces_choix" id="pieces_choix">
+                                <option value=Classic>Classic</option>
+                                <option value=StarWars>Star-Wars</option>
+                                <option value=Pokemon>Pokemon</option>
+                                <option value=Minion>Minion</option>
+                           </select>
+                        </div>
+                        <div class= "ia_check">
+                            <label class="checkbox-inline ecriture"><input type="checkbox" name = "IA" value="1" id = "IA">&nbsp IA </label>
+                        </div>
                     </form>
                 </div>
-                <button type="button" class="btn btn-dark" id="play">PLAY</button>
+                <button class="btn btn-dark" id="play">PLAY</button>
             </center>
         </div>
-    <script type="application/javascript" src="../js/Hud/Menu.js"></script>
+
+        <div class = "tableau_score">
+            <table class="table table-dark">
+                <thead >
+                    <tr>
+                        <th scope="col" class = "ecriture">Pseudo</th>
+                        <th scope="col" class = "ecriture">Pièces</th>
+                        <th scope="col" class = "ecriture">temps</th>
+                        <th scope="col" class = "ecriture">Replays</th>
+                    </tr>
+                </thead>
+                <tbody  id="tableau_score_affichage" class = "ecriture">
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td>
+                        <button class="btn btn-dark btn_tableau" id="tableau_page_precedente"><h1 class="ecriture"><i class="far fa-arrow-alt-circle-left"></i></h1></button>
+                        </td>
+                        <td></td>
+                        <td></td>
+                        <td>
+                        <button class="btn btn-dark btn_tableau" id="tableau_page_suivante"><h1 class="ecriture"><i class="far fa-arrow-alt-circle-right"></i></h1></button>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
+    <script src="../js/Hud/Menu.js"></script>
 </body>
 
 </html>
