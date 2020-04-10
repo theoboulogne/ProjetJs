@@ -5,7 +5,7 @@ class RenduThreeJs{
         //Initialisation de la scène
         this.scene = new THREE.Scene();
         this.camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight);
-        this.PositionCamera(couleur); // On positionne la caméra en fonction de la couleur
+        this.camera.up.set( 0, 0, 1 ); // pour que orbitcontrols 'suit' la caméra
     
         //Ajout du rendu
         let renderer = new THREE.WebGLRenderer({
@@ -26,7 +26,26 @@ class RenduThreeJs{
         //Gestion des objets
         let objLoader = new THREE.OBJLoader(); // Chargement des modèles
         this.raycaster = new THREE.Raycaster(); //Gestion de la détection des clicks (Events)
+
+        this.controls = new THREE.OrbitControls( this.camera, renderer.domElement );
         
+        this.controls.enablePan = false; // translation
+        this.controls.enableDamping = true; // inertie
+
+        this.controls.enableZoom = true; // paramètres du zoom
+        this.controls.minDistance = 5
+        this.controls.maxDistance = 6
+
+        this.controls.maxPolarAngle = Math.PI/3 // pour laisser la caméra au dessus du plateau
+        this.controls.rotateSpeed = 0.4
+        this.controls.dampingFactor = 0.1 // on réduit l'inertie pour qu'elle reste cohérente avec la vitesse de rotation réduite
+
+        this.controls.mouseButtons = { // on touche pas au click gauche pour éviter les conflits avec le raycast
+            MIDDLE: THREE.MOUSE.DOLLY, // zoom
+            RIGHT: THREE.MOUSE.ROTATE // rotation
+        }
+        this.PositionCamera(couleur); // On positionne la caméra en fonction de la couleur
+
         // Cases jouables
         this.materialCases = [
             new THREE.MeshBasicMaterial( {color: 0x000000, opacity: 0, transparent: true} ),   // transparent
@@ -81,6 +100,7 @@ class RenduThreeJs{
         function render() {
             requestAnimationFrame( render );
             TWEEN.update();
+            Rendu.controls.update() // pour l'inertie
             renderer.render( Rendu.scene, Rendu.camera );
         }
         render();
@@ -100,10 +120,10 @@ class RenduThreeJs{
         return tween;
     };
     animatePiece(piece, X, Y) {
-        let tweenUp = this.Tween(piece, [{Axis:'z', Offset:1}], 300)
+        let tweenUp = this.Tween(piece, [{Axis:'z', Offset:1}], 200)
         let tweenMove = this.Tween(piece, [{Axis:'x', Offset:0.5*X}, 
                                            {Axis:'y', Offset:0.5*Y}], 100*Math.max(Math.abs(X),Math.abs(Y))) // calcul delai en fonction distance ?
-        let tweenDown = this.Tween(piece, [{Axis:'z', Offset:0}], 300)
+        let tweenDown = this.Tween(piece, [{Axis:'z', Offset:0}], 200)
         tweenUp.chain(tweenMove);
         tweenMove.chain(tweenDown);
         tweenUp.start();
@@ -130,7 +150,7 @@ class RenduThreeJs{
                 if(deplacements.length == 1) Rendu.movePiece(deplacements[0]); // si pas de roque
                 else Rendu.moveRoque(deplacements);
             }
-        }, 100);
+        }, 500);
     }
     movePiece(deplacement) {
         let pieceIdx = this.getPieceIdx(deplacement.piece)
@@ -166,15 +186,17 @@ class RenduThreeJs{
     }
     switchPawn(piece) {
         let Rendu = this;
-        let idx = Rendu.getPieceIdx(piece);
-        let tweenUp = Rendu.Tween(Rendu.piecesObj[idx], [{Axis:'z', Offset:3}], 800); 
-        tweenUp.start();// on lève la pièce
         setTimeout(function() {
-            Rendu.removePiece(idx); // indice du pion
+            let idx = Rendu.getPieceIdx(piece);
+            let tweenUp = Rendu.Tween(Rendu.piecesObj[idx], [{Axis:'z', Offset:3}], 800); 
+            tweenUp.start();// on lève la pièce
             setTimeout(function() {
-                Rendu.LoadPieces([piece]);
-            }, 50)//On attend légèrement après que la pièce soit supprimée pour éviter de supprimer la nouvelle car elles ont le même id
-        }, 800) // on attend que la pièce soit levée
+                Rendu.removePiece(idx); // indice du pion
+                setTimeout(function() {
+                    Rendu.LoadPieces([piece]);
+                }, 100)//On attend légèrement après que la pièce soit supprimée pour éviter de supprimer la nouvelle car elles ont le même id
+            }, 800) // on attend que la pièce soit levée
+        }, 1250) // On attend la fin de tout les autres mouvements avant 
     }
 
     //Méthodes de suppression de pièce
@@ -318,7 +340,20 @@ class RenduThreeJs{
         this.scene.add( spotLight );
     }
     PositionCamera(couleur){
-        if(couleur){
+        /*if(couleur){ // Caméra haute
+            this.camera.position.x = 3.2;
+            this.camera.position.z = 4;
+            this.camera.rotation.y = ( 40* (Math.PI / 180));
+            this.camera.rotation.z = ( 90* (Math.PI / 180));
+        }
+        else{
+            this.camera.position.x = -3.2;
+            this.camera.position.z = 4;
+            this.camera.rotation.y = ( 320* (Math.PI / 180));
+            this.camera.rotation.z = ( 270* (Math.PI / 180));
+        }*/
+        
+        if(couleur){ // Caméra basse
             this.camera.position.x = 3.5;
             this.camera.position.z = 3;
             this.camera.rotation.y = ( 50* (Math.PI / 180));
@@ -330,6 +365,7 @@ class RenduThreeJs{
             this.camera.rotation.y = ( 310* (Math.PI / 180));
             this.camera.rotation.z = ( 270* (Math.PI / 180));
         }
+        this.controls.update();
     }
 
     //Méthodes de gestion d'erreurs des cases
@@ -492,62 +528,99 @@ class RenduThreeJs{
     }	
 
     
-    replay(board, coups, pieces_prises) {
-        this.loadBoardPieces(this.getBoardPieces(board));
+    replay() {
         let Rendu = this;
-        let j=0;
-        for (let i=0; i<coups.length; i) {
-            if (typeof coups[i] != 'string') {
-                setTimeout(function(){
+        
+        $( document ).ready(function() {
+            $.ajax({//Reprise avec modification de : https://grokonez.com/node-js/integrate-nodejs-express-jquery-ajax-post-get-bootstrap-view
+            type : "GET",
+            url : window.location.origin+window.location.pathname+"/replay", // on reconstitue l'url car on a des arguments dans l'url actuelle
+            success: function(result){
+                console.log(result)
+                let board = result.board;
+                let coups = JSON.parse(result.data[0].coups)
+                let pieces_prises = [JSON.parse(result.data[0].pieces_prises_blanc), JSON.parse(result.data[0].pieces_prises_noir)]
 
-                    let tmpPiece = coups[i];
-                    tmpPiece.x = coups[i].deplacements[coups[i].deplacements.length-2].x
-                    tmpPiece.y = coups[i].deplacements[coups[i].deplacements.length-2].y
+                console.log(board)
+                console.log(coups)
+                console.log(pieces_prises)
+                let loadCheck = setInterval(function() { // On attend que toutes nos pièces soient 
+                    if (Rendu.checkLoadModels()) {  // chargées avant de commencer à les afficher
+                        clearInterval(loadCheck);
+                        Rendu.loadBoardPieces(board);
+                        let j=0;
+                        setTimeout(function(){
+                            for (let i=0; i<coups.length; i) {
+                                if (typeof coups[i] != 'string') {
+                                    setTimeout(function(){
 
-                    let deplacement = {
-                        x:coups[i].x,
-                        y:coups[i].y,
-                        piece:tmpPiece
+                                        let tmpPiece = coups[i];
+                                        tmpPiece.x = coups[i].deplacements[coups[i].deplacements.length-2].x
+                                        tmpPiece.y = coups[i].deplacements[coups[i].deplacements.length-2].y
+
+                                        let deplacement = {
+                                            x:coups[i].x,
+                                            y:coups[i].y,
+                                            piece:tmpPiece
+                                        }
+
+                                        Rendu.movePiece(deplacement);
+
+                                        //si promotion
+                                        if(coups[i].choix != undefined){
+                                            let tmpPiecePromotion = coups[i]
+                                            tmpPiecePromotion.nom = coups[i].choix
+                                            Rendu.switchPawn(tmpPiecePromotion);
+                                        }
+
+
+                                        if(pieces_prises[i%2].length>j) if (pieces_prises[i%2][j].nbTours == i) {
+                                            Rendu.moveOut(pieces_prises[i%2][j].piece);
+                                            j++;
+                                        }
+
+                                        i++;
+                                    }, 2500 );
+                                }
+                                else{
+                                    let decalage;
+                                    if(coups[i] == "G.R") decalage = 2; 
+                                    else decalage = -2;
+
+                                    let Roi = board[3][i%2*7].piece;
+                                    let deplacement = ({
+                                        x:Roi.x+decalage,
+                                        y:Roi.y,
+                                        piece:Roi
+                                    })
+                                    
+                                    let deplacements = (Roque.getDeplacements(deplacement, board))
+                                    Rendu.moveRoque(JSON.parse(JSON.stringify(deplacements)));
+                                    i++;
+                                }
+                            }
+                        }, 500 );
                     }
+                }, 300);
+            },
+            error : function(e) {
+                //Afficher erreur et redirection au menu
+                $("#popup").modal({
+                    fadeDuration: 100,
+                    showClose: false
+                });
+                $('#popup').on($.modal.BEFORE_CLOSE, function(event, modal) {
+                    window.location.href = "./"
+                });
 
-                    Rendu.movePiece(deplacement);
-
-                    //si promotion
-                    if(coups[i].choix != undefined){
-                        let tmpPiecePromotion = coups[i]
-                        tmpPiecePromotion.nom = coups[i].choix
-                        Rendu.switchPawn(tmpPiecePromotion);
-                    }
-
-
-                    if (pieces_prises[i%2][j].nbTours == i) {
-                        Rendu.moveOut(pieces_prises[i%2][j].piece);
-                        j++;
-                    }
-
-                    i++;
-                }, 2500 );
+                console.log("ERROR: ", e);
             }
-            else{
-
-                if(coups[i] == "G.R") decalage = 2; 
-                else decalage = -2;
-
-                let Roi = board[3][i%2*7].piece;
-                let deplacement = ({
-                    x:Roi.x+decalage,
-                    y:Roi.y,
-                    piece:Roi
-                })
-                
-                let deplacements = (Roque.getDeplacements(deplacement, board))
-                Rendu.moveRoque(JSON.parse(JSON.stringify(deplacements)));
-            }
-        }
+            });  
+        })
     }
 
     //Méthode de suppression du rendu
-    remove(){
+    remove() {
         document.body.removeChild(document.body.lastChild)//on supprime le rendu
         document.getElementById('infos').parentNode.removeChild(document.getElementById('infos'));//on supprime l'import des infos sur les modèles
     }

@@ -7,6 +7,9 @@
 + voir changer hauteur déplacement
 
 
++ modif prise en passant pour faire sur le tour du déplacement de 2 cases
+
+
 A vérifier :
 récupération du plateau nécessaire au debut de move ????
 */
@@ -21,11 +24,7 @@ class Jeu{
         this.mode = 0
         if(getParams(window.location.href).ia!=undefined) this.mode = 1;
 
-
-
-
         function onClick(event) {
-            console.log('click')
             if(Game.echiquier.Nbtour%2 == Game.couleur){//si son tour
                 let intersectPiece = Game.rendu.getClickModels(event, Game.rendu.piecesObj);
                 let intersectCase = Game.rendu.getClickModels(event, Game.rendu.playableCases);
@@ -204,6 +203,11 @@ class Jeu{
 
 
 (function() {
-    let game = new Jeu();
+    let game;
+    if(getParams(window.location.href).replay!=undefined){
+        let Rendu = new RenduThreeJs(0);
+        Rendu.replay();
+    }
+    else game = new Jeu();
 })();
 
