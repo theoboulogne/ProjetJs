@@ -168,8 +168,10 @@ class RenduThreeJs{
                 Rendu.removePiece(pieceIdx);    // on supprime la piece mangé du plateau
                 setTimeout(function(){
                     Rendu.LoadPieceOut(piece, 3);   // on la recharge dans la scene en hauteur pour faire croire qu'on l'a juste déplacée
-                    let tweenDown = Rendu.Tween(Rendu.piecesOut[piece.couleur][Rendu.piecesOut[piece.couleur].length-1], [{Axis:'z', Offset:-3}],1200);
-                    tweenDown.start();           // on la fait redescendre sur le coté du plateau*/
+                    setTimeout(function(){ // on laisse le temps au modèle d'apparaitre
+                        let tweenDown = Rendu.Tween(Rendu.piecesOut[piece.couleur][Rendu.piecesOut[piece.couleur].length-1], [{Axis:'z', Offset:-3}],1200);
+                        tweenDown.start();           // on la fait redescendre sur le coté du plateau*/
+                    }, 50);
                 }, 100);
             }, 1200);
         }
@@ -414,39 +416,10 @@ class RenduThreeJs{
                 let obj = (this.models[i + (this.info.couleur * couleur * 6)].obj).clone()
                 obj.traverse( function ( child ) {
                     if (child instanceof THREE.Mesh) {
-                        // on définit la couleur
-                        if(couleur) child.material = new THREE.MeshLambertMaterial({color: 0x666666});
-                        else child.material = new THREE.MeshLambertMaterial({color: 0xFFFFFF});
+                        // on définit la couleur ( avec un effet metalisé)
                         
-                        /*
-                        if(couleur) child.material = new THREE.MeshStandardMaterial( {
-
-                            color: 0x555555,
-                        
-                            //roughness: 1,
-                            //metalness: 0.5,
-                        
-                            //roughnessMap: 1,
-                            //metalnessMap: 1,
-                        
-                            //envMap: 1, // important -- especially for metals!
-                            //envMapIntensity: 0.5
-                        
-                        } );
-                        else child.material = new THREE.MeshStandardMaterial( {
-
-                            color: 0xFFFFFF,
-                        
-                            //roughness: 1,
-                            //metalness: 0.5,
-                        
-                            //roughnessMap: 1,
-                            //metalnessMap: 1,
-                        
-                            //envMap: 1, // important -- especially for metals!
-                            //envMapIntensity: 0.5
-                        
-                        } );*/
+                        if(couleur) child.material = new THREE.MeshStandardMaterial({color: 0x808080, metalness: 0.5, roughness: 0.4});
+                        else child.material = new THREE.MeshStandardMaterial({color: 0xFFFFFF, metalness: 0.4, roughness: 0.4});
                     }
                 });
                 //On récupère le bon nom si nécessaire
@@ -499,8 +472,8 @@ class RenduThreeJs{
         obj.traverse( function ( child ) {
             if (child instanceof THREE.Mesh) {
                 // on définit la couleur
-                if(piece.couleur) child.material = new THREE.MeshLambertMaterial({color: 0x555555});
-                else child.material = new THREE.MeshLambertMaterial({color: 0xFFFFFF});
+                if(piece.couleur) child.material = new THREE.MeshStandardMaterial({color: 0x808080, metalness: 0.5, roughness: 0.4});
+                else child.material = new THREE.MeshStandardMaterial({color: 0xFFFFFF, metalness: 0.4, roughness: 0.4});
             }
         });        
         obj.position.set((Math.pow(-1, piece.couleur) * (-1.7 + (0.4 * (this.piecesOut[piece.couleur].length/2)))),

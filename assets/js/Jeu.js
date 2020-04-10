@@ -4,7 +4,7 @@
 
 + methode pour indiceechiquier/couleursocket
 
-
++ accelerer moveout
 
 + modif prise en passant pour faire sur le tour du déplacement de 2 cases
 
