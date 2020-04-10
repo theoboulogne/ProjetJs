@@ -5,6 +5,7 @@ class RenduThreeJs{
         //Initialisation de la scène
         this.scene = new THREE.Scene();
         this.camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight);
+        this.camera.up.set( 0, 0, 1 ); // pour que orbitcontrols 'suit' la caméra
     
         //Ajout du rendu
         let renderer = new THREE.WebGLRenderer({
@@ -27,9 +28,22 @@ class RenduThreeJs{
         this.raycaster = new THREE.Raycaster(); //Gestion de la détection des clicks (Events)
 
         this.controls = new THREE.OrbitControls( this.camera, renderer.domElement );
-        this.controls.enableZoom = false;
-        this.controls.enablePan = false;
-        this.controls.enableDamping = true;
+        
+        this.controls.enablePan = false; // translation
+        this.controls.enableDamping = true; // inertie
+
+        this.controls.enableZoom = true; // paramètres du zoom
+        this.controls.minDistance = 5
+        this.controls.maxDistance = 6
+
+        this.controls.maxPolarAngle = Math.PI/3 // pour laisser la caméra au dessus du plateau
+        this.controls.rotateSpeed = 0.4
+        this.controls.dampingFactor = 0.1 // on réduit l'inertie pour qu'elle reste cohérente avec la vitesse de rotation réduite
+
+        this.controls.mouseButtons = { // on touche pas au click gauche pour éviter les conflits avec le raycast
+            MIDDLE: THREE.MOUSE.DOLLY, // zoom
+            RIGHT: THREE.MOUSE.ROTATE // rotation
+        }
         this.PositionCamera(couleur); // On positionne la caméra en fonction de la couleur
 
         // Cases jouables
@@ -86,6 +100,7 @@ class RenduThreeJs{
         function render() {
             requestAnimationFrame( render );
             TWEEN.update();
+            Rendu.controls.update() // pour l'inertie
             renderer.render( Rendu.scene, Rendu.camera );
         }
         render();
@@ -325,7 +340,7 @@ class RenduThreeJs{
         this.scene.add( spotLight );
     }
     PositionCamera(couleur){
-        if(couleur){
+        /*if(couleur){ // Caméra haute
             this.camera.position.x = 3.2;
             this.camera.position.z = 4;
             this.camera.rotation.y = ( 40* (Math.PI / 180));
@@ -336,8 +351,9 @@ class RenduThreeJs{
             this.camera.position.z = 4;
             this.camera.rotation.y = ( 320* (Math.PI / 180));
             this.camera.rotation.z = ( 270* (Math.PI / 180));
-        }
-        /*if(couleur){
+        }*/
+        
+        if(couleur){ // Caméra basse
             this.camera.position.x = 3.5;
             this.camera.position.z = 3;
             this.camera.rotation.y = ( 50* (Math.PI / 180));
@@ -348,7 +364,8 @@ class RenduThreeJs{
             this.camera.position.z = 3;
             this.camera.rotation.y = ( 310* (Math.PI / 180));
             this.camera.rotation.z = ( 270* (Math.PI / 180));
-        }*/
+        }
+        this.controls.update();
     }
 
     //Méthodes de gestion d'erreurs des cases
