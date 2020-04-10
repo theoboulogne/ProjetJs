@@ -42,10 +42,9 @@ let Menu = (function(){
             event.preventDefault();
             let pseudo = document.getElementById("pseudo").value;
             let affichage = document.getElementById("pieces_choix").value;
-            let IA = document.getElementById("IA").value;
-            let IA_check = document.getElementsByName("IA")[0].checked;
+            let IA_check = document.getElementsByName("ia")[0].checked;
             if(IA_check){
-                window.location.href = "jeu?pseudo=" + pseudo + "&affichage=" + affichage + "&ia=" +IA
+                window.location.href = "jeu?pseudo=" + pseudo + "&affichage=" + affichage + "&ia=1"
             }
             else{
                 window.location.href = "jeu?pseudo=" + pseudo + "&affichage=" + affichage

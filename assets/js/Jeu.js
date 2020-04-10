@@ -4,7 +4,6 @@
 
 + methode pour indiceechiquier/couleursocket
 
-+ voir changer hauteur déplacement
 
 
 + modif prise en passant pour faire sur le tour du déplacement de 2 cases
@@ -116,14 +115,19 @@ class Jeu{
 
         socket.on('move', (plateau,deplacement,piece_prise) => { // piece et deplacer en x,y
             console.log('Event - move')
+            console.log(deplacement)
             Game.echiquier = plateau; // On récupère le nouveau plateau (sans les cases playable)
             //Détermination du roque
             let deplacements = Roque.getDeplacements(deplacement, plateau.board);
 
             //Affichage graphique
-            if(piece_prise != 0) Game.rendu.moveOut(piece_prise); // On affiche la suppression 
-
-            Game.rendu.movePieces(JSON.parse(JSON.stringify(deplacements))); 
+            if(piece_prise != 0) {
+                Game.rendu.moveOut(piece_prise); // On affiche la suppression 
+                setTimeout(function(){//on attend la fin de la suppression
+                    Game.rendu.movePieces(JSON.parse(JSON.stringify(deplacements))); 
+                }, 1500);
+            }
+            else Game.rendu.movePieces(JSON.parse(JSON.stringify(deplacements))); 
             // on lance le déplacement de la ou des pièces en cas de roque
             // on effectue une copie du déplacement car le déplacement est asynchrone et que l'on veut garder les bonnes infos
 

@@ -13,8 +13,8 @@ class Roi extends Piece{
 
             if (plateau.isInBoard(x,y)) while(boucle){
                 if(plateau.check_piece(x,y)){
-                    if(plateau.board[x][y].piece.couleur == this.couleur) boucle = false;
-                    else for (let j = 0; j < pieceName.length; j++) if (plateau.board[x][y].piece.nom == pieceName[j]) return true;
+                    if(plateau.board[x][y].piece.couleur != this.couleur) for (let j = 0; j < pieceName.length; j++) if (plateau.board[x][y].piece.nom == pieceName[j]) return true;
+                    boucle = false;
                 }
                 x += sens[i][0]
                 y += sens[i][1]
