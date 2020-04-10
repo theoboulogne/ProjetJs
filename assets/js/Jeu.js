@@ -6,6 +6,10 @@
 
 + voir changer hauteur déplacement
 
+
++ modif prise en passant pour faire sur le tour du déplacement de 2 cases
+
+
 A vérifier :
 récupération du plateau nécessaire au debut de move ????
 */

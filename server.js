@@ -187,15 +187,19 @@ io.sockets.on('connection',  (socket) =>{
             //On vient définir le déplacement de l'IA si nécessaire
             if((couleurSocket) != (game.echiquiers[indiceEchiquier].Nbtour%2) && game.echiquiers[indiceEchiquier].ia == 1){
                 let moveIA = IA.ia(game.echiquiers[indiceEchiquier], (couleurSocket+1)%2);
-                console.log(moveIA)
+                // console.log('Move IA : ')
+                // console.log(moveIA)
                 game.echiquiers[indiceEchiquier].select.x = moveIA.piece.x
                 game.echiquiers[indiceEchiquier].select.y = moveIA.piece.y
-                deplacement.piece = moveIA.piece.clone();
+                deplacement.piece = JSON.parse(JSON.stringify(moveIA.piece))
                 deplacement.x = moveIA.Coo.x
                 deplacement.y = moveIA.Coo.y
                 game.echiquiers[indiceEchiquier].board[deplacement.x][deplacement.y].playable = true;
                 if(deplacement.piece.nom == "Pion" && (deplacement.y == 0 || deplacement.y == 7)) deplacement.piece.choix = "Reine" // en cas de promotion on choisi toujours la reine pour l'ia
             }
+            // else {
+            //     console.log('Valeur Joueur : ' + String(IA.testcoup(game.echiquiers[indiceEchiquier], game.echiquiers[indiceEchiquier].board[deplacement.piece.x][deplacement.piece.y].piece, deplacement.x, deplacement.y)))
+            // }
 
             //Si son tour ou IA actif et paramètres corrects alors
             if (((couleurSocket) == (game.echiquiers[indiceEchiquier].Nbtour%2)||(game.echiquiers[indiceEchiquier].ia == 1))&&
