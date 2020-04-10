@@ -150,7 +150,7 @@ class RenduThreeJs{
                 if(deplacements.length == 1) Rendu.movePiece(deplacements[0]); // si pas de roque
                 else Rendu.moveRoque(deplacements);
             }
-        }, 100);
+        }, 500);
     }
     movePiece(deplacement) {
         let pieceIdx = this.getPieceIdx(deplacement.piece)
