@@ -32,16 +32,13 @@ class RenduThreeJs{
         this.controls.enablePan = false; // translation
         this.controls.enableDamping = true; // inertie
 
-        this.controls.enableZoom = true; // paramètres du zoom
-        this.controls.minDistance = 5
-        this.controls.maxDistance = 6
+        this.controls.enableZoom = false; // paramètres du zoom
 
         this.controls.maxPolarAngle = Math.PI/3 // pour laisser la caméra au dessus du plateau
         this.controls.rotateSpeed = 0.4
         this.controls.dampingFactor = 0.1 // on réduit l'inertie pour qu'elle reste cohérente avec la vitesse de rotation réduite
 
         this.controls.mouseButtons = { // on touche pas au click gauche pour éviter les conflits avec le raycast
-            MIDDLE: THREE.MOUSE.DOLLY, // zoom
             RIGHT: THREE.MOUSE.ROTATE // rotation
         }
         this.PositionCamera(couleur); // On positionne la caméra en fonction de la couleur
@@ -150,14 +147,14 @@ class RenduThreeJs{
                 if(deplacements.length == 1) Rendu.movePiece(deplacements[0]); // si pas de roque
                 else Rendu.moveRoque(deplacements);
             }
-        }, 500);
+        }, 100);
     }
     movePiece(deplacement) {
         let pieceIdx = this.getPieceIdx(deplacement.piece)
 
         if(pieceIdx>-1){
             this.animatePiece(this.piecesObj[pieceIdx], deplacement.y-deplacement.piece.y, deplacement.x-deplacement.piece.x);
-        }// Gérer la gestion d'erreur !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        }
     }
     moveOut(piece) {
         let pieceIdx = this.getPieceIdx(piece)
@@ -169,9 +166,11 @@ class RenduThreeJs{
 
             setTimeout(function(){
                 Rendu.removePiece(pieceIdx);    // on supprime la piece mangé du plateau
-                Rendu.LoadPieceOut(piece, 3);   // on la recharge dans la scene en hauteur pour faire croire qu'on l'a juste déplacée
-                let tweenDown = Rendu.Tween(Rendu.piecesOut[piece.couleur][Rendu.piecesOut[piece.couleur].length-1], [{Axis:'z', Offset:-3}],1200);
-                tweenDown.start();           // on la fait redescendre sur le coté du plateau*/
+                setTimeout(function(){
+                    Rendu.LoadPieceOut(piece, 3);   // on la recharge dans la scene en hauteur pour faire croire qu'on l'a juste déplacée
+                    let tweenDown = Rendu.Tween(Rendu.piecesOut[piece.couleur][Rendu.piecesOut[piece.couleur].length-1], [{Axis:'z', Offset:-3}],1200);
+                    tweenDown.start();           // on la fait redescendre sur le coté du plateau*/
+                }, 100);
             }, 1200);
         }
     }
