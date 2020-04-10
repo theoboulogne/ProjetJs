@@ -1,10 +1,16 @@
 module.exports = {
     ia(plateau, couleur){
         let tmpPlateau = plateau.clone(); // on clone le plateau en amount par sécurité
+        let debut = new Date().getTime(); // On enregistre l'heure 
+
 
         let coup = evaluation_joueur(tmpPlateau, couleur, 3) 
         // on sélectionne les 3 meilleurs coups uniquement pour éviter un trop grand nombre d'appels 
         //(faire varier pour augmenter la puissance de l'ia au détriment de la vitesse
+
+     
+        while (debut + 3000 > new Date().getTime()); // pause pour éviter de renvoyer un coup trop rapidement
+                                                    // et donc d'avoir des movements qui se lancent en meme temps
         return coup;
     },
     testcoup(plateau, piece, x, y){//fonction de test de l'évaluation sur les coups du joueur pour évaluer l'efficacité de l'IA
@@ -80,12 +86,36 @@ function evaluation_joueur(plateau, couleur, nb){
     // if(nb == 4){
     //     console.log(coups)
     // }
-    if(coups.length>0)return {
+
+    if(coups.length>0 && coups[0].Coo!=undefined)return { // double sécurité pour éviter le crash
         Coo:JSON.parse(JSON.stringify(coups[0].Coo)),
         piece:coups[0].piece.clone(),
         valeur:JSON.parse(JSON.stringify(coups[0].valeur))
     }; // et on renvoi le meilleur coup
-    else return meilleurs[0]; // sécurité si le tableau coups plante
+    else if(meilleurs.length>0 && meilleurs[0].Coo!=undefined) return meilleurs[0]; // sécurité si le tableau coups plante
+    else return getCoupSecurite(plateau, couleur); // dernière sécurité si tout l'algo plante
+}
+
+function getCoupSecurite(plateau, couleur){
+    let pieces = []
+    for(let i=0; i<8; i++){
+        for(let j=0; j<8; j++){
+            if(plateau.board[i][j].piece != 0){
+                if(plateau.board[i][j].piece.couleur = couleur) pieces.push(plateau.board[i][j].piece)
+            }
+        }
+    }
+    let tmpPlateau = plateau.clone();
+    for(let k=0; k<pieces.length; k++){
+        pieces[k].playable(tmpPlateau);
+        for(let i=0; i<8; i++){
+            for(let j=0; j<8; j++){
+                if(plateau.board[i][j].playable){
+                    return {Coo:JSON.parse(JSON.stringify({x:i, y:j})), piece:pieces[k].clone()};
+                }
+            }
+        }
+    }
 }
 
 function evaluation_coups_piece(plateau, piece){//On récupère les déplacements possibles de la pièce

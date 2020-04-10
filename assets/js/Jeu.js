@@ -4,7 +4,6 @@
 
 + methode pour indiceechiquier/couleursocket
 
-+ voir changer hauteur déplacement
 
 
 + modif prise en passant pour faire sur le tour du déplacement de 2 cases

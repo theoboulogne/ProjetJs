@@ -19,13 +19,13 @@
             <center>
                 <div class="info" id="div_form">
                     <h2 class= "ecriture">Entrer votre nom d'utilisateur :</h2> 
-                    <form name="formulaire">
+                    <form name="formulaire" action='./jeu' method="GET">
                         <div class="pseudo_formulaire">
                             <input class="form-control" type="text" name="pseudo" id="pseudo" placeholder="Votre pseudo">
                         </div>
                         <div class="piece_formulaire">
                             <h2 class= "ecriture">Choisissez votre style de pièces :</h2> 
-                            <select class="form-control" name="pieces_choix" id="pieces_choix">
+                            <select class="form-control" name="affichage" id="pieces_choix">
                                 <option value=Classic>Classic</option>
                                 <option value=StarWars>Star-Wars</option>
                                 <option value=Pokemon>Pokemon</option>
@@ -33,7 +33,7 @@
                            </select>
                         </div>
                         <div class= "ia_check">
-                            <label class="checkbox-inline ecriture"><input type="checkbox" name = "IA" value="1" id = "IA">&nbsp IA </label>
+                            <label class="checkbox-inline ecriture"><input type="checkbox" name = "ia" value="1" id = "IA">&nbsp IA </label>
                         </div>
                     </form>
                 </div>
