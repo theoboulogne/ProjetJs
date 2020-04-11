@@ -6,22 +6,22 @@ class Pion extends Piece {
     }
 
     playable(plateau){
-        if(this.deplacements.length == 1) { //si jms jouée
+        if(this.deplacements.length == 1) { //Si la pièce est jamais jouée on la déplace de 2
             if(plateau.isInBoard(this.x,this.y+(Math.pow(-1,this.couleur)*(2)))){
                 if(plateau.check_vide(this.x,this.y+(Math.pow(-1,this.couleur)*(2)))&&plateau.check_vide(this.x,this.y+(Math.pow(-1,this.couleur)))) {
                     plateau.playable(this.x,this.y+(Math.pow(-1,this.couleur)*(2)),this)
                 }
             }
         }
-        //déplacement par défault
+        //Par défault le pion avance d'une case
         if(plateau.isInBoard(this.x,this.y+(Math.pow(-1,this.couleur)*(1)))){
             if(plateau.check_vide(this.x,this.y+(Math.pow(-1,this.couleur)*(1)))){
                 plateau.playable(this.x,this.y+(Math.pow(-1,this.couleur)*(1)), this)
             }
         }
         
-        for(let i=-1; i<2; i+=2) {
-            //prise de piece
+        for(let i=-1; i<2; i+=2) { // on regarde sur les deux cotés
+            //Prise de pièce 'traditionelle'
             if(plateau.isInBoard(this.x + i,this.y+(Math.pow(-1,this.couleur)*(1)))){
                 if(plateau.check_piece(this.x + i,this.y+(Math.pow(-1,this.couleur)*(1)))){
                     if(plateau.board[this.x + i][this.y+(Math.pow(-1,this.couleur)*(1))].piece.couleur != this.couleur){
@@ -29,7 +29,7 @@ class Pion extends Piece {
                     }
                 }
             }
-            //prise en passant
+            //Prise en passant
             if(plateau.isInBoard(this.x + i, this.y)){
                 if(plateau.getBoard(this.x + i,this.y).piece.nom==this.nom){ 
                     if(plateau.getBoard(this.x+i,this.y).piece.deplacements.length == 2 && this.y == plateau.getBoard(this.x+i,this.y).piece.deplacements[1].y){
@@ -45,13 +45,11 @@ class Pion extends Piece {
                     }
                 }
             }
-
         }
-
     }
 
 
-    move(x,y,plateau){
+    move(x,y,plateau){ // Méthode de déplacement à cause de la prise en passant
         if(plateau.isInBoard(x,y)){
             if(plateau.board[x][y].playable){
                 for(let i=-1; i<2; i+=2){ // on supprime la piece en cas de prise en passant,
@@ -70,10 +68,10 @@ class Pion extends Piece {
         }
     }
 
-    promotion(nomPiece){
-        const P = eval("require('./"+nomPiece+"')") //On appelle la pièce demandée
+    promotion(nomPiece){//Methode à appeller en cas de promotion, on fournit la nouvelle pièce en entrée
+        const P = eval("require('./"+nomPiece+"')") //On inclut uniquement la pièce demandée
         let tmp = new P(this.couleur, this.x, this.y, this.id)
-        tmp.deplacements.pop()
+        tmp.deplacements.pop() // On supprime le premier déplacement (mis par défault à l'initialisation)
         for(let i=0; i<this.deplacements.length; i++) tmp.deplacements.push(this.deplacements[i])
         return tmp;
     }

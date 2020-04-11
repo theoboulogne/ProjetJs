@@ -5,7 +5,7 @@ class Roi extends Piece{
         super(couleur, x, y, id)
     }
 
-    verifierboucle(pieceName,sens, plateau){
+    verifierboucle(pieceName,sens, plateau){  // vérification pour l'écheque par la reine, le fou et la tour
         for(let i = 0; i < sens.length; i++){
             let x = this.x + sens[i][0];
             let y = this.y + sens[i][1];
@@ -24,7 +24,7 @@ class Roi extends Piece{
         return false;
     }
 
-    verifiercote(pieceName,sens, plateau){
+    verifiercote(pieceName,sens, plateau){ // vérification pour l'écheque par le roi, le cavalier et le pion
         for(let i = 0; i < sens.length; i++){
             let x = this.x + sens[i][0];
             let y = this.y + sens[i][1];
@@ -38,9 +38,8 @@ class Roi extends Piece{
         return false;
     }
 
-    echec(plateau){
-
-//Voir pour changer piecename par une condition avec des |
+    echec(plateau){ // on a fait deux types de vérifications (pour l'échec) car pour le roi, le cavalier et le pion on vérifie directement des positions précises
+    // tandis que pour la reine, le fou et la tour on vérifie sur toute une ligne, clonne ou diagonale
 
         if (this.verifierboucle(["Reine","Fou"],[[1,1],[1,-1],[-1,1],[-1,-1]], plateau)) return true;
         if (this.verifierboucle(["Reine","Tour"],[[1,0],[-1,0],[0,1],[0,-1]], plateau)) return true;
@@ -51,6 +50,7 @@ class Roi extends Piece{
         return false;
     }
 
+    // méthode pour définir les cases jouable par le roi
     playable(plateau){
         for (let i = -1; i < 2; i++){
             for (let j = -1; j < 2; j++){
@@ -70,19 +70,20 @@ class Roi extends Piece{
         }
     }
 
+    // méthode pour vérifier si on peu faire un roque
     roquePlayable(plateau){
-        let renvoi = [false,false];
-        let valeurs = [-3,4];
+        let renvoi = [false,false]; // tableau de retour (false = pas playable; true = playable)
+        let valeurs = [-3,4]; // position en x des tours par rapport au roi
         
-        let tempX = this.x;
+        let tempX = this.x; // pendant les tests, on bouje le roi et a la fin on le remet a sa place
         
-        if(!this.echec(plateau)){
-            if(this.deplacements.length == 1){
+        if(!this.echec(plateau)){ // on vérifie que le roi ne soit pas en echec a sa position initiale
+            if(this.deplacements.length == 1){ // on vérifie qu'il n'est pas bougé
                 for (let j = 0; j < valeurs.length; j++){
-                    if(plateau.board[this.x + valeurs[j]][this.y].piece.nom == 'Tour' && plateau.board[this.x + valeurs[j]][this.y].piece.deplacements.length == 1){
+                    if(plateau.board[this.x + valeurs[j]][this.y].piece.nom == 'Tour' && plateau.board[this.x + valeurs[j]][this.y].piece.deplacements.length == 1){ // on vérifie que les tours sont bien en position initiale et qu'elles n'ont pas bougées
                         let i = 1;
                         let indiceR = true;
-                        while (i < (Math.abs(valeurs[j])) && indiceR){ // on regarde 2 cases dans les deux sens
+                        while (i < (Math.abs(valeurs[j])) && indiceR){ // on regarde les cases entre le roi et les tours
                             // si y'a une piece devant ton roi on coupe
                             if(plateau.board[this.x + (valeurs[j]/Math.abs(valeurs[j]))][this.y].piece != 0) indiceR = false;
                             else {
@@ -97,7 +98,7 @@ class Roi extends Piece{
                         // on reset les coo de x, on enregistre si c'est bon et on passe au roque suivant
                         this.x = tempX;
                         if (indiceR){
-                            renvoi[j] = true;
+                            renvoi[j] = true; // si l'indice n'est pas passé a false c'est que le roque avec la tour testée est possible
                         }
                     }
                 }
@@ -106,18 +107,18 @@ class Roi extends Piece{
         return renvoi;
     }
 
-    move(x,y, plateau){ 
-        if(plateau.isInBoard(x,y)){
-            if(plateau.board[x][y].playable){
+    move(x,y, plateau){ // on a une méthode spéciale pour le move du roi car on a deux types de déplacements, les déplacements normaux et le roque
+        if(plateau.isInBoard(x,y)){ // on vérifie que les coordonées soit bien sur le plateau
+            if(plateau.board[x][y].playable){ // on vérifie qu'on puisse vraiment jouer a ces coordonnées
                 let diff = x - this.x;
-                if(Math.abs(diff) == 2){
-                    plateau.jouer(x - (diff/Math.abs(diff)),y,plateau.board[3.5 + ((diff/Math.abs(diff))*3.5)][this.y].piece);
-                    plateau.jouer(x,y,this);
+                if(Math.abs(diff) == 2){ // si le déplacement est sur deux cases c'est qu'on fait un roque
+                    plateau.jouer(x - (diff/Math.abs(diff)),y,plateau.board[3.5 + ((diff/Math.abs(diff))*3.5)][this.y].piece); // on bouge la tour
+                    plateau.jouer(x,y,this); // on bouge le roi
 
-                    plateau.Nbtour--;
+                    plateau.Nbtour--; // chaque fonction jouer augmente de un le tour donc on le baisse pour garder un bon compte
+
                     plateau.coups.splice(plateau.coups.length - 2, 2);
-
-                    if(diff == 2)  plateau.coups.push("G.R");
+                    if(diff == 2)  plateau.coups.push("G.R");          //au lieu d'afficher le déplacement du roi et de la tour, on affiche juste "grand ou petit roque"
                     else plateau.coups.push("P.R");
                 }
                 else plateau.jouer(x, y, this);//Déplacement normal

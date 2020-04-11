@@ -11,9 +11,9 @@ class Joueur{
         this.id = id; // l'id correspond à l'id de la socket correspondante
         this.pseudo = pseudo // le pseudo est enregistré pour l'enregistrement des scores
 
-        this.roi = {x:3, y:couleur*7}
+        this.roi = {x:3, y:couleur*7} // on enregistre la position du roi 
 
-        this.pieces_prises = new Array()
+        this.pieces_prises = new Array() // tableau des pieces prises
     }
     //Méthode pour le clonage du plateau, non utilisée finalement pour réduire le nombre d'opération lors du clone
     // (on se contente d'une recopie avec JSON.parse/stringlify car on a pas besoin des méthodes de la classe)
