@@ -3,10 +3,6 @@
 /*TO-DO :
 
 + methode pour indiceechiquier/couleursocket
-+ arreter de crash qd pas de BDD
-+ deplacer toutes les requetes sql en methode avec res en argument
-+ test difficulte ia avec menu thomas
-+ ajouter un delai avant redirection sur les alertes et changer le texte en conséquence
 
 +Options :
 refaire chrono nous meme
