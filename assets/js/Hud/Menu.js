@@ -13,12 +13,11 @@ $( document ).ready(function() {
         Menu.setScores(result)
         Menu.AjoutTableauScore(6)
         
+        //bouton servant a changer de page dans le tableau des scores (de 6 score maxi)
         let Bouton_page_precedente = document.getElementById("tableau_page_precedente");
         Bouton_page_precedente.addEventListener("click", event=>Menu.AjoutTableauScore(-6));
         let Bouton_page_suivante = document.getElementById("tableau_page_suivante");
         Bouton_page_suivante.addEventListener("click", event=>Menu.AjoutTableauScore(6));
-
-
       },
       error : function(e) {
         
@@ -37,7 +36,16 @@ $( document ).ready(function() {
 let Menu = (function(){
     let i = -6;
     this.tableau = undefined;
+
+    //fonction qui permettra de rajouter les elements dans une nouvelles lignes du tableau des scores
+    let ajout_case = (val)=>{
+        let part = document.createElement('td');
+        let valeur = document.createTextNode(val);
+        part.appendChild(valeur);
+        return part
+    }
     return{
+        //fonction lier au bouton play
         Play : () => {  
             event.preventDefault();
             let pseudo = document.getElementById("pseudo").value;
@@ -45,25 +53,21 @@ let Menu = (function(){
             let ia = document.getElementById("ia").value;
             window.location.href = "jeu?pseudo=" + pseudo + "&affichage=" + affichage + "&ia=" + ia;
         },
+        //recupère le tableau du serveur
         setScores : (tab) => {
             this.tableau = tab;
         },
-        AjoutScore : (pseudo, nbpiece_restante, temps) =>{
+        //ajout un element au tableau des scores
+        AjoutScore : (j) =>{
+
             let tableau = document.getElementById("tableau_score_affichage");
-            var tr = document.createElement('tr');
+            let tr = document.createElement('tr');
             tableau.appendChild(tr);
-            let pseudo_Tabableau = document.createElement('td');
-            tr.appendChild(pseudo_Tabableau);
-            let pseudo_Tabableau_valeur = document.createTextNode(pseudo);
-            pseudo_Tabableau.appendChild(pseudo_Tabableau_valeur);
-            let nbpiece_restante_Tabableau = document.createElement('td');
-            tr.appendChild(nbpiece_restante_Tabableau);
-            let nbpiece_restante_Tabableau_valeur = document.createTextNode(nbpiece_restante);
-            nbpiece_restante_Tabableau.appendChild(nbpiece_restante_Tabableau_valeur); 
-            let temps_Tabableau = document.createElement('td');
-            tr.appendChild(temps_Tabableau);
-            let temps_Tabableau_valeur = document.createTextNode(temps);
-            temps_Tabableau.appendChild(temps_Tabableau_valeur);
+
+            tr.appendChild(ajout_case(this.tableau[j].pseudo))
+            tr.appendChild(ajout_case(this.tableau[j].pieces))
+            tr.appendChild(ajout_case(this.tableau[j].chrono))
+
             let replay = document.createElement('td');
             tr.appendChild(replay);
             let replay_bouton = document.createElement("BUTTON");
@@ -75,8 +79,9 @@ let Menu = (function(){
             zone_texte.appendChild(t);   
             replay_bouton.appendChild(zone_texte);   
             replay.appendChild(replay_bouton);
-            replay_bouton.addEventListener("click", event=> console.log("test"));
+            replay_bouton.addEventListener("click", function(){window.location.href = "jeu?replay=" + String(j)});
         },
+        //cree une nouvelle page pour le tableau de scores ( pas plus de 6 scores par pages)
         AjoutTableauScore : (i_suplementaire) =>{
             if(i+i_suplementaire < this.tableau.length && i+i_suplementaire > -1){
                 i += i_suplementaire;
@@ -85,7 +90,7 @@ let Menu = (function(){
                 }
                 for(let j = i; j < i + Math.abs(i_suplementaire); j++){
                     if(j < this.tableau.length){
-                        Menu.AjoutScore(this.tableau[j].pseudo, this.tableau[j].pieces, this.tableau[j].chrono);
+                        Menu.AjoutScore(j);
                     }
                 }
             }

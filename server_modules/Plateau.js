@@ -25,27 +25,27 @@ class Plateau{
                              // correctement et ainsi éviter les problèmes liés aux fonctions de déplacement qui sont
                              // executées lorsque l'on est sur la page 
                              // (sinon lors de la prise d'une pièce il arrive que la pièce déplacée soit supprimée également..)
-        for(let j=0; j<2; j++){
-            for(let i=0; i<8; i++) {
-                this.board[i][1 + (j*5)].piece = new Pion(j, i, 1 + (j*5), idGeneration); 
-                idGeneration++;
-            }
-            for(let i=0; i<2; i++) {
-                this.board[i*7][j*7].piece = new Tour(j, i*7, j*7, idGeneration);
-                idGeneration++;
-            }
-            for(let i=0; i<2; i++) {
-                this.board[1 + (i*5)][j*7].piece = new Cavalier(j, 1 + (i*5), j*7, idGeneration); 
-                idGeneration++;
-            }
-            for(let i=0; i<2; i++) {
-                this.board[2 + (i*3)][j*7].piece = new Fou(j, 2+ (i*3), j*7, idGeneration); 
-                idGeneration++;
-            }
-            this.board[4][j*7].piece = new Reine(j, 4, j*7, idGeneration); 
-            idGeneration++;
-            this.board[3][j*7].piece = new Roi(j, 3, j*7, idGeneration); 
-            idGeneration++;
+        for(let j=0; j<2; j++){                                                                    //
+            for(let i=0; i<8; i++) {                                                               //
+                this.board[i][1 + (j*5)].piece = new Pion(j, i, 1 + (j*5), idGeneration);          //
+                idGeneration++;                                                                    //
+            }                                                                                      //
+            for(let i=0; i<2; i++) {                                                               //
+                this.board[i*7][j*7].piece = new Tour(j, i*7, j*7, idGeneration);                  //
+                idGeneration++;                                                                    //
+            }                                                                                      //
+            for(let i=0; i<2; i++) {                                                               // On créé chaque pieces pour chaque joueurs avec 
+                this.board[1 + (i*5)][j*7].piece = new Cavalier(j, 1 + (i*5), j*7, idGeneration);  // leur couleur,
+                idGeneration++;                                                                    // leurs positions,
+            }                                                                                      // et leur ID
+            for(let i=0; i<2; i++) {                                                               //
+                this.board[2 + (i*3)][j*7].piece = new Fou(j, 2+ (i*3), j*7, idGeneration);        //
+                idGeneration++;                                                                    //
+            }                                                                                      //
+            this.board[4][j*7].piece = new Reine(j, 4, j*7, idGeneration);                         //
+            idGeneration++;                                                                        //
+            this.board[3][j*7].piece = new Roi(j, 3, j*7, idGeneration);                           //
+            idGeneration++;                                                                        //
         }
 
         this.Joueurs = new Array()
@@ -63,8 +63,6 @@ class Plateau{
     getBoard(x,y){
         if(this.isInBoard(x,y)) return this.board[x][y];
         else return new Case(); 
-        // Gestion de l'erreur a faire en fonction de l'utilisation, Case en attendant pour eviter l'erreur
-        //<---------------------------------------------------------------------------------------------------------------------
     }
     
     //Méthode de vérification pour la présence de pièce (2 méthodes par rapport à la gestion d'erreur)
@@ -91,29 +89,27 @@ class Plateau{
                 if(this.board[x][y].piece.couleur == piece.couleur) return;
             }
             if(!this.check_echec(x,y,piece)) this.board[x][y].playable = true; 
-            // erreur a afficher sinon ? (ex:en rouge au lieu de vert)
-            // A voir <------------------------------------------------------------------------------------------------
         }
     }
 
-
+// méthodes de jeu pour bouger et manger des pièces
     jouer(x, y, piece){
-        this.supprimer(x, y)
+        this.supprimer(x, y) // on mange la case d'arrivé au cas où il y a une pièce
         
-        piece.deplacements.push({x:x, y:y});
+        piece.deplacements.push({x:x, y:y}); // on enregistre le déplacement
 
-        this.board[piece.x][piece.y].piece=0; //rajouter dans une methode ? <---------------------------------------------
-        piece.x = x
+        this.board[piece.x][piece.y].piece=0;
+        piece.x = x                           // on bouge la piece coté piece et on la supprime sur le plateau
         piece.y = y
 
-        this.coups.push(piece)
+        this.coups.push(piece)               // on enregistre le coup
 
-        this.board[x][y].piece = piece
+        this.board[x][y].piece = piece       // on met la piece sur sa destination
 
-        this.Nbtour++;
+        this.Nbtour++;                       // on augmente le nombre de tour
 
-        this.select = {x:-1, y:-1};
-        this.reset_playable(); // Vérifier que l'on ne répète pas ça <-----------------------------------------------------
+        this.select = {x:-1, y:-1};          // on de-selectione la piece jouée
+        this.reset_playable();
     }
     supprimer(x,y){
         if(this.check_piece(x, y)){
@@ -124,15 +120,16 @@ class Plateau{
         }
     }
 
+    // Méthode d'évaluation du mat
     echecEtMat(couleur){
-        if(this.board[this.Joueurs[couleur].roi.x][this.Joueurs[couleur].roi.y].piece.echec(this)){
-            for(let j = 0; j < 8; j++){
-                for(let k = 0; k < 8; k++){
+        if(this.board[this.Joueurs[couleur].roi.x][this.Joueurs[couleur].roi.y].piece.echec(this)){ // si le roi est en échec
+            for(let j = 0; j < 8; j++){       
+                for(let k = 0; k < 8; k++){                           // on cherche des pieces de notre couleur
                     if(this.board[j][k].piece.couleur == couleur){
                         this.board[j][k].piece.playable(this);
-                        for(let l = 0; l < 8; l++){
-                            for(let m = 0; m < 8; m++){
-                                if(this.board[l][m].playable){
+                        for(let l = 0; l < 8; l++){                   // si aucune ne peu bouger alors on est mat
+                            for(let m = 0; m < 8; m++){               // car la méthode playable() ne retourne rien 
+                                if(this.board[l][m].playable){        // si le roi est en échec et que le piece ne peut pas aider
                                     return false;
                                 }
                             }
@@ -146,7 +143,7 @@ class Plateau{
     }
 
     
-    check_echec(x, y, piece){ 
+    check_echec(x, y, piece){ // on vérifie qu'un coup ne met pas notre roi en echec
 
         //Clone par copie, plus long a executer mais plus simple à comprendre
 
@@ -156,7 +153,8 @@ class Plateau{
         if(tmpPlateau.board[tmpPlateau.Joueurs[piece.couleur].roi.x][tmpPlateau.Joueurs[piece.couleur].roi.y].piece.echec(tmpPlateau)) return true;
         return false;
     }
-    clone(){
+    clone(){ // on copie le plateau pour effectuer le coup virtuelement pour le test check_echec()
+             // notre IA est recursive donc pour éviter de chambouler le jeu, pour chaque test on clone le plateau
         let tmp = new Plateau();
 
         tmp.Nbtour = this.Nbtour;
@@ -175,19 +173,20 @@ class Plateau{
 
         return tmp;
 
-        //Ancienne méthode de clone, non conservée car inutile
-
-        //for(let i=0; i<this.Joueurs.length; i++){
-        //    tmp.Joueurs.push(this.Joueurs[i].clone())
-        //}
-        //for(let i=0; i<this.coups.length; i++){
-        //    if(typeof(this.coups[i])=='String') tmp.coups.push(this.coups[i])
-        //    else tmp.coups.push(this.coups[i].clone())
-        //}
-        //tmp.select.x = this.select.x
-        //tmp.select.y = this.select.y
 
     }
+}
+        // Ancienne méthode de clone, non conservée car inutile
+
+        // for(let i=0; i<this.Joueurs.length; i++){
+        //    tmp.Joueurs.push(this.Joueurs[i].clone())
+        // }
+        // for(let i=0; i<this.coups.length; i++){
+        //    if(typeof(this.coups[i])=='String') tmp.coups.push(this.coups[i])
+        //    else tmp.coups.push(this.coups[i].clone())
+        // }
+        // tmp.select.x = this.select.x
+        // tmp.select.y = this.select.y
 
         /*
 
@@ -252,42 +251,41 @@ class Plateau{
         return tmpbool;     
         */
        
-    //Fonctions utilisées pour l'ancien check echec :
-    /*
-    cancel_jouer(x,y){
-        this.Nbtour--;
+        //Fonctions utilisées pour l'ancien check echec :
+        /*
+        cancel_jouer(x,y){
+            this.Nbtour--;
 
-        this.coups[this.Nbtour].x = this.coups[this.Nbtour].deplacements[this.coups[this.Nbtour].deplacements.length-2].x
-        this.coups[this.Nbtour].y = this.coups[this.Nbtour].deplacements[this.coups[this.Nbtour].deplacements.length-2].y
-        this.coups[this.Nbtour].deplacements.splice(this.coups[this.Nbtour].deplacements.length - 1, 1);
-        
+            this.coups[this.Nbtour].x = this.coups[this.Nbtour].deplacements[this.coups[this.Nbtour].deplacements.length-2].x
+            this.coups[this.Nbtour].y = this.coups[this.Nbtour].deplacements[this.coups[this.Nbtour].deplacements.length-2].y
+            this.coups[this.Nbtour].deplacements.splice(this.coups[this.Nbtour].deplacements.length - 1, 1);
+            
 
-        if(this.coups[this.Nbtour].nom=="Roi"){
-            this.Joueurs[this.coups[this.Nbtour].couleur].roi.x = this.coups[this.Nbtour].x;
-            this.Joueurs[this.coups[this.Nbtour].couleur].roi.y = this.coups[this.Nbtour].y;
+            if(this.coups[this.Nbtour].nom=="Roi"){
+                this.Joueurs[this.coups[this.Nbtour].couleur].roi.x = this.coups[this.Nbtour].x;
+                this.Joueurs[this.coups[this.Nbtour].couleur].roi.y = this.coups[this.Nbtour].y;
+            }
+
+
+            this.board[this.coups[this.Nbtour].x][this.coups[this.Nbtour].y].piece=this.coups[this.Nbtour]; 
+            this.board[x][y].piece = 0
+
+            this.cancel_supprimer(this.Nbtour, (this.coups[this.Nbtour].couleur+1)%2)
+            this.coups.splice(this.coups, 1)
         }
-
-
-        this.board[this.coups[this.Nbtour].x][this.coups[this.Nbtour].y].piece=this.coups[this.Nbtour]; 
-        this.board[x][y].piece = 0
-
-        this.cancel_supprimer(this.Nbtour, (this.coups[this.Nbtour].couleur+1)%2)
-        this.coups.splice(this.coups, 1)
-    }
-    cancel_supprimer(Nbtour, couleur){ // en fonction du nombre de tour pour la prise en passant..
-        if(this.Joueurs[couleur].pieces_prises.length > 0){
-            let x = this.Joueurs[couleur].pieces_prises[this.Joueurs[couleur].pieces_prises.length - 1].piece.x
-            let y = this.Joueurs[couleur].pieces_prises[this.Joueurs[couleur].pieces_prises.length - 1].piece.y
-            let piece = this.Joueurs[couleur].pieces_prises[this.Joueurs[couleur].pieces_prises.length - 1].piece
-            if(this.Joueurs[couleur].pieces_prises[this.Joueurs[couleur].pieces_prises.length - 1].Nbtour == Nbtour){
-                // si le bon tour
-                this.Joueurs[couleur].pieces++;
-                this.board[x][y].piece = piece;
+        cancel_supprimer(Nbtour, couleur){ // en fonction du nombre de tour pour la prise en passant..
+            if(this.Joueurs[couleur].pieces_prises.length > 0){
+                let x = this.Joueurs[couleur].pieces_prises[this.Joueurs[couleur].pieces_prises.length - 1].piece.x
+                let y = this.Joueurs[couleur].pieces_prises[this.Joueurs[couleur].pieces_prises.length - 1].piece.y
+                let piece = this.Joueurs[couleur].pieces_prises[this.Joueurs[couleur].pieces_prises.length - 1].piece
+                if(this.Joueurs[couleur].pieces_prises[this.Joueurs[couleur].pieces_prises.length - 1].Nbtour == Nbtour){
+                    // si le bon tour
+                    this.Joueurs[couleur].pieces++;
+                    this.board[x][y].piece = piece;
+                }
             }
         }
-    }
-    */
-}
+        */
 
 
 module.exports = Plateau;

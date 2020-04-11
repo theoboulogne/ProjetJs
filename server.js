@@ -202,6 +202,7 @@ io.sockets.on('connection',  (socket) =>{
             // else {
             //     console.log('Valeur Joueur : ' + String(IA.testcoup(game.echiquiers[indiceEchiquier], game.echiquiers[indiceEchiquier].board[deplacement.piece.x][deplacement.piece.y].piece, deplacement.x, deplacement.y)))
             // }
+
             //Si son tour ou IA actif et paramètres corrects alors
             if ((((couleurSocket) == (game.echiquiers[indiceEchiquier].Nbtour%2))||(game.echiquiers[indiceEchiquier].ia > 0))&&
                 (deplacement.piece.x == game.echiquiers[indiceEchiquier].select.x) &&

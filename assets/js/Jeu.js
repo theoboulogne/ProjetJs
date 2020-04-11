@@ -8,9 +8,6 @@
 + test difficulte ia avec menu thomas
 + ajouter un delai avant redirection sur les alertes et changer le texte en conséquence
 
-+Options :
-refaire chrono nous meme
-retirer les get param et passer par le serveur uniquement ? voir si c'est faisable avec l'asynchrone
 
 
 A vérifier :
@@ -97,10 +94,10 @@ class Jeu{
 
         socket.on('reset', (echiquierReset, couleurReset) => {
             console.log('Event - reset') // On réinitialise en cas d'incohérence dans les envois au serveur
-            Game.couleur = couleurReset; // Les infos de gestion de jeu
-            Game.echiquier = echiquierReset;
-            Game.rendu.reloadAll(echiquierReset);//Le coté graphique 3D
-            Hud.reloadAll(echiquierReset);//Le coté HUD
+            Game.couleur = couleurReset; // on réinitialise la couleur du joueur
+            Game.echiquier = echiquierReset; // on réinitialise les infos du jeu
+            Game.rendu.reloadAll(echiquierReset); // on réinitialise le coté graphique 3D
+            reloadAll(echiquierReset); // on réinitialise l'interface
         });
 
         socket.on('endGame', (couleurGagnant) => { 
