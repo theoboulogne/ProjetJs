@@ -159,7 +159,7 @@ class RenduThreeJs{
     moveOut(piece) {
         let pieceIdx = this.getPieceIdx(piece)
         if(pieceIdx>-1){
-            let tweenUp = this.Tween(this.piecesObj[pieceIdx], [{Axis:'z', Offset:3}], 1200); 
+            let tweenUp = this.Tween(this.piecesObj[pieceIdx], [{Axis:'z', Offset:3}], 600); 
             tweenUp.start();            // on lève la pièce
 
             let Rendu = this;
@@ -169,11 +169,11 @@ class RenduThreeJs{
                 setTimeout(function(){
                     Rendu.LoadPieceOut(piece, 3);   // on la recharge dans la scene en hauteur pour faire croire qu'on l'a juste déplacée
                     setTimeout(function(){ // on laisse le temps au modèle d'apparaitre
-                        let tweenDown = Rendu.Tween(Rendu.piecesOut[piece.couleur][Rendu.piecesOut[piece.couleur].length-1], [{Axis:'z', Offset:-3}],1200);
+                        let tweenDown = Rendu.Tween(Rendu.piecesOut[piece.couleur][Rendu.piecesOut[piece.couleur].length-1], [{Axis:'z', Offset:-3}],600);
                         tweenDown.start();           // on la fait redescendre sur le coté du plateau*/
-                    }, 50);
+                    }, 100);
                 }, 100);
-            }, 1200);
+            }, 650);
         }
     }
     moveRoque(deplacements) {
@@ -197,7 +197,7 @@ class RenduThreeJs{
                     Rendu.LoadPieces([piece]);
                 }, 100)//On attend légèrement après que la pièce soit supprimée pour éviter de supprimer la nouvelle car elles ont le même id
             }, 800) // on attend que la pièce soit levée
-        }, 1250) // On attend la fin de tout les autres mouvements avant 
+        }, 1500) // On attend la fin de tout les autres mouvements avant 
     }
 
     //Méthodes de suppression de pièce

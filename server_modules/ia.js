@@ -172,6 +172,7 @@ function evaluation_coup(plateau, piece, x, y){ //On effectue le déplacement av
         valeur += AutresPieces.Menace(aTraiter[i], tmpPlateau);
     }
 
+
     //on renvoi la valeur de ce déplacement après avoir calculé l'influence du déplacement sur cette pièce
     return valeur + valeur_ia(tmpPiece, tmpPlateau, piece_prise);
 }
@@ -186,7 +187,6 @@ function valeur_ia(piece, plateau, piecePrise){ //on vient calculer la valeur d'
     valeur += ValeursPiece.Reine(piece)
     valeur += ValeursPiece.Tour(piece)
     valeur += ValeursPiece.Roi(piece)
-
     //On évalue la prise d'une autre pièce si il y a
     valeur += AutresPieces.Prise(piecePrise)
 
@@ -206,7 +206,7 @@ let ValeursPiece = (function(){
     //Fonctions du pion
     let avancement = piece =>{
         if(piece.y == ((piece.couleur+1)%2)*7) return 4 // promotion donc on renvoi une valeur importante
-        else return 0.1*(Math.abs(piece.y-(1+(piece.couleur*5)))); // sinon on augmente la valeur au fur et a mesure de l'avancement
+        else return 0.05*(Math.abs(piece.y-(1+(piece.couleur*5)))); // sinon on augmente la valeur au fur et a mesure de l'avancement
     }
     let direction_libre = (piece, board)=>{
         for(let i=0; i<8; i++){
@@ -237,20 +237,25 @@ let ValeursPiece = (function(){
         Pion:(piece, board)=>{
             if(piece.nom=='Pion'){
                 let valeur = 0;
-                if((piece.x == 0 || piece.x == 7) && piece.y > 1 && piece.y < 6) valeur -= 2 // on baisse la valeur des pions sur les extrémités pour baisser la probabilité de leur utilisation
                 if(checkDeuxièmeLigne(piece)) valeur +=3 // on donne une bonne valeur à la position de départ pour favoriser le déplacement des autres pièces
+                if((piece.x == 0 || piece.x == 7)){return valeur-10} // on baisse la valeur des pions sur les extrémités pour baisser la probabilité de leur utilisation
                 if(piece.x > 2 && piece.x <5){
-                    for(let i=1; i<3; i++) if(piece.y == (piece.couleur * 5) + 1 + (i*Math.pow(-1, piece.couleur))){
+                    if(piece.y == (piece.couleur + 3)){
                         let check = true;
                         for(let j=-1; j<2; j+=2){
-                            if(board[piece.x-1+j][piece.y+Math.pow(-1, piece.couleur)].piece != 0) check = false;
+                            if(board[piece.x+j][piece.y+Math.pow(-1, piece.couleur)].piece != 0){
+                                if(board[piece.x+j][piece.y+Math.pow(-1, piece.couleur)].piece != piece.couleur){
+                                    check = false;
+                                }
+                            }
                         }
-                        if(check) valeur+=3.5 // on favorise le déplacement des pions du milieu pour améliorer la défense
+                        if(check) valeur+=5 // on favorise le déplacement des pions du milieu pour améliorer la défense
+                        else return valeur-10;
                     } 
                 }
-                if(piece.y == (piece.couleur * 3) + 2) for(let i=0; i<4; i+=3) if(piece.x==2+i) valeur+=2.5 // on favorise le déplacement des pion d'une case sur les cotés du milieu pour améliorer la défense des pions centraux
+                if(piece.y == (piece.couleur * 3) + 2) for(let i=0; i<4; i+=3) if(piece.x==2+i) valeur+=4.5 // on favorise le déplacement des pion d'une case sur les cotés du milieu pour améliorer la défense des pions centraux
                 
-                valeur+= avancement(piece);
+                if(!(piece.x == 0 || piece.x == 7)) valeur+= avancement(piece);
                 valeur+= direction_libre(piece, board);
                 return valeur;
             }
@@ -259,15 +264,19 @@ let ValeursPiece = (function(){
         Cavalier:(piece, plateau)=>{
             if(piece.nom=='Cavalier'){
                 let tmpPlateau = plateau.clone(); // copie pour éviter d'influencer le reste des évaluations
-                piece.playable(plateau);
+                piece.playable(tmpPlateau);
                 let compteur = 0;
                 for(let i=0; i<8; i++){//on enregistre toutes les pièces du joueur dans un tableau
                     for(let j=0; j<8; j++){
-                        if(plateau.board[i][j].playable) compteur++;
+                        if(tmpPlateau.board[i][j].playable) compteur++;
                     }
                 }
-                return ((8-compteur)/4) // en fonction du nombre de cases jouables par rapport aux cases jouables max on renvoi une valeur
+                let valeur = ((8-compteur)/4)
+                // en fonction du nombre de cases jouables par rapport aux cases jouables max on renvoi une valeur
                 //on divise par 4 car c'est peu représentatif sachant que si le cavalier protège une pièce alliée la case est définie comme non jouable.
+                if(piece.x == 0 || piece.x == 7) valeur -=2
+                if(piece.y == 0 || piece.y == 7) valeur--
+                return valeur;
             }
             return 0;
         },
@@ -288,15 +297,9 @@ let ValeursPiece = (function(){
         },
         Roi:(piece)=>{
             if(piece.nom=='Roi'){
-                let valeur = 0;
                 if(checkPremiereLigne(piece)){ // valeur pour la dernière ligne
-                    if(piece.x > 4 || piece.x < 3) valeur++;
-                    for(let i=-2; i<5; i+=4) if(piece.x == 3 + i) valeur +=2 // si la position du roque +2 pour le favoriser
+                    for(let i=-2; i<5; i+=4) if(piece.x == 3 + i) return 2 // si la position du roque +3 pour le favoriser
                 }
-                if(checkDeuxièmeLigne(piece)){//valeur pour la ligne juste devant ( pour éviter qu'il enferme son roi en cas d'echec en position de roque)
-                    if(piece.x < 2 || piece.x > 5) valeur += 2
-                }
-                return valeur;
             }
             return 0;
         }

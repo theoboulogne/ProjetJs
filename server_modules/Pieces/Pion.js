@@ -34,9 +34,11 @@ class Pion extends Piece {
                 if(plateau.getBoard(this.x + i,this.y).piece.nom==this.nom){ 
                     if(plateau.getBoard(this.x+i,this.y).piece.deplacements.length == 2 && this.y == plateau.getBoard(this.x+i,this.y).piece.deplacements[1].y){
                         if(Math.abs(plateau.getBoard(this.x+i,this.y).piece.deplacements[1].y-plateau.getBoard(this.x+i,this.y).piece.deplacements[0].y)==2){
-                            if(plateau.isInBoard(this.x + i,this.y+(Math.pow(-1,this.couleur)*(1)))){
-                                if(plateau.check_vide(this.x + i,this.y+(Math.pow(-1,this.couleur)*(1)))){
-                                    plateau.playable(this.x + i,this.y+(Math.pow(-1,this.couleur)*(1)), this)
+                            if(plateau.coups[plateau.coups.length-1].x == this.x+i && plateau.coups[plateau.coups.length-1].y == this.y){
+                                if(plateau.isInBoard(this.x + i,this.y+(Math.pow(-1,this.couleur)*(1)))){
+                                    if(plateau.check_vide(this.x + i,this.y+(Math.pow(-1,this.couleur)*(1)))){
+                                        plateau.playable(this.x + i,this.y+(Math.pow(-1,this.couleur)*(1)), this)
+                                    }
                                 }
                             }
                         }
