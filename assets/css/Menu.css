@@ -34,6 +34,7 @@ margin-top: 2%;
 }
 .piece_formulaire{
     margin-top: 2%;
+    width: 72%;
 }
 .tableau_score{
     margin-left: 5%;
@@ -47,6 +48,8 @@ margin-top: 2%;
 }
 .ia_check{
     margin-top: 3%;
-    background-color:#343A40;
-    width: 16%;
+    width: 72%;
+}
+.pseudo_formulaire{
+    width: 72%;
 }
