@@ -91,6 +91,12 @@ class Jeu{
             Hud.OpenMenu(infos)
         });
 
+        /*socket.on('pat', () => {
+            console.log('Partie terminée')// Fin de partie
+
+            Hud.OpenMenu("Pat !")
+        });*/
+
         socket.on('deconnection', () => {
             console.log('Redirection vers le menu') // car déconnection de l'adversaire
             Hud.OpenMenu("Votre adversaire s'est déconnecté.")

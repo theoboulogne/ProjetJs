@@ -123,26 +123,38 @@ class Plateau{
     // Méthode d'évaluation du mat
     echecEtMat(couleur){
         if(this.board[this.Joueurs[couleur].roi.x][this.Joueurs[couleur].roi.y].piece.echec(this)){ // si le roi est en échec
-            for(let j = 0; j < 8; j++){       
-                for(let k = 0; k < 8; k++){                           // on cherche des pieces de notre couleur
-                    if(this.board[j][k].piece.couleur == couleur){
-                        this.board[j][k].piece.playable(this);
-                        for(let l = 0; l < 8; l++){                   // si aucune ne peu bouger alors on est mat
-                            for(let m = 0; m < 8; m++){               // car la méthode playable() ne retourne rien 
-                                if(this.board[l][m].playable){        // si le roi est en échec et que le piece ne peut pas aider
-                                    return false;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            if(this.estCeQuUnePiecePeutBouger(couleur)) return false; // on regarde si une piece peu bouger
             return true;
         }
         return false;
     }
 
-    
+    pat(couleur){
+        if(this.board[this.Joueurs[couleur].roi.x][this.Joueurs[couleur].roi.y].piece.echec(this)){ // si le roi n'est pas en échec
+            if(this.estCeQuUnePiecePeutBouger(couleur)) return false; // on regarde si une piece peu bouger
+            return true;
+        }
+        return false;
+    }
+
+    estCeQuUnePiecePeutBouger(couleur){
+        for(let i = 0; i < 8; i++){                               // On parcourt le plateau
+            for(let j = 0; j < 8; j++){                           //
+                if(this.board[i][j].piece.couleur == couleur){    // Quand une piece est de la meme couleur que celle demandé
+                    this.board[i][j].piece.playable(this);        // On lui lance sa fonction playable
+                    for(let l = 0; l < 8; l++){                   //
+                        for(let m = 0; m < 8; m++){               //
+                            if(this.board[l][m].playable){        // Si elle peu bouger sur une case 
+                                return true;                      // on s'arrete sinon on continue
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;                                             // si on ne s'est pas arreté alors aucune piece ne peu bouger
+    }
+
     check_echec(x, y, piece){ // on vérifie qu'un coup ne met pas notre roi en echec
 
         //Clone par copie, plus long a executer mais plus simple à comprendre
