@@ -64,6 +64,7 @@ module.exports = {
                 let sql = "SELECT `id`, `pseudo`, `pieces`, `chrono` FROM `scores` LIMIT 100" // On récupère les données, on limite à 100 scores pour 
                 con.query(sql, function (err, result) {     // éviter les problèmes en cas de trop grand nombre d'infos
                     // if (err) throw err;
+                    console.log('Scores envoyés')
                     if (!err) return res.send(result); // on envoi au client
                 });
             }
@@ -82,6 +83,7 @@ module.exports = {
                         let envoi = {};
                         envoi.data = result;
                         envoi.board = tmpPlateau.board;
+                        console.log('Replay envoyé')
                         return res.send(envoi); // on envoi au client
                     }
                 });

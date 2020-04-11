@@ -629,7 +629,7 @@ class RenduThreeJs{
             });  
         })
     }
-
+    
     //Méthode de suppression du rendu
     remove() {
         document.body.removeChild(document.body.lastChild)//on supprime le rendu
