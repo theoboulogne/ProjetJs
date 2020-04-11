@@ -32,16 +32,13 @@ class RenduThreeJs{
         this.controls.enablePan = false; // translation
         this.controls.enableDamping = true; // inertie
 
-        this.controls.enableZoom = true; // paramètres du zoom
-        this.controls.minDistance = 5
-        this.controls.maxDistance = 6
+        this.controls.enableZoom = false; // paramètres du zoom
 
         this.controls.maxPolarAngle = Math.PI/3 // pour laisser la caméra au dessus du plateau
         this.controls.rotateSpeed = 0.4
         this.controls.dampingFactor = 0.1 // on réduit l'inertie pour qu'elle reste cohérente avec la vitesse de rotation réduite
 
         this.controls.mouseButtons = { // on touche pas au click gauche pour éviter les conflits avec le raycast
-            MIDDLE: THREE.MOUSE.DOLLY, // zoom
             RIGHT: THREE.MOUSE.ROTATE // rotation
         }
         this.PositionCamera(couleur); // On positionne la caméra en fonction de la couleur
@@ -150,29 +147,33 @@ class RenduThreeJs{
                 if(deplacements.length == 1) Rendu.movePiece(deplacements[0]); // si pas de roque
                 else Rendu.moveRoque(deplacements);
             }
-        }, 500);
+        }, 100);
     }
     movePiece(deplacement) {
         let pieceIdx = this.getPieceIdx(deplacement.piece)
 
         if(pieceIdx>-1){
             this.animatePiece(this.piecesObj[pieceIdx], deplacement.y-deplacement.piece.y, deplacement.x-deplacement.piece.x);
-        }// Gérer la gestion d'erreur !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        }
     }
     moveOut(piece) {
         let pieceIdx = this.getPieceIdx(piece)
         if(pieceIdx>-1){
-            let tweenUp = this.Tween(this.piecesObj[pieceIdx], [{Axis:'z', Offset:3}], 1200); 
+            let tweenUp = this.Tween(this.piecesObj[pieceIdx], [{Axis:'z', Offset:3}], 600); 
             tweenUp.start();            // on lève la pièce
 
             let Rendu = this;
 
             setTimeout(function(){
                 Rendu.removePiece(pieceIdx);    // on supprime la piece mangé du plateau
-                Rendu.LoadPieceOut(piece, 3);   // on la recharge dans la scene en hauteur pour faire croire qu'on l'a juste déplacée
-                let tweenDown = Rendu.Tween(Rendu.piecesOut[piece.couleur][Rendu.piecesOut[piece.couleur].length-1], [{Axis:'z', Offset:-3}],1200);
-                tweenDown.start();           // on la fait redescendre sur le coté du plateau*/
-            }, 1200);
+                setTimeout(function(){
+                    Rendu.LoadPieceOut(piece, 3);   // on la recharge dans la scene en hauteur pour faire croire qu'on l'a juste déplacée
+                    setTimeout(function(){ // on laisse le temps au modèle d'apparaitre
+                        let tweenDown = Rendu.Tween(Rendu.piecesOut[piece.couleur][Rendu.piecesOut[piece.couleur].length-1], [{Axis:'z', Offset:-3}],600);
+                        tweenDown.start();           // on la fait redescendre sur le coté du plateau*/
+                    }, 100);
+                }, 100);
+            }, 650);
         }
     }
     moveRoque(deplacements) {
@@ -196,7 +197,7 @@ class RenduThreeJs{
                     Rendu.LoadPieces([piece]);
                 }, 100)//On attend légèrement après que la pièce soit supprimée pour éviter de supprimer la nouvelle car elles ont le même id
             }, 800) // on attend que la pièce soit levée
-        }, 1250) // On attend la fin de tout les autres mouvements avant 
+        }, 1500) // On attend la fin de tout les autres mouvements avant 
     }
 
     //Méthodes de suppression de pièce
@@ -415,39 +416,10 @@ class RenduThreeJs{
                 let obj = (this.models[i + (this.info.couleur * couleur * 6)].obj).clone()
                 obj.traverse( function ( child ) {
                     if (child instanceof THREE.Mesh) {
-                        // on définit la couleur
-                        if(couleur) child.material = new THREE.MeshLambertMaterial({color: 0x666666});
-                        else child.material = new THREE.MeshLambertMaterial({color: 0xFFFFFF});
+                        // on définit la couleur ( avec un effet metalisé)
                         
-                        /*
-                        if(couleur) child.material = new THREE.MeshStandardMaterial( {
-
-                            color: 0x555555,
-                        
-                            //roughness: 1,
-                            //metalness: 0.5,
-                        
-                            //roughnessMap: 1,
-                            //metalnessMap: 1,
-                        
-                            //envMap: 1, // important -- especially for metals!
-                            //envMapIntensity: 0.5
-                        
-                        } );
-                        else child.material = new THREE.MeshStandardMaterial( {
-
-                            color: 0xFFFFFF,
-                        
-                            //roughness: 1,
-                            //metalness: 0.5,
-                        
-                            //roughnessMap: 1,
-                            //metalnessMap: 1,
-                        
-                            //envMap: 1, // important -- especially for metals!
-                            //envMapIntensity: 0.5
-                        
-                        } );*/
+                        if(couleur) child.material = new THREE.MeshStandardMaterial({color: 0x808080, metalness: 0.5, roughness: 0.4});
+                        else child.material = new THREE.MeshStandardMaterial({color: 0xFFFFFF, metalness: 0.4, roughness: 0.4});
                     }
                 });
                 //On récupère le bon nom si nécessaire
@@ -500,8 +472,8 @@ class RenduThreeJs{
         obj.traverse( function ( child ) {
             if (child instanceof THREE.Mesh) {
                 // on définit la couleur
-                if(piece.couleur) child.material = new THREE.MeshLambertMaterial({color: 0x555555});
-                else child.material = new THREE.MeshLambertMaterial({color: 0xFFFFFF});
+                if(piece.couleur) child.material = new THREE.MeshStandardMaterial({color: 0x808080, metalness: 0.5, roughness: 0.4});
+                else child.material = new THREE.MeshStandardMaterial({color: 0xFFFFFF, metalness: 0.4, roughness: 0.4});
             }
         });        
         obj.position.set((Math.pow(-1, piece.couleur) * (-1.7 + (0.4 * (this.piecesOut[piece.couleur].length/2)))),
