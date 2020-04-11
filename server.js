@@ -82,21 +82,21 @@ io.sockets.on('connection',  (socket) =>{
     }
 
     //si un paramètre n'est pas définit on redirige au menu (au redémarrage du serveur principalement):
-    if(lastParam == undefined) socket.emit('menu')
+    if(lastParam == undefined || lastParam.ia == undefined) socket.emit('menu')
     else { // sinon on lance la partie
         let pseudo = lastParam.pseudo;
         if(pseudo == "") pseudo = "Karadoc" // pseudo par défault
-        
+
         if(lastParam.ia > 0){
             //Ajout de l'échiquier
             this.echiquiers.push(new Plateau);
             let indiceEchiquier = this.echiquiers.length-1
-            this.echiquiers[indiceEchiquier].ia = lastParam.ia;
-            this.echiquiers[indiceEchiquier].ModeIA = true;
+            this.echiquiers[indiceEchiquier].ia = 1;
+            this.echiquiers[indiceEchiquier].ModeIA = 1;
 
 
             //Gestion de l'ajout de joueur (Blanc toujours contre l'IA pour laisser le temps de charger les modèles)
-            this.echiquiers[indiceEchiquier].Joueurs.push(new Joueur(0, socket.id, pseudo));
+            this.echiquiers[indiceEchiquier].Joueurs.push(new Joueur(0, socket.id, lastParam.pseudo));
             this.echiquiers[indiceEchiquier].Joueurs.push(new Joueur(1, "IA", "Ordinateur"));
             socket.emit('repconnection', 0)
 
@@ -119,7 +119,7 @@ io.sockets.on('connection',  (socket) =>{
             else if(this.echiquiers[this.echiquiers.length-1].Joueurs.length==2) this.echiquiers.push(new Plateau());
 
             //Gestion de l'ajout de joueur      
-            this.echiquiers[this.echiquiers.length-1].Joueurs.push(new Joueur(this.echiquiers[this.echiquiers.length-1].Joueurs.length, socket.id, pseudo));//On définit la couleur avec le nombre de joueur sur le plateau et on rajoute un joueur
+            this.echiquiers[this.echiquiers.length-1].Joueurs.push(new Joueur(this.echiquiers[this.echiquiers.length-1].Joueurs.length, socket.id, lastParam.pseudo));//On définit la couleur avec le nombre de joueur sur le plateau et on rajoute un joueur
             socket.emit('repconnection', game.echiquiers[game.echiquiers.length-1].Joueurs.length-1)// on informe le client que la connection est effectuée et on lui donne sa couleur
 
             //Gestion du lancement de la partie
@@ -187,7 +187,7 @@ io.sockets.on('connection',  (socket) =>{
         if(indiceEchiquier != undefined){
 
             //On vient définir le déplacement de l'IA si nécessaire
-            if((couleurSocket) != (game.echiquiers[indiceEchiquier].Nbtour%2) && game.echiquiers[indiceEchiquier].ia == 1){
+            if((couleurSocket) != (game.echiquiers[indiceEchiquier].Nbtour%2) && game.echiquiers[indiceEchiquier].ia > 0){
                 let moveIA = IA.ia(game.echiquiers[indiceEchiquier], (couleurSocket+1)%2);
                 console.log('Move IA : ')
                 console.log(moveIA)
@@ -202,18 +202,16 @@ io.sockets.on('connection',  (socket) =>{
             // else {
             //     console.log('Valeur Joueur : ' + String(IA.testcoup(game.echiquiers[indiceEchiquier], game.echiquiers[indiceEchiquier].board[deplacement.piece.x][deplacement.piece.y].piece, deplacement.x, deplacement.y)))
             // }
-
             //Si son tour ou IA actif et paramètres corrects alors
-            if (((couleurSocket) == (game.echiquiers[indiceEchiquier].Nbtour%2)||(game.echiquiers[indiceEchiquier].ia == 1))&&
+            if ((((couleurSocket) == (game.echiquiers[indiceEchiquier].Nbtour%2))||(game.echiquiers[indiceEchiquier].ia > 0))&&
                 (deplacement.piece.x == game.echiquiers[indiceEchiquier].select.x) &&
                 (deplacement.piece.y == game.echiquiers[indiceEchiquier].select.y) &&
                 (game.echiquiers[indiceEchiquier].board[deplacement.x][deplacement.y].playable)){
-                
                 //on clone le plateau pour l'envoyer avant le déplacement afin de l'effectuer graphiquement en front
                 let plateau = (game.echiquiers[indiceEchiquier]).clone();
                 if(deplacement.piece.choix != undefined) game.echiquiers[indiceEchiquier].board[deplacement.piece.x][deplacement.piece.y].piece.choix = deplacement.piece.choix;
                 game.echiquiers[indiceEchiquier].board[deplacement.piece.x][deplacement.piece.y].piece.move(deplacement.x,deplacement.y,game.echiquiers[indiceEchiquier])
-
+                
                 if(deplacement.piece.choix != undefined){
                     if(game.echiquiers[indiceEchiquier].board[deplacement.x][deplacement.y].piece.nom == "Pion"&&
                     game.echiquiers[indiceEchiquier].board[deplacement.x][deplacement.y].piece.y == ((game.echiquiers[indiceEchiquier].board[deplacement.x][deplacement.y].piece.couleur + 1) % 2)*7 ){
@@ -228,22 +226,21 @@ io.sockets.on('connection',  (socket) =>{
                     piece_prise = game.echiquiers[indiceEchiquier].Joueurs[((plateau.Nbtour%2)+1)%2].pieces_prises[game.echiquiers[indiceEchiquier].Joueurs[((plateau.Nbtour%2)+1)%2].pieces_prises.length - 1].piece
                 }
                 // On envoi le déplacement a tout le monde
-                for(let i=0; i<(2-game.echiquiers[indiceEchiquier].ia); i++) io.sockets.sockets[game.echiquiers[indiceEchiquier].Joueurs[i].id].emit('move', plateau, deplacement, piece_prise);
+                for(let i=0; i<(2-game.echiquiers[indiceEchiquier].ModeIA); i++) io.sockets.sockets[game.echiquiers[indiceEchiquier].Joueurs[i].id].emit('move', plateau, deplacement, piece_prise);
                 
                 if(game.echiquiers[indiceEchiquier].echecEtMat(((plateau.Nbtour%2)+1)%2)){//Detection fin de partie
                     console.log('Echec et Mat')
                     //Enregistrement du score dans la BDD mysql
                     MYSQL.EnvoiScoreBDD(game.echiquiers[indiceEchiquier], (plateau.Nbtour%2), InfoConnectionBDD);
                     //Envoi de l'event aux client pour rediriger vers le menu
-                    for(let i=0; i<(2-game.echiquiers[indiceEchiquier].ia); i++) io.sockets.sockets[game.echiquiers[indiceEchiquier].Joueurs[i].id].emit('endGame', (plateau.Nbtour%2));
+                    for(let i=0; i<(2-game.echiquiers[indiceEchiquier].ModeIA); i++) io.sockets.sockets[game.echiquiers[indiceEchiquier].Joueurs[i].id].emit('endGame', (plateau.Nbtour%2));
                     //On désactive l'IA au cas où pour éviter que le serveur crash lors d'une victoire
                     game.echiquiers[indiceEchiquier].ia = 0;
                 }
 
-
             }
             else{
-                if(!(game.echiquiers[indiceEchiquier].ModeIA && game.echiquiers[indiceEchiquier].ia == 0)){ // on reset pas si modeIA actif alors que ia désactivée ( fin de partie contre IA )
+                if(!(game.echiquiers[indiceEchiquier].ModeIA && game.echiquiers[indiceEchiquier].ia == 0)){
                     console.log("Réinitialisation d'un client - Move");
                     game.echiquiers[indiceEchiquier].reset_playable(); // on reset les playables avant de l'envoyer
                     game.echiquiers[indiceEchiquier].select = {x:-1, y:-1}; // aussi le select car on est dans l'event move donc il est assigné

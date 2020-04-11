@@ -25,7 +25,7 @@ class Jeu{
         //variable pour éviter de devoir acceder aux paramètres à chaque fois
 
         this.mode = 0
-        if(getParams(window.location.href).ia!=undefined) this.mode = 1;
+        if(getParams(window.location.href).ia>0) this.mode = 1;
 
         
     
