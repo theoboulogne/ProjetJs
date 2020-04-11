@@ -16,7 +16,7 @@ module.exports = {
             if (!err){
                 console.log("Connecté à la mysql !");
                 let sql = "SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'echecs' AND TABLE_NAME = 'scores'";
-                con.query(sql, function (err, result) {
+                con.query(sql, function (err, result) { // on effectue la requete pour regarder si la table echecs existe
                     // if (err) throw err;
                     if (!err){
                         if(!result.length){ // si la table n'est pas présente alors on la crée
@@ -40,7 +40,7 @@ module.exports = {
                 console.log("Connecté à la mysql !");
                 let sql = "INSERT INTO `scores`(`pseudo`, `pieces`, `chrono`, `gagnant`, `coups`, `pieces_prises_blanc`, `pieces_prises_noir`) VALUES ( ?, ?, ?, ?, ?, ?, ?)" 
                 //On insère les données demandées par l'énoncé
-                //On insère également la partie en entier afin de pouvoir la replay auto
+                //On insère également certaines infos de la partie afin de pouvoir la replay auto
                 con.query(sql, [plateau.Joueurs[couleurJoueur].pseudo, 
                                 String(16 - plateau.Joueurs[(couleurJoueur+1)%2].pieces_prises.length), 
                                 (plateau.chrono.CalcChrono()),
@@ -64,7 +64,7 @@ module.exports = {
                 let sql = "SELECT `id`, `pseudo`, `pieces`, `chrono` FROM `scores` LIMIT 100" // On récupère les données, on limite à 100 scores pour 
                 con.query(sql, function (err, result) {     // éviter les problèmes en cas de trop grand nombre d'infos
                     // if (err) throw err;
-                    if (!err) return res.send(result);
+                    if (!err) return res.send(result); // on envoi au client
                 });
             }
         });
@@ -76,13 +76,13 @@ module.exports = {
             if (!err){
                 console.log("Connecté à la mysql !");
                 let sql = "SELECT `gagnant`, `coups`, `pieces_prises_blanc`, `pieces_prises_noir` FROM `scores` WHERE `id`="+String(idreplay)+" LIMIT 1" // On récupère les données
-                con.query(sql, function (err, result) {     // éviter les problèmes en cas de trop grand nombre d'infos
+                con.query(sql, function (err, result) { 
                     // if (err) throw err;
                     if (!err){
                         let envoi = {};
                         envoi.data = result;
                         envoi.board = tmpPlateau.board;
-                        return res.send(envoi);
+                        return res.send(envoi); // on envoi au client
                     }
                 });
             }

@@ -39,6 +39,10 @@ app.get("/jeu/replay", function(req,res){
     }
 });
 
+// On garde uniquement le code de gestion des events dans le fichier server car on doit effectuer des envois et donc
+// accéder à io.sockets par moment
+
+
 //On stocke dans une variable tampon les paramètre du dernier client car on y accède uniquement depuis le app.get de /jeu
 let lastParam = undefined; // on utilise des paramètre au lieu d'un envoi au serveur car certaines informations sont nécessaire à l'initialisation client
 //On enregistre nos plateaux et nos joueurs avec leur socket
@@ -105,7 +109,7 @@ io.sockets.on('connection',  (socket) =>{
     //Définition des envois au serveur pour la partie
     socket.on('playable', (piece)=> {
         console.log("Génération des coups possibles")
-        let tmp = GET.Indice(game.echiquiers);
+        let tmp = GET.Indice(game.echiquiers, socket.id);
         let indiceEchiquier = tmp[0];
         let couleurSocket = tmp[1];
         
@@ -118,19 +122,19 @@ io.sockets.on('connection',  (socket) =>{
                 couleurSocket == game.echiquiers[indiceEchiquier].board[piece.x][piece.y].piece.couleur
                 ){ // si son tour et pas d'erreur
                 
-                game.echiquiers[indiceEchiquier].reset_playable();
+                game.echiquiers[indiceEchiquier].reset_playable(); // on génère les coups jouables
                 game.echiquiers[indiceEchiquier].board[piece.x][piece.y].piece.playable(game.echiquiers[indiceEchiquier]);
                 for(let i = 0; i < 8; i++){
-                    for(let j = 0; j < 8; j++){
+                    for(let j = 0; j < 8; j++){ // on vérifie qu'il y a bien un coup jouable car sinon on reset la piece selectionné
                         if(game.echiquiers[indiceEchiquier].board[i][j].playable) {
                             game.echiquiers[indiceEchiquier].select = {x:piece.x, y:piece.y};
                         }
                     }
                 }
-                socket.emit('playable', game.echiquiers[indiceEchiquier]);
+                socket.emit('playable', game.echiquiers[indiceEchiquier]); // on envoi au client
             }
             else {
-                console.log("Réinitialisation d'un client - Playable");
+                console.log("Réinitialisation d'un client - Playable"); // reset en cas d'erreur
                 game.echiquiers[indiceEchiquier].reset_playable(); // on reset les playables avant de l'envoyer
                 socket.emit('reset', game.echiquiers[indiceEchiquier], couleurSocket);
             }
@@ -139,7 +143,7 @@ io.sockets.on('connection',  (socket) =>{
 
     socket.on('move', (deplacement)=> {
         console.log("Déplacement de pièce")
-        let tmp = GET.Indice(game.echiquiers);
+        let tmp = GET.Indice(game.echiquiers, socket.id);
         let indiceEchiquier = tmp[0];
         let couleurSocket = tmp[1];
 
@@ -147,16 +151,10 @@ io.sockets.on('connection',  (socket) =>{
 
             //On vient définir le déplacement de l'IA si nécessaire
             if((couleurSocket) != (game.echiquiers[indiceEchiquier].Nbtour%2) && game.echiquiers[indiceEchiquier].ia > 0){
-                let moveIA = IA.ia(game.echiquiers[indiceEchiquier], (couleurSocket+1)%2);
-                console.log('Move IA : ')
-                console.log(moveIA)
-                game.echiquiers[indiceEchiquier].select.x = moveIA.piece.x
-                game.echiquiers[indiceEchiquier].select.y = moveIA.piece.y
-                deplacement.piece = JSON.parse(JSON.stringify(moveIA.piece))
-                deplacement.x = moveIA.Coo.x
-                deplacement.y = moveIA.Coo.y
+                deplacement = IA.ia(game.echiquiers[indiceEchiquier], (couleurSocket+1)%2);
+                game.echiquiers[indiceEchiquier].select.x = deplacement.piece.x
+                game.echiquiers[indiceEchiquier].select.y = deplacement.piece.y
                 game.echiquiers[indiceEchiquier].board[deplacement.x][deplacement.y].playable = true;
-                if(deplacement.piece.nom == "Pion" && (deplacement.y == 0 || deplacement.y == 7)) deplacement.piece.choix = "Reine" // en cas de promotion on choisi toujours la reine pour l'ia
             }
             // else {
             //     console.log('Valeur Joueur : ' + String(IA.testcoup(game.echiquiers[indiceEchiquier], game.echiquiers[indiceEchiquier].board[deplacement.piece.x][deplacement.piece.y].piece, deplacement.x, deplacement.y)))
@@ -210,7 +208,7 @@ io.sockets.on('connection',  (socket) =>{
     });
     socket.on('disconnect', ()=>{ // si le joueur demande une déconnection
         console.log("Déconnection d'un joueur")
-        let tmp = GET.Indice(game.echiquiers);
+        let tmp = GET.Indice(game.echiquiers, socket.id);
         let indiceEchiquier = tmp[0];
 
         if(indiceEchiquier != undefined) { // si le plateau existe toujours alors on redirige

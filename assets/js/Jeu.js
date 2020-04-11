@@ -1,30 +1,12 @@
-
-
-/*TO-DO :
-
-+ methode pour indiceechiquier/couleursocket
-
-+Options :
-refaire chrono nous meme
-retirer les get param et passer par le serveur uniquement ? voir si c'est faisable avec l'asynchrone
-
-
-A vérifier :
-récupération du plateau nécessaire au debut de move ????
-*/
-
-
 class Jeu{
     constructor(){
         let Game = this; // pour accéder depuis les fonctions
+
         //On regarde si le mode IA est enclenché et si oui on le définit dans une 
         //variable pour éviter de devoir acceder aux paramètres à chaque fois
-
         this.mode = 0
-        if(getParams(window.location.href).ia>0) this.mode = 1;
-
-        
-    
+        if(getParams(window.location.href).ia>0) this.mode = 1; 
+        // pas mode=param directement pour permettre le lancement sans parametre ia
 
         //connection au serveur
         const socket = io.connect('http://localhost:800');
@@ -34,7 +16,7 @@ class Jeu{
             Game.couleur = couleur;//on stocke la couleur du joueur
             if(Game.rendu != undefined) Game.rendu.remove(); //On retire le renderer du DOM + infos des modèles pour reset proprement en cas de reset du serveur sans redirection
             Game.rendu = new RenduThreeJs(couleur); // on lance l'affichage graphique (uniquement le board pour le moment pour signaler l'attente)
-            Hud.OpenAttente();
+            Hud.OpenAttente(); // On ouvre la 'page' d'attente d'un adversaire
         });
 
         socket.on('start', (plateau) => {
@@ -47,7 +29,7 @@ class Jeu{
                     Game.rendu.loadBoardPieces(Game.echiquier.board); // On charge les pièces
                     document.getElementById('RenduThreeJs').addEventListener("click", function(){onClick(event, Game, socket)}, false); // On active les events
                     Hud.Affichage_AquiDejouer(0) // On affiche c'est à qui de jouer
-                    Hud.CloseAttente();
+                    Hud.CloseAttente();// On ferme la 'page' d'attente
                 }
             }, 100);
         });
@@ -72,16 +54,16 @@ class Jeu{
                     Game.rendu.movePieces(JSON.parse(JSON.stringify(deplacements))); 
                 }, 750);
             }
-            else Game.rendu.movePieces(JSON.parse(JSON.stringify(deplacements))); 
+            else Game.rendu.movePieces(JSON.parse(JSON.stringify(deplacements))); // sinon on attend pas avant
             // on lance le déplacement de la ou des pièces en cas de roque
-            // on effectue une copie du déplacement car le déplacement est asynchrone et que l'on veut garder les bonnes infos
+            // on effectue une copie du déplacement car le déplacement est asynchrone et que l'on veut garder les bonnes infos lors du déplacement
 
-            Game.Move(deplacements, piece_prise);
+            Game.Move(deplacements, piece_prise); // On déplace la pièce dans le tableau de jeu
 
             //Détermination de la promotion de pion
             if(deplacement.piece.nom == "Pion" && ((deplacement.piece.couleur + 1) % 2)*7 == deplacement.y){
                 if(deplacement.piece.choix != undefined){
-                    Game.echiquier.board[deplacement.x][deplacement.y].piece.nom = deplacement.piece.choix;
+                    Game.echiquier.board[deplacement.x][deplacement.y].piece.nom = deplacement.piece.choix; // On fait la promotion au niveau du jeu
                     Game.rendu.switchPawn(Game.echiquier.board[deplacement.x][deplacement.y].piece)//Lancement de la promotion graphiquement
                 }
             }
@@ -115,7 +97,7 @@ class Jeu{
         });
         
         socket.on('menu', () => {
-            console.log('Redirection vers le menu') // manque de paramètres
+            console.log('Redirection vers le menu') // manque de paramètres ou redémarrage du serveur
             Hud.OpenMenu('Il y a au moins un paramètre manquant..')
         });
     }
@@ -153,10 +135,10 @@ class Jeu{
 
 (function() {
     let game;
-    if(getParams(window.location.href).replay!=undefined){
+    if(getParams(window.location.href).replay!=undefined){ //Si le mode replay est demandé on le lance
         let Rendu = new RenduThreeJs(0);
         Rendu.replay();
     }
-    else game = new Jeu();
+    else game = new Jeu();//sinon on lance le jeu normal
 })();
 
