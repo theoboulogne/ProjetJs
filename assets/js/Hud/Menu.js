@@ -42,13 +42,8 @@ let Menu = (function(){
             event.preventDefault();
             let pseudo = document.getElementById("pseudo").value;
             let affichage = document.getElementById("pieces_choix").value;
-            let IA_check = document.getElementsByName("ia")[0].checked;
-            if(IA_check){
-                window.location.href = "jeu?pseudo=" + pseudo + "&affichage=" + affichage + "&ia=1"
-            }
-            else{
-                window.location.href = "jeu?pseudo=" + pseudo + "&affichage=" + affichage
-            }
+            let ia = document.getElementById("ia").value;
+            window.location.href = "jeu?pseudo=" + pseudo + "&affichage=" + affichage + "&ia=" + ia;
         },
         setScores : (tab) => {
             this.tableau = tab;
