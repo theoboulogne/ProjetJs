@@ -3,7 +3,9 @@
 /*TO-DO :
 
 + methode pour indiceechiquier/couleursocket
-
++ arreter de crash qd pas de BDD
++ deplacer toutes les requetes sql en methode avec res en argument
++ test difficulte ia avec menu thomas
 
 
 A vérifier :

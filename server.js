@@ -82,19 +82,21 @@ io.sockets.on('connection',  (socket) =>{
     }
 
     //si un paramètre n'est pas définit on redirige au menu (au redémarrage du serveur principalement):
-    if(lastParam == undefined || lastParam.pseudo == "") socket.emit('menu')
+    if(lastParam == undefined) socket.emit('menu')
     else { // sinon on lance la partie
-
-        if(lastParam.ia == 1){
+        let pseudo = lastParam.pseudo;
+        if(pseudo == "") pseudo = "Karadoc" // pseudo par défault
+        
+        if(lastParam.ia > 0){
             //Ajout de l'échiquier
             this.echiquiers.push(new Plateau);
             let indiceEchiquier = this.echiquiers.length-1
-            this.echiquiers[indiceEchiquier].ia = 1;
+            this.echiquiers[indiceEchiquier].ia = lastParam.ia;
             this.echiquiers[indiceEchiquier].ModeIA = true;
 
 
             //Gestion de l'ajout de joueur (Blanc toujours contre l'IA pour laisser le temps de charger les modèles)
-            this.echiquiers[indiceEchiquier].Joueurs.push(new Joueur(0, socket.id, lastParam.pseudo));
+            this.echiquiers[indiceEchiquier].Joueurs.push(new Joueur(0, socket.id, pseudo));
             this.echiquiers[indiceEchiquier].Joueurs.push(new Joueur(1, "IA", "Ordinateur"));
             socket.emit('repconnection', 0)
 
@@ -117,7 +119,7 @@ io.sockets.on('connection',  (socket) =>{
             else if(this.echiquiers[this.echiquiers.length-1].Joueurs.length==2) this.echiquiers.push(new Plateau());
 
             //Gestion de l'ajout de joueur      
-            this.echiquiers[this.echiquiers.length-1].Joueurs.push(new Joueur(this.echiquiers[this.echiquiers.length-1].Joueurs.length, socket.id, lastParam.pseudo));//On définit la couleur avec le nombre de joueur sur le plateau et on rajoute un joueur
+            this.echiquiers[this.echiquiers.length-1].Joueurs.push(new Joueur(this.echiquiers[this.echiquiers.length-1].Joueurs.length, socket.id, pseudo));//On définit la couleur avec le nombre de joueur sur le plateau et on rajoute un joueur
             socket.emit('repconnection', game.echiquiers[game.echiquiers.length-1].Joueurs.length-1)// on informe le client que la connection est effectuée et on lui donne sa couleur
 
             //Gestion du lancement de la partie
