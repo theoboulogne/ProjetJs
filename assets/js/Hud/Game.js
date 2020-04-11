@@ -1,32 +1,6 @@
-/*document.getElementById('pieces').innerHTML = "";
-for(let i = 0; i < test.length; i++){
-    let img = document.createElement("img");
-    img.src = "../textures/piece-chess/"+test[i]+".png";
-    let src = document.getElementById("pieces");
-    src.appendChild(img);
-    img.className = "image";
-}*/
-
-
-
-//coups = new Array()
-//coups.push('B8')
 let Nbtour = 0;
 let Hud = (function(){
     return{
-        reloadAll:(plateau)=>{
-            let elem = document.getElementById('Affichage_coups');
-            while(elem != undefined){
-                elem.parentNode.removeChild(elem);
-                elem = document.getElementById('Affichage_coups');
-            }
-            for(let i=0; i<plateau.coups.length; i++){
-                this.Affichage_coups(plateau.coups[i], i);
-            }
-            this.Affichage_AquiDejouer(plateau.Nbtour)
-            //this.Affichage_SetChrono(plateau.chrono.Chrono) 
-            //On ne reset pas le chrono pour éviter de devoir le réactualiser inutilement coté serveur
-        },
         OpenAttente:()=>{
             $("#attente").modal({
                 escapeClose: false,
@@ -44,12 +18,18 @@ let Hud = (function(){
             $('#popup').on($.modal.BEFORE_CLOSE, function(event, modal) {
                 window.location.href = "./"
             });
+            setTimeout(function(){ // on redirige au bout de 5 secondes
+                window.location.href = "./"
+            }, 5000);
         },
+        //fonction permettant d'afficher les positions des couts joués dans l'endroit prevu a cet effets
         Affichage_coups : (coupTour, Nbtour) => { 
+            //donne tous les atribut necessaire a l'ecriture de ce couts
             let div;
             let coup = document.createElement("h2");
             coup.setAttribute("class","ecriture_coups");
             coup.setAttribute("id", "Affichage_coups")
+            //choisit dans quelle colone mettre
             if(Nbtour % 2 == 0){
                 div = document.getElementById("coups_blanc");
             }
@@ -66,32 +46,33 @@ let Hud = (function(){
                 coupString += String(1+piece.y)
             }
 
-            var texte = document.createTextNode(coupString);
+            let texte = document.createTextNode(coupString);
             div.append(coup);
             coup.appendChild(texte);
-            var x = div.childElementCount; 
+            let x = div.childElementCount; 
         },
-
+        //affichages a qui c'est de jouer dans la case prevu a cette effet
         Affichage_AquiDejouer : (Nbtour) => {
-            document.getElementById("AquiDejouer").innerHTML = "";
-            let div = document.getElementById("AquiDejouer");
-            let cout = document.createElement("h1");
-            cout.setAttribute("class","ecriture_titre");
+            let span = document.getElementById("AquiDejouer");
+            let texte;
             if(Nbtour % 2 == 0){
-                var texte = document.createTextNode("C'est aux blancs de jouer !");
+                texte = "blancs";
             }
             if(Nbtour % 2 == 1){
-                var texte = document.createTextNode("C'est aux noirs de jouer !");
+                texte = "noirs";
             }
-            div.append(cout);
-            cout.appendChild(texte);
+            span.innerHTML = texte;
         },
+        //lorsque un piont arrive au bout du plateau, je joueur a le choix de changer ce point
+        //affiche la demande "quelle pieces choisir ?"
         choix_piece : (piece) =>{
+            //affiche le modal ecrit en html
             $("#choix_piece").modal({
                 escapeClose: false,
                 clickClose: false,
                 showClose: false
             });
+            //affiche les 4 choix
             let reine = document.getElementById("bouton_reine");
             let fou = document.getElementById("bouton_fou");
             let cheval = document.getElementById("bouton_chevalier");
@@ -101,63 +82,18 @@ let Hud = (function(){
             cheval.addEventListener("click",event => piece.choix = "Cavalier");
             tour.addEventListener("click",event => piece.choix = "Tour");
         }
-        /*Message_Alerte : (texte)=>{
-            alert(texte);
-            while(!confirm(texte)){}
-            window.location.href = "./";
-        }*/
     }
 })();
-/*
-Hud.Affichage_coups(coups,Nbtour);
-Hud.Affichage_AquiDejouer(Nbtour);
 
-
-coups.push('C3')
-Nbtour = 1;
-Hud.Affichage_coups(coups,Nbtour);
-
-coups.push('C6')
-Nbtour = 2;
-Hud.Affichage_coups(coups,Nbtour);
-
-coups.push('C3')
-Nbtour = 1;
-Hud.Affichage_coups(coups,Nbtour);
-
-coups.push('C6')
-Nbtour = 2;
-Hud.Affichage_coups(coups,Nbtour);
-
-coups.push('C3')
-Nbtour = 1;
-Hud.Affichage_coups(coups,Nbtour);
-
-coups.push('C6')
-Nbtour = 2;
-Hud.Affichage_coups(coups,Nbtour);
-
-coups.push('C3')
-Nbtour = 1;
-Hud.Affichage_coups(coups,Nbtour);
-
-coups.push('C6')
-Nbtour = 2;
-Hud.Affichage_coups(coups,Nbtour);
-
-coups.push('C3')
-Nbtour = 1;
-Hud.Affichage_coups(coups,Nbtour);
-
-coups.push('C6')
-Nbtour = 2;
-Hud.Affichage_coups(coups,Nbtour);
-
-coups.push('C3')
-Nbtour = 1;
-Hud.Affichage_coups(coups,Nbtour);
-
-coups.push('C6')
-Nbtour = 2;
-Hud.Affichage_coups(coups,Nbtour);
-*/
+//en cas de bug bloquant cette fonction permet de "relancer" le plateau
+let reloadAll = plateau =>{
+    let elem = document.getElementById('Affichage_coups');
+    while(elem != undefined){
+        elem.parentNode.removeChild(elem);
+        elem = document.getElementById('Affichage_coups');
+    }
+    for(let i=0; i<plateau.coups.length; i++){
+        Hud.Affichage_coups(plateau.coups[i], i);
+    }
+    Hud.Affichage_AquiDejouer(plateau.Nbtour)
+}

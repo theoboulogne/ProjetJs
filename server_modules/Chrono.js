@@ -5,46 +5,24 @@ class Chrono{
         this.Chrono = {m:0, s:0};
     }
 
-    CalcChrono(){
+    CalcChrono(){ // on met à jour le chrono au cas ou il se soit décalé
         let Fin = new Date();
-
+        
+        // on enregstre les temps de debut et de fin
         let TempsDebut = {m:this.Debut.getMinutes(), s:this.Debut.getSeconds()}
         let TempsFin = {m:Fin.getMinutes(), s:Fin.getSeconds()}
-
+        
+        // on calcule le temps entre les deux
         let TempsEcoule = {
             m: Math.abs(TempsDebut.m - TempsFin.m),
             s: Math.abs(TempsDebut.s - TempsFin.s)
         };
-
+        
+        // on renvoi le chrono convertit
         return this.getChronoTotal(TempsEcoule)
     }
 
-
-
-/*
-    startTour(couleur){
-        let TourPrec = {m:this.Precedent.getMinutes(), s:this.Precedent.getSeconds()}
-        this.Precedent = new Date();
-
-        let TempsEcoule = {
-            m: Math.abs(TourPrec.m - this.Precedent.getMinutes()),
-            s: Math.abs(TourPrec.s - this.Precedent.getSeconds())
-        };
-        this.Chrono[couleur] = this.addChrono(this.Chrono[couleur], TempsEcoule);
-    }
-    addChrono(a, b){
-        let renvoi = {m:(a.m + b.m), s:(a.s + b.s)};
-        
-        if(renvoi.s >= 60){
-            renvoi.m += 1;
-            renvoi.s -= 60;
-        }
-
-        return renvoi;
-    }*/
-
-
-    getChronoTotal(Chrono){
+    getChronoTotal(Chrono){ // on convertit le chrono finale en heures minutes secondes
         let ChronoTotal = {h:0, m:Chrono.m, s:Chrono.s}
 
         // on rajoute les heures uniquement pour l'enregistrement en BDD
