@@ -4,7 +4,7 @@ module.exports = {
         let debut = new Date().getTime(); // On enregistre l'heure 
 
 
-        let coup = evaluation_joueur(tmpPlateau, couleur, 3) 
+        let coup = evaluation_joueur(tmpPlateau, couleur, plateau.ia) 
         // on sélectionne les 3 meilleurs coups uniquement pour éviter un trop grand nombre d'appels 
         //(faire varier pour augmenter la puissance de l'ia au détriment de la vitesse
 
