@@ -46,7 +46,7 @@ function evaluation_joueur(plateau, couleur, nb){
         // console.log(nb)
         // console.log('Evaluation de : '+String(couleur)+'/'+String(couleurorigine)+" = "+String(meilleurs[0].valeur) + "  ("+String(nb)+')');
         if(meilleurs.length>0) return meilleurs[0]
-        else return {valeur:0}
+        else return {valeur:-20}
     }
     let idx = 0; // si les premiers couts sont égaux en valeur on les test tous et pas juste les 5 premiers
     while(meilleurs[idx].valeur==meilleurs[0].valeur && idx+1<meilleurs.length) idx++;
@@ -116,6 +116,7 @@ function getCoupSecurite(plateau, couleur){
             }
         }
     }
+    return {valeur:-50} // pas de coup jouable on envoi -50 car mat
 }
 
 function evaluation_coups_piece(plateau, piece){//On récupère les déplacements possibles de la pièce
