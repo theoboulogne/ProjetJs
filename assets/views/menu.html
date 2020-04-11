@@ -17,14 +17,16 @@
     </center>
         <div class="Info" id="menu">
             <center>
+                
+                <h2 class= "ecriture">Entrer votre nom d'utilisateur :</h2> 
                 <div class="info" id="div_form">
-                    <h2 class= "ecriture">Entrer votre nom d'utilisateur :</h2> 
                     <form name="formulaire" action='./jeu' method="GET">
                         <div class="pseudo_formulaire">
                             <input class="form-control" type="text" name="pseudo" id="pseudo" placeholder="Votre pseudo">
                         </div>
+                    </br>
+                        <h2 class= "ecriture">Choisissez votre style de pièces :</h2> 
                         <div class="piece_formulaire">
-                            <h2 class= "ecriture">Choisissez votre style de pièces :</h2> 
                             <select class="form-control" name="affichage" id="pieces_choix">
                                 <option value=Classic>Classic</option>
                                 <option value=StarWars>Star-Wars</option>
@@ -32,8 +34,15 @@
                                 <option value=Minion>Minion</option>
                            </select>
                         </div>
+                    </br>
+                        <h2 class= "ecriture">Choisissez votre adversaire :</h2> 
                         <div class= "ia_check">
-                            <label class="checkbox-inline ecriture"><input type="checkbox" name = "ia" value="1" id = "IA">&nbsp IA </label>
+                            <select class="form-control" name="ia" id="ia">
+                                <option value=0>Joueur Vs Joueur</option>
+                                <option value=1>Joueur Vs IA Facile</option>
+                                <option value=2>Joueur Vs IA Moyen</option>
+                                <option value=3>Joueur Vs IA Difficile</option>
+                            </select>
                         </div>
                     </form>
                 </div>

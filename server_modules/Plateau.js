@@ -11,6 +11,7 @@ class Plateau{
     constructor(){
 
         this.ia = 0 //variable pour signaler le mode IA ou non 
+        this.ModeIA = 0;
 
         this.Nbtour = 0;
         this.board = new Array(8)

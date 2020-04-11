@@ -6,6 +6,11 @@
 + arreter de crash qd pas de BDD
 + deplacer toutes les requetes sql en methode avec res en argument
 + test difficulte ia avec menu thomas
++ ajouter un delai avant redirection sur les alertes et changer le texte en conséquence
+
++Options :
+refaire chrono nous meme
+retirer les get param et passer par le serveur uniquement ? voir si c'est faisable avec l'asynchrone
 
 
 A vérifier :
@@ -20,7 +25,7 @@ class Jeu{
         //variable pour éviter de devoir acceder aux paramètres à chaque fois
 
         this.mode = 0
-        if(getParams(window.location.href).ia!=undefined) this.mode = 1;
+        if(getParams(window.location.href).ia>0) this.mode = 1;
 
         
     
