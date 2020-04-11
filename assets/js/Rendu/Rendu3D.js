@@ -66,7 +66,8 @@ class RenduThreeJs{
         let ModelType = getParams(window.location.href).affichage;
         if(ModelType == "" || ModelType == undefined) ModelType = "Classic"; // on redéfinit par sécurité si l'argument est manquant
         console.log("Affichage : " + ModelType)
-        document.body.style.background = "url('../../img/"+ModelType+".png') no-repeat center center";
+        document.body.style.backgroundImage = "url('../../img/"+ModelType+".png')";
+        document.body.style.backgroundSize = "cover"
 
         $.getJSON("../../JSON/"+ModelType+".json", function(json) {
             Rendu.info = json;
