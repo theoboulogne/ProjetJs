@@ -41,7 +41,10 @@ module.exports = {
                 let sql = "INSERT INTO `scores`(`pseudo`, `pieces`, `chrono`, `gagnant`, `coups`, `pieces_prises_blanc`, `pieces_prises_noir`) VALUES ( ?, ?, ?, ?, ?, ?, ?)" 
                 //On insère les données demandées par l'énoncé
                 //On insère également certaines infos de la partie afin de pouvoir la replay auto
-                con.query(sql, [plateau.Joueurs[couleurJoueur].pseudo, 
+                let pseudo = 'Nul'
+                if(couleurJoueur<2) pseudo = plateau.Joueurs[couleurJoueur].pseudo
+
+                con.query(sql, [pseudo, 
                                 String(16 - plateau.Joueurs[(couleurJoueur+1)%2].pieces_prises.length), 
                                 (plateau.chrono.CalcChrono()),
                                 String(couleurJoueur), // On rajoute la couleur du gagnant et le tableau des coups pour le replay

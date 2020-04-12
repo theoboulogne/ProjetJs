@@ -102,7 +102,7 @@ class Plateau{
         piece.x = x                           // on bouge la piece coté piece et on la supprime sur le plateau
         piece.y = y
 
-        this.coups.push(piece)               // on enregistre le coup
+        this.coups.push(JSON.parse(JSON.stringify(piece))) // on enregistre le coup ( par copie pour éviter les pb de portée de variable )
 
         this.board[x][y].piece = piece       // on met la piece sur sa destination
 
@@ -123,36 +123,71 @@ class Plateau{
     // Méthode d'évaluation du mat
     echecEtMat(couleur){
         if(this.board[this.Joueurs[couleur].roi.x][this.Joueurs[couleur].roi.y].piece.echec(this)){ // si le roi est en échec
-            if(this.estCeQuUnePiecePeutBouger(couleur)) return false; // on regarde si une piece peu bouger
-            return true;
+            if(!this.check_CanMovePieces(couleur)) return true; // on regarde si une piece peu bouger
         }
         return false;
     }
 
     pat(couleur){
-        if(this.board[this.Joueurs[couleur].roi.x][this.Joueurs[couleur].roi.y].piece.echec(this)){ // si le roi n'est pas en échec
-            if(this.estCeQuUnePiecePeutBouger(couleur)) return false; // on regarde si une piece peu bouger
-            return true;
+        // Vérification de la possibilité de se déplacer du joueur
+        //On check le roi en premier pour éviter les test inutiles
+        if(!this.check_CanMovePiece(this.Joueurs[couleur].roi.x,this.Joueurs[couleur].roi.y)){ // si il peut pas bouger on vérifie les autres pièces
+            if(!this.check_CanMovePieces(couleur)){ // on regarde si une piece peu bouger
+                return true; // si aucunes pièces ne peut bouger on renvoi vrai
+            }
         }
+        // Maintenant on vient vérifier la répétition des 3 coups pour le nul 
+        //(on le garde dans la même fonction 'pat' pour éviter la multiplication des events socket.io)
+        if(this.coups.length>10){ // on se garde une marge pour éviter les dépassements du tableau et aussi vu que la règle n'est jamais appliquée en début de partie
+            let compteur = 0;
+            let debutIdx = this.coups.length-8; // on vient vérifier sur 4 tours pour vérifier 2 paires de coups
+
+            for(let i=0; i<3; i+=2){ // les 2 paires(décallage de 2 car 2 coups par tour)
+                if(this.check_coups_egaux(debutIdx+i, debutIdx+4+i) && this.check_coups_egaux(debutIdx+1+i, debutIdx+5+i)){ // on vérifie les 2 joueurs
+                    compteur++;
+                }
+            }
+            if(compteur == 2) return true; // si les 2 paires correspondent on met nul 
+            //(répétition de 4 coups au lieu de 3 pour éviter que ça se déclenche en début de partie)
+        }
+
         return false;
     }
 
-    estCeQuUnePiecePeutBouger(couleur){
-        for(let i = 0; i < 8; i++){                               // On parcourt le plateau
-            for(let j = 0; j < 8; j++){                           //
-                if(this.board[i][j].piece.couleur == couleur){    // Quand une piece est de la meme couleur que celle demandé
-                    this.board[i][j].piece.playable(this);        // On lui lance sa fonction playable
-                    for(let l = 0; l < 8; l++){                   //
-                        for(let m = 0; m < 8; m++){               //
-                            if(this.board[l][m].playable){        // Si elle peu bouger sur une case 
-                                return true;                      // on s'arrete sinon on continue
-                            }
-                        }
-                    }
+    check_coups_egaux(idx1, idx2){//meme nom et meme position
+        if(this.coups[idx1].nom == this.coups[idx2].nom){
+            if(this.coups[idx1].x == this.coups[idx2].x){
+                if(this.coups[idx1].y == this.coups[idx2].y){
+                    return true;
                 }
             }
         }
-        return false;                                             // si on ne s'est pas arreté alors aucune piece ne peu bouger
+        return false;
+    }
+    check_CanMovePieces(couleur){
+        for(let i = 0; i < 8; i++){                               // On parcourt le plateau
+            for(let j = 0; j < 8; j++){                           //
+                if(this.board[i][j].piece.couleur == couleur){    // Quand une piece est de la meme couleur que celle demandé
+                    if(this.check_CanMovePiece(i, j)) return true // si on peut la bouger on renvoi true
+                }
+            }
+        }
+        this.reset_playable()
+        return false;                // si on ne s'est pas arreté alors aucune piece ne peu bouger
+    }
+    check_CanMovePiece(x, y){
+        this.reset_playable()
+        this.board[x][y].piece.playable(this);        // On lui lance sa fonction playable
+        for(let l = 0; l < 8; l++){                   //
+            for(let m = 0; m < 8; m++){               //
+                if(this.board[l][m].playable){        // Si elle peu bouger sur une case 
+                    this.reset_playable()
+                    return true;                      // on s'arrete sinon on continue
+                }
+            }
+        }
+        this.reset_playable()
+        return false; // alors elle ne peut pas bouger
     }
 
     check_echec(x, y, piece){ // on vérifie qu'un coup ne met pas notre roi en echec

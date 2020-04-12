@@ -185,7 +185,7 @@ io.sockets.on('connection',  (socket) =>{
                 // On envoi le déplacement a tout le monde
                 for(let i=0; i<(2-game.echiquiers[indiceEchiquier].ModeIA); i++) io.sockets.sockets[game.echiquiers[indiceEchiquier].Joueurs[i].id].emit('move', plateau, deplacement, piece_prise);
                 
-                if(game.echiquiers[indiceEchiquier].echecEtMat(((plateau.Nbtour%2)+1)%2) || game.echiquiers[indiceEchiquier].pat(((plateau.Nbtour%2)+1)%2)){//Detection fin de partie
+                if(game.echiquiers[indiceEchiquier].echecEtMat(((plateau.Nbtour%2)+1)%2)){//Detection fin de partie (Victoire)
                     console.log('Echec et Mat')
                     //Enregistrement du score dans la BDD mysql
                     MYSQL.EnvoiScoreBDD(game.echiquiers[indiceEchiquier], (plateau.Nbtour%2));
@@ -193,17 +193,16 @@ io.sockets.on('connection',  (socket) =>{
                     for(let i=0; i<(2-game.echiquiers[indiceEchiquier].ModeIA); i++) io.sockets.sockets[game.echiquiers[indiceEchiquier].Joueurs[i].id].emit('endGame', (plateau.Nbtour%2));
                     //On désactive l'IA au cas où pour éviter que le serveur crash lors d'une victoire
                     game.echiquiers[indiceEchiquier].ia = 0;
-                }
-
-                /*if(game.echiquiers[indiceEchiquier].pat(((plateau.Nbtour%2)+1)%2)){//Detection fin de partie
-                    console.log('Pat')
+                } // sinon car si mat alors pat également, le joueur ne peut pas jouer
+                else if(game.echiquiers[indiceEchiquier].pat(((plateau.Nbtour%2)+1)%2)){//Detection fin de partie (Pat ou Nul)
+                    console.log('Pat ou nul')
                     //Enregistrement du score dans la BDD mysql
-                    //MYSQL.EnvoiScoreBDD(game.echiquiers[indiceEchiquier], (plateau.Nbtour%2));
+                    MYSQL.EnvoiScoreBDD(game.echiquiers[indiceEchiquier], 2); // 2 pour signaler le nul
                     //Envoi de l'event aux client pour rediriger vers le menu
-                    for(let i=0; i<(2-game.echiquiers[indiceEchiquier].ModeIA); i++) io.sockets.sockets[game.echiquiers[indiceEchiquier].Joueurs[i].id].emit('pat');
-                    //On désactive l'IA au cas où pour éviter que le serveur crash lors d'une victoire
+                    for(let i=0; i<(2-game.echiquiers[indiceEchiquier].ModeIA); i++) io.sockets.sockets[game.echiquiers[indiceEchiquier].Joueurs[i].id].emit('nul');
+                    //On désactive l'IA au cas où pour éviter que le serveur crash lors d'un nul
                     game.echiquiers[indiceEchiquier].ia = 0;
-                }*/
+                }
 
             }
             else{
