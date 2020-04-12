@@ -127,7 +127,7 @@ class Plateau{
         }
         return false;
     }
-
+    // Méthode d'évaluation du Pat/Nul
     pat(couleur){
         // Vérification de la possibilité de se déplacer du joueur
         //On check le roi en premier pour éviter les test inutiles
@@ -186,10 +186,11 @@ class Plateau{
                 }
             }
         }
-        this.reset_playable()
+        this.reset_playable() // on reset les playables avant chaque return pour éviter les pb
         return false; // alors elle ne peut pas bouger
     }
 
+    
     check_echec(x, y, piece){ // on vérifie qu'un coup ne met pas notre roi en echec
 
         //Clone par copie, plus long a executer mais plus simple à comprendre

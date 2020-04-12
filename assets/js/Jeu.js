@@ -90,6 +90,11 @@ class Jeu{
 
             Hud.OpenMenu(infos)
         });
+        socket.on('nul', () => { 
+            console.log('Partie terminée')// Fin de partie
+
+            Hud.OpenMenu('Match nul !')
+        });
 
         socket.on('nul', () => {
             console.log('Partie terminée')// Fin de partie

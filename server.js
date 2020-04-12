@@ -203,6 +203,15 @@ io.sockets.on('connection',  (socket) =>{
                     //On désactive l'IA au cas où pour éviter que le serveur crash lors d'un nul
                     game.echiquiers[indiceEchiquier].ia = 0;
                 }
+                else if(game.echiquiers[indiceEchiquier].pat(((plateau.Nbtour%2)+1)%2)){//Detection Nul ou pat
+                    console.log('Nul ou pat')
+                    //Enregistrement du score dans la BDD mysql
+                    MYSQL.EnvoiScoreBDD(game.echiquiers[indiceEchiquier], 2); // 2 car pas de gagnant
+                    //Envoi de l'event aux client pour rediriger vers le menu
+                    for(let i=0; i<(2-game.echiquiers[indiceEchiquier].ModeIA); i++) io.sockets.sockets[game.echiquiers[indiceEchiquier].Joueurs[i].id].emit('nul');
+                    //On désactive l'IA au cas où pour éviter que le serveur crash lors d'un nul/pat
+                    game.echiquiers[indiceEchiquier].ia = 0;
+                }
 
             }
             else{
