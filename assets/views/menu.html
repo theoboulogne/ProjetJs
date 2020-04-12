@@ -12,20 +12,23 @@
 <body style="background-color:rgb(45, 133, 92);">
 
     <center>
+        <!-- titre -->
         <h1 class="ecriture_titre"> CHESS GAME</h1>
         <h1 class="ecriture"> projet CIR²</h1>
     </center>
+        <!-- div qui contient tout le formulaire du menu -->
         <div class="Info" id="menu">
             <center>
-                
                 <h2 class= "ecriture">Entrer votre nom d'utilisateur :</h2> 
                 <div class="info" id="div_form">
                     <form name="formulaire" action='./jeu' method="GET">
+                        <!-- entrée du pseudo -->
                         <div class="pseudo_formulaire">
                             <input class="form-control" type="text" name="pseudo" id="pseudo" placeholder="Votre pseudo">
                         </div>
-                    </br>
+                        </br>
                         <h2 class= "ecriture">Choisissez votre style de pièces :</h2> 
+                        <!-- dropdown pour le choix des pieces -->
                         <div class="piece_formulaire">
                             <select class="form-control" name="affichage" id="pieces_choix">
                                 <option value=Classic>Classic</option>
@@ -34,8 +37,9 @@
                                 <option value=Minion>Minion</option>
                            </select>
                         </div>
-                    </br>
+                        </br>
                         <h2 class= "ecriture">Choisissez votre adversaire :</h2> 
+                        <!-- choix du mode de jeux -->
                         <div class= "ia_check">
                             <select class="form-control" name="ia" id="ia">
                                 <option value=0>Joueur Vs Joueur</option>
@@ -46,10 +50,12 @@
                         </div>
                     </form>
                 </div>
+                <!-- bouton pour lancer la partie -->
                 <button class="btn btn-dark" id="play">PLAY</button>
             </center>
         </div>
 
+        <!-- tableau des scores, affiche des pages d'aciennes parties (6 par 6) avec le pseudo du vainqueur, sont nombre de pieces restante et le temps de jeux -->
         <div class = "tableau_score">
             <table class="table table-dark">
                 <thead >
@@ -65,17 +71,20 @@
                 <tfoot>
                     <tr>
                         <td>
+                            <!-- bouton page suivante -->
                         <button class="btn btn-dark btn_tableau" id="tableau_page_precedente"><h1 class="ecriture"><i class="far fa-arrow-alt-circle-left"></i></h1></button>
                         </td>
                         <td></td>
                         <td></td>
                         <td>
+                            <!-- bouton page precedente -->
                         <button class="btn btn-dark btn_tableau" id="tableau_page_suivante"><h1 class="ecriture"><i class="far fa-arrow-alt-circle-right"></i></h1></button>
                         </td>
                     </tr>
                 </tfoot>
             </table>
         </div>
+        
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>

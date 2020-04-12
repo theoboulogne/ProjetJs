@@ -527,7 +527,7 @@ class RenduThreeJs{
                 let GetDeplacementId = id => {
                     let compteur = 0;
                     for(let i=0; i<pieces_deplaces.length; i++){
-                        if (coups[i].id == id) {
+                        if (pieces_deplaces[i] == id) {
                             compteur++;
                         }
                     }
@@ -539,9 +539,10 @@ class RenduThreeJs{
                         Hud.Affichage_AquiDejouer(i)
                         setTimeout(function(){
                             Hud.Affichage_coups(coups[i], i)
-                            let d = 1500;
+                            let d = 2000;
                             if (typeof coups[i] != 'string') {
                                 console.log("replay4");
+                                console.log(coups[i].nom + ": "+String(coups[i].id))
                                 let tmpPiece = JSON.parse(JSON.stringify(coups[i]));
                                 let delta = GetDeplacementId(coups[i].id);
                                 tmpPiece.x = coups[i].deplacements[delta].x
@@ -555,25 +556,7 @@ class RenduThreeJs{
                                 pieces_deplaces.push(coups[i].id);
                                 Rendu.movePiece(deplacement);
 
-                                if(pieces_prises[i%2].length>indiceSuppr[i%2]) if (pieces_prises[i%2][indiceSuppr[i%2]].Nbtour == i+1) {
-                                    setTimeout(function(){
-                                        Rendu.moveOut(pieces_prises[i%2][indiceSuppr[i%2]].piece);
-                                        indiceSuppr[i%2]++;
-                                    }, 1000);
-
-                                    d+=800;
-                                }
-                                
-                                //si promotion
-                                if(coups[i].choix != undefined){
-                                    d+=2500
-                                    
-                                    let tmpPiecePromotion = coups[i]
-                                    tmpPiecePromotion.nom = coups[i].choix
-                                    Rendu.switchPawn(tmpPiecePromotion);
-                                }
-
-                                Play(i+1, d);
+                                // + de delai si déplacement long
                             }
                             else{
                                 console.log("replay5");
@@ -590,9 +573,37 @@ class RenduThreeJs{
                                 
                                 let deplacements = (Roque.getDeplacements(deplacement, board))
                                 Rendu.moveRoque(JSON.parse(JSON.stringify(deplacements)));
-
-                                Play(i+1, d);
+                                d+=800
+                                
+                                pieces_deplaces.push(Roi.id);
+                                pieces_deplaces.push(deplacements[1].piece.id);
                             }
+
+
+                            if(pieces_prises[i%2].length>indiceSuppr[i%2]) if (pieces_prises[i%2][indiceSuppr[i%2]].Nbtour == i+1) {
+                                console.log('moveOUT')
+                                console.log(pieces_prises[i%2][indiceSuppr[i%2]].piece)
+                                setTimeout(function(){
+                                    Rendu.moveOut(pieces_prises[i%2][indiceSuppr[i%2]].piece);
+                                    indiceSuppr[i%2]++;
+                                }, 1000);
+
+                                d+=900;
+                            }
+                            
+                            //si promotion
+                            if(coups[i].choix != undefined){
+                                d+=2500
+                                
+                                let tmpPiecePromotion = coups[i]
+                                tmpPiecePromotion.nom = coups[i].choix
+                                Rendu.switchPawn(tmpPiecePromotion);
+                            }
+
+                            Play(i+1, d);
+
+
+
                         }, delai );
                     }
                     else{
@@ -629,7 +640,7 @@ class RenduThreeJs{
             });  
         })
     }
-
+    
     //Méthode de suppression du rendu
     remove() {
         document.body.removeChild(document.body.lastChild)//on supprime le rendu

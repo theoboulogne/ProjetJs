@@ -11,7 +11,15 @@ module.exports = {
      
         while (debut + 3000 > new Date().getTime()); // pause pour éviter de renvoyer un coup trop rapidement
                                                     // et donc d'avoir des movements qui se lancent en meme temps
-        return coup;
+
+        let deplacement = {
+            piece: JSON.parse(JSON.stringify(coup.piece)),// par copie pour éviter les problèmes de portée de variable
+            x: coup.Coo.x,
+            y: coup.Coo.y
+        };
+        if(deplacement.piece.nom == "Pion" && (deplacement.y == 0 || deplacement.y == 7)) deplacement.piece.choix = "Reine" 
+        // en cas de promotion on choisi toujours la reine pour l'ia
+        return deplacement;
     },
     testcoup(plateau, piece, x, y){//fonction de test de l'évaluation sur les coups du joueur pour évaluer l'efficacité de l'IA
         return evaluation_coup(plateau, piece, x, y);

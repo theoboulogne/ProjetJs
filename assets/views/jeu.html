@@ -7,8 +7,14 @@
 </head>
 <body>
     
-    <div class = "AquiDejouer" id = "AquiDejouer"></div>
+    <!-- case qui indique quel joueur doit jouer -->
+    <div class = "AquiDejouer">
+        <h1 class = "ecriture_titre">
+            C'est aux <span id = "AquiDejouer">blancs</span> de jouer !
+        </h1>
+    </div>
 
+    <!-- tableau a 2 colone (couts blancs et coups noir) qui affiche les derniere position joué -->
     <div class = "fenetre_coups">
         <div class="navbar">
             <a class="ecriture_coups">coups blanc: </a>
@@ -27,6 +33,7 @@
         </form>
     </div>
     
+    <!-- modal qui s'affiche lorsqu'un piont arrive au bout. Le joueur peut alors choisir sa piece -->
     <div id="choix_piece" class="modal">
         <center>
             <h2 class="ecriture_choix_piece">Choisissez votre piece :</h2>
@@ -45,17 +52,19 @@
         </center>
     </div>
 
+    <!-- modal qui attends un adversaire -->
     <div id="attente" class="modal">
         <center>
             <h1>Attente d'un adversaire, veuillez patienter.</h1>
         </center>
     </div>
 
+    <!-- Modal qui affiche  une erreur puis redirigé vers le menu -->
     <div id="popup" class="modal">
         <center>
             <h1 id="contenu-popup">Erreur.</h1>
         </center>
-        <p>Vous allez être redirigé vers le menu en cliquant en dehors de cette fenêtre.</p>
+        <p>Vous allez être redirigé vers le menu dans 5 secondes.</p>
     </div>
 
 </body>
