@@ -527,7 +527,7 @@ class RenduThreeJs{
                 let GetDeplacementId = id => {
                     let compteur = 0;
                     for(let i=0; i<pieces_deplaces.length; i++){
-                        if (coups[i].id == id) {
+                        if (pieces_deplaces[i] == id) {
                             compteur++;
                         }
                     }
@@ -574,6 +574,9 @@ class RenduThreeJs{
                                 let deplacements = (Roque.getDeplacements(deplacement, board))
                                 Rendu.moveRoque(JSON.parse(JSON.stringify(deplacements)));
                                 d+=800
+                                
+                                pieces_deplaces.push(Roi.id);
+                                pieces_deplaces.push(deplacements[1].piece.id);
                             }
 
 
