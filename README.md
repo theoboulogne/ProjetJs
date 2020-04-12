@@ -11,6 +11,7 @@
 #### Si vous lancez une partie a deux joueurs, tant que le deuxième joueur n'est pas conecté vous serez mis en attente.
 
 ## En partie :
+    - Le jeu est en 3D
     - Impossibilité de jouer un coup illégal (vous ne pouvez pas mettre volontairement votre roi en position d'échec)
     - Si le roi est en échec vous ne pourrez que le sauver ou perdre
     - Possibilité de roquer
