@@ -1,5 +1,6 @@
-# ProjetJs
-## Les échecs
+# ProjetJs - échecs
+
+![Presentation](https://github.com/theoboulogne/ProjetJs/blob/master/readme.png)
 
 ## Page d'accueil :
     - Renseignement d'un pseudo (pseudo par défaut si aucune saisie)
