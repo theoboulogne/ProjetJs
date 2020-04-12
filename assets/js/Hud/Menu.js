@@ -44,6 +44,10 @@ let Menu = (function(){
         part.appendChild(valeur);
         return part
     }
+    let LienReplay = j =>{
+        let affichage = document.getElementById("pieces_choix").value;
+        return "jeu?replay=" + String(j+1) + "&affichage="+ affichage;
+    }
     return{
         //fonction lier au bouton play
         Play : () => {  
@@ -79,7 +83,7 @@ let Menu = (function(){
             zone_texte.appendChild(t);   
             replay_bouton.appendChild(zone_texte);   
             replay.appendChild(replay_bouton);
-            replay_bouton.addEventListener("click", function(){window.location.href = "jeu?replay=" + String(j)});
+            replay_bouton.addEventListener("click", function(){window.location.href = LienReplay(j)});
         },
         //cree une nouvelle page pour le tableau de scores ( pas plus de 6 scores par pages)
         AjoutTableauScore : (i_suplementaire) =>{

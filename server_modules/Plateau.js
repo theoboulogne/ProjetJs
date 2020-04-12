@@ -123,23 +123,71 @@ class Plateau{
     // Méthode d'évaluation du mat
     echecEtMat(couleur){
         if(this.board[this.Joueurs[couleur].roi.x][this.Joueurs[couleur].roi.y].piece.echec(this)){ // si le roi est en échec
-            for(let j = 0; j < 8; j++){       
-                for(let k = 0; k < 8; k++){                           // on cherche des pieces de notre couleur
-                    if(this.board[j][k].piece.couleur == couleur){
-                        this.board[j][k].piece.playable(this);
-                        for(let l = 0; l < 8; l++){                   // si aucune ne peu bouger alors on est mat
-                            for(let m = 0; m < 8; m++){               // car la méthode playable() ne retourne rien 
-                                if(this.board[l][m].playable){        // si le roi est en échec et que le piece ne peut pas aider
-                                    return false;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            return true;
+            if(!this.check_CanMovePieces(couleur)) return true; // on regarde si une piece peu bouger
         }
         return false;
+    }
+    // Méthode d'évaluation du Pat/Nul
+    pat(couleur){
+        // Vérification de la possibilité de se déplacer du joueur
+        //On check le roi en premier pour éviter les test inutiles
+        if(!this.check_CanMovePiece(this.Joueurs[couleur].roi.x,this.Joueurs[couleur].roi.y)){ // si il peut pas bouger on vérifie les autres pièces
+            if(!this.check_CanMovePieces(couleur)){ // on regarde si une piece peu bouger
+                return true; // si aucunes pièces ne peut bouger on renvoi vrai
+            }
+        }
+        // Maintenant on vient vérifier la répétition des 3 coups pour le nul 
+        //(on le garde dans la même fonction 'pat' pour éviter la multiplication des events socket.io)
+        if(this.coups.length>10){ // on se garde une marge pour éviter les dépassements du tableau et aussi vu que la règle n'est jamais appliquée en début de partie
+            let compteur = 0;
+            let debutIdx = this.coups.length-8; // on vient vérifier sur 4 tours pour vérifier 2 paires de coups
+
+            for(let i=0; i<3; i+=2){ // les 2 paires(décallage de 2 car 2 coups par tour)
+                if(this.check_coups_egaux(debutIdx+i, debutIdx+4+i) && this.check_coups_egaux(debutIdx+1+i, debutIdx+5+i)){ // on vérifie les 2 joueurs
+                    compteur++;
+                }
+            }
+            if(compteur == 2) return true; // si les 2 paires correspondent on met nul 
+            //(répétition de 4 coups au lieu de 3 pour éviter que ça se déclenche en début de partie)
+        }
+
+        return false;
+    }
+
+    check_coups_egaux(idx1, idx2){//meme nom et meme position
+        if(this.coups[idx1].nom == this.coups[idx2].nom){
+            if(this.coups[idx1].x == this.coups[idx2].x){
+                if(this.coups[idx1].y == this.coups[idx2].y){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    check_CanMovePieces(couleur){
+        for(let i = 0; i < 8; i++){                               // On parcourt le plateau
+            for(let j = 0; j < 8; j++){                           //
+                if(this.board[i][j].piece.couleur == couleur){    // Quand une piece est de la meme couleur que celle demandé
+                    if(this.check_CanMovePiece(i, j)) return true // si on peut la bouger on renvoi true
+                }
+            }
+        }
+        this.reset_playable()
+        return false;                // si on ne s'est pas arreté alors aucune piece ne peu bouger
+    }
+    check_CanMovePiece(x, y){
+        this.reset_playable()
+        this.board[x][y].piece.playable(this);        // On lui lance sa fonction playable
+        for(let l = 0; l < 8; l++){                   //
+            for(let m = 0; m < 8; m++){               //
+                if(this.board[l][m].playable){        // Si elle peu bouger sur une case 
+                    this.reset_playable()
+                    return true;                      // on s'arrete sinon on continue
+                }
+            }
+        }
+        this.reset_playable() // on reset les playables avant chaque return pour éviter les pb
+        return false; // alors elle ne peut pas bouger
     }
 
     
