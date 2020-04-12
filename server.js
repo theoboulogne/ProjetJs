@@ -28,19 +28,19 @@ app.get('/jeu', (request, response, next) => {
     lastParam = request.query // on récupère les paramètres
     response.sendFile(__dirname + '/assets/views/jeu.html')
 });
-
-app.get("/scores", function(req,res){
+//Envoi de données
+app.get("/scores", function(req,res){//Envoi des scores
     MYSQL.sendScores(res);
 });
-app.get("/jeu/replay", function(req,res){ 
+app.get("/jeu/replay", function(req,res){ //Envoi des replays
     if(lastParam!=undefined && lastParam.replay != undefined){
-        let tmpPlateau = new Plateau();
+        let tmpPlateau = new Plateau();//On génère un tableau pour le début
         MYSQL.sendReplay(res, lastParam.replay, tmpPlateau);
     }
 });
 
 // On garde uniquement le code de gestion des events dans le fichier server car on doit effectuer des envois et donc
-// accéder à io.sockets par moment
+// accéder à io.sockets par moment, on ne le passe pas en argument car le tableau est trop lourd et ça risquerait de réduire le jeu
 
 
 //On stocke dans une variable tampon les paramètre du dernier client car on y accède uniquement depuis le app.get de /jeu
@@ -169,7 +169,7 @@ io.sockets.on('connection',  (socket) =>{
                 if(deplacement.piece.choix != undefined) game.echiquiers[indiceEchiquier].board[deplacement.piece.x][deplacement.piece.y].piece.choix = deplacement.piece.choix;
                 game.echiquiers[indiceEchiquier].board[deplacement.piece.x][deplacement.piece.y].piece.move(deplacement.x,deplacement.y,game.echiquiers[indiceEchiquier])
                 
-                if(deplacement.piece.choix != undefined){
+                if(deplacement.piece.choix != undefined){ // Gestion de la promotion
                     if(game.echiquiers[indiceEchiquier].board[deplacement.x][deplacement.y].piece.nom == "Pion"&&
                     game.echiquiers[indiceEchiquier].board[deplacement.x][deplacement.y].piece.y == ((game.echiquiers[indiceEchiquier].board[deplacement.x][deplacement.y].piece.couleur + 1) % 2)*7 ){
                         let piecePromotion = game.echiquiers[indiceEchiquier].board[deplacement.x][deplacement.y].piece.promotion(deplacement.piece.choix);
@@ -206,7 +206,7 @@ io.sockets.on('connection',  (socket) =>{
 
             }
             else{
-                if(!(game.echiquiers[indiceEchiquier].ModeIA && game.echiquiers[indiceEchiquier].ia == 0)){
+                if(!(game.echiquiers[indiceEchiquier].ModeIA && game.echiquiers[indiceEchiquier].ia == 0)){//On gère le cas de l'ia
                     console.log("Réinitialisation d'un client - Move");
                     game.echiquiers[indiceEchiquier].reset_playable(); // on reset les playables avant de l'envoyer
                     game.echiquiers[indiceEchiquier].select = {x:-1, y:-1}; // aussi le select car on est dans l'event move donc il est assigné
