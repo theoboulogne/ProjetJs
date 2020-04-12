@@ -82,7 +82,7 @@ class Jeu{
         });
 
         socket.on('endGame', (couleurGagnant) => { 
-            console.log('Partie terminée')// Fin de partie
+            console.log('Partie terminée')// Fin de partie (victoire d'un joueur)
 
             let infos;
             if(couleurGagnant == Game.couleur) infos = "Vous avez gagné !"
@@ -90,10 +90,10 @@ class Jeu{
 
             Hud.OpenMenu(infos)
         });
-        socket.on('nul', () => { 
-            console.log('Partie terminée')// Fin de partie
+        socket.on('pat', () => { 
+            console.log('Partie terminée')// Fin de partie (nul)
 
-            Hud.OpenMenu('Match nul !')
+            Hud.OpenMenu('Il y a Pat !')
         });
 
         socket.on('nul', () => {

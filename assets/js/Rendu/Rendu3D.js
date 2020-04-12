@@ -1,3 +1,5 @@
+// reprise avec modifications du plateau: https://github.com/SuperiorJT/Threejs-Chess
+
 class RenduThreeJs{
     constructor(couleur){
         //Pour appel du raycast des variables
@@ -5,7 +7,7 @@ class RenduThreeJs{
         //Initialisation de la scène
         this.scene = new THREE.Scene();
         this.camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight);
-        this.camera.up.set( 0, 0, 1 ); // pour que orbitcontrols 'suit' la caméra
+        this.camera.up.set( 0, 0, 1 ); // pour que orbitcontrols 'suive' la caméra
     
         //Ajout du rendu
         let renderer = new THREE.WebGLRenderer({
@@ -117,10 +119,11 @@ class RenduThreeJs{
 
         return tween;
     };
+    //animation mouvement vers le haut/bas et en diagonal
     animatePiece(piece, X, Y) {
         let tweenUp = this.Tween(piece, [{Axis:'z', Offset:1}], 200)
         let tweenMove = this.Tween(piece, [{Axis:'x', Offset:0.5*X}, 
-                                           {Axis:'y', Offset:0.5*Y}], 100*Math.max(Math.abs(X),Math.abs(Y))) // calcul delai en fonction distance ?
+                                           {Axis:'y', Offset:0.5*Y}], 100*Math.max(Math.abs(X),Math.abs(Y)))
         let tweenDown = this.Tween(piece, [{Axis:'z', Offset:0}], 200)
         tweenUp.chain(tweenMove);
         tweenMove.chain(tweenDown);
@@ -131,14 +134,14 @@ class RenduThreeJs{
     /*animateSelectedPiece(piece, X, Y) {
         let tweenUp = this.Tween(piece, [{Axis:'y', Offset:40}], 1000)
         let tweenMove = this.Tween(piece, [{Axis:'x', Offset:20*X}, 
-                                            {Axis:'z', Offset:20*Y}], 3000) // calcul delai en fonction distance ?
+                                            {Axis:'z', Offset:20*Y}], 3000)
         let tweenDown = this.Tween(piece, [{Axis:'y', Offset:0}], 1000)
         tweenUp.chain(tweenMove);
         tweenMove.chain(tweenDown);
         tweenUp.start();
     }*/
 
-    //Méthodes de déplacement de pièce
+    //Méthodes de déplacement de pièces
     movePieces(deplacements) {
         let Rendu = this;
         let loadCheck = setInterval(function() { // On attend que toutes nos pièces soient 
@@ -157,7 +160,7 @@ class RenduThreeJs{
             this.animatePiece(this.piecesObj[pieceIdx], deplacement.y-deplacement.piece.y, deplacement.x-deplacement.piece.x);
         }
     }
-    moveOut(piece) {
+    moveOut(piece) {    //déplacement des pièces mangées à l'extérieur du plateau
         let pieceIdx = this.getPieceIdx(piece)
         if(pieceIdx>-1){
             let tweenUp = this.Tween(this.piecesObj[pieceIdx], [{Axis:'z', Offset:3}], 600); 
@@ -177,6 +180,7 @@ class RenduThreeJs{
             }, 650);
         }
     }
+    //animation du Roque
     moveRoque(deplacements) {
         let Rendu = this;
         // ROI
@@ -186,6 +190,7 @@ class RenduThreeJs{
             Rendu.movePiece(deplacements[1]);
         }, 800); // on prend le temps de déplacement du roi moins le temps de descente
     }
+    //animation de la promotion
     switchPawn(piece) {
         let Rendu = this;
         setTimeout(function() {
@@ -202,7 +207,7 @@ class RenduThreeJs{
     }
 
     //Méthodes de suppression de pièce
-    removePiecesOut() {
+    removePiecesOut() {     //pour les pièces mangées
         for(let i=0; i<2; i++){
             for(let j=0; j<this.piecesOut[i].length; j++){
                 this.removeObject(this.piecesOut[i][j]);
@@ -210,27 +215,27 @@ class RenduThreeJs{
             this.piecesOut[i].length = 0;
         }
     }
-    removePieces() {
+    removePieces() {    //supprime toutes les pièces
         for(let i=0; i<this.piecesObj.length; i++){
             this.removePiece(0); // pas i mais 0 car on le retire du tableau au fur et a mesure
         }
     }
-    removePiece(idx){//idx = emplacement de l'objet dans piecesId et piecesObj
-        if(idx!=-1){
+    removePiece(idx){   //supprime une seule pièce
+        if(idx!=-1){    //idx = emplacement de l'objet dans piecesId et piecesObj
             this.removeObject(this.piecesObj[idx]);
             this.piecesObj.splice(idx, 1);
             this.piecesId.splice(idx, 1);
         }
     }
-    removeObject(piece) {
+    removeObject(piece) {   //supprime le modèle
         this.scene.remove(piece);
     }
 
     //Gestion des Cases
-    removePlayable() {
+    removePlayable() {  // suppressions de l'affichage des cases jouables
         for (let i = 0; i < this.playableCases.length; i++) this.playableCases[i].material = this.materialCases[0]
     }
-    setPlayables(board, CooSelect) {
+    setPlayables(board, CooSelect) {    //affichage des cases jouables
         for (let i = 0; i < board.length; i++) {
             for (let j = 0; j < board.length; j++) {
                 if (board[i][j].playable) {
@@ -249,16 +254,16 @@ class RenduThreeJs{
         }
         this.setSelect(CooSelect.x, CooSelect.y);
     };
-    setPlayable(X, Y, playableType) {
+    setPlayable(X, Y, playableType) {   //affichage d'une case jouable avec gestion de sa couleur
         let materiel;
         if (playableType) { materiel = this.materialCases[2]/*.color.setHex(0x00ff00);*/ }
         else { materiel = this.materialCases[3]/*.color.setHex(0xff0000);*/ }
         this.setCase(X, Y, materiel)
     };
-    setSelect(X, Y) {
+    setSelect(X, Y) {   //affichage en vert de la case de la pièce sélectionnnée
         this.setCase(X, Y, this.materialCases[1]);
     };
-    setTransparent(X, Y){
+    setTransparent(X, Y){   //texture transparente
         this.setCase(X, Y, this.materialCases[0]);
     }
     setCase(X, Y, materiel){
@@ -278,7 +283,7 @@ class RenduThreeJs{
     }
 
     //Méthodes de sélection d'objets
-    getPieceIdx(piece){
+    getPieceIdx(piece){     //récupération de l'indice d'une pièce
         for(let i=0; i<this.piecesId.length; i++){ // on parcours toutes les pièces pour trouver la bonne à défault d'une meilleure méthode
             if(this.piecesId[i] == piece.id){
                 return i;
@@ -286,13 +291,13 @@ class RenduThreeJs{
         }
         return -1;
     }
-    getCooObject(Objet){
+    getCooObject(Objet){    //récupération des coordonnées d'un modèle
         return this.getCoo(Objet.position);
     }
-    getCooSelected(selectedObject){
+    getCooSelected(selectedObject){  //récupération des coordonnées de la pièce sélectionnée
         return this.getCoo(selectedObject.point);
     }
-    getCoo(position){
+    getCoo(position){   //calcul de la position de la pièce sur le plateau à partir des coordonnées "brutes" de la scene
         let Coo = new THREE.Vector2();
         Coo.x = Math.trunc(2*(position.y + 2)); // Calcul coo
         Coo.y = Math.trunc(2*(position.x + 2));
@@ -342,18 +347,6 @@ class RenduThreeJs{
         this.scene.add( spotLight );
     }
     PositionCamera(couleur){
-        /*if(couleur){ // Caméra haute
-            this.camera.position.x = 3.2;
-            this.camera.position.z = 4;
-            this.camera.rotation.y = ( 40* (Math.PI / 180));
-            this.camera.rotation.z = ( 90* (Math.PI / 180));
-        }
-        else{
-            this.camera.position.x = -3.2;
-            this.camera.position.z = 4;
-            this.camera.rotation.y = ( 320* (Math.PI / 180));
-            this.camera.rotation.z = ( 270* (Math.PI / 180));
-        }*/
         
         if(couleur){ // Caméra basse
             this.camera.position.x = 3.5;
@@ -461,6 +454,7 @@ class RenduThreeJs{
             }
         }
     }
+    //Méthodes de génération d'une seule pièce supprimé
     LoadPieceOut(piece, hauteur){
         let idx = -1;
         for(let i=0; i<this.models.length; i++) {
@@ -500,7 +494,7 @@ class RenduThreeJs{
         this.LoadPiecesOut(plateau); 
     }
 
-    
+    //replay d'une partie précédente
     replay() {
         console.log("replay1");
         let Rendu = this;
@@ -540,7 +534,7 @@ class RenduThreeJs{
                         setTimeout(function(){
                             Hud.Affichage_coups(coups[i], i)
                             let d = 2000;
-                            if (typeof coups[i] != 'string') {
+                            if (typeof coups[i] != 'string') { // si le coup n'est pas un Roque
                                 console.log("replay4");
                                 console.log(coups[i].nom + ": "+String(coups[i].id))
                                 let tmpPiece = JSON.parse(JSON.stringify(coups[i]));
@@ -558,7 +552,7 @@ class RenduThreeJs{
 
                                 // + de delai si déplacement long
                             }
-                            else{
+                            else{ //cas du Roque
                                 console.log("replay5");
                                 let decalage;
                                 if(coups[i] == "G.R") decalage = 2; 

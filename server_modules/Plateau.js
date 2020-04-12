@@ -138,32 +138,35 @@ class Plateau{
         }
         // Maintenant on vient vérifier la répétition des 3 coups pour le nul 
         //(on le garde dans la même fonction 'pat' pour éviter la multiplication des events socket.io)
-        if(this.coups.length>10){ // on se garde une marge pour éviter les dépassements du tableau et aussi vu que la règle n'est jamais appliquée en début de partie
-            let compteur = 0;
-            let debutIdx = this.coups.length-8; // on vient vérifier sur 4 tours pour vérifier 2 paires de coups
+        // if(this.coups.length>10){ // on se garde une marge pour éviter les dépassements du tableau et aussi vu que la règle n'est jamais appliquée en début de partie
+        //     let compteur = 0;
+        //     let debutIdx = this.coups.length-8; // on vient vérifier sur 4 tours pour vérifier 2 paires de coups
 
-            for(let i=0; i<3; i+=2){ // les 2 paires(décallage de 2 car 2 coups par tour)
-                if(this.check_coups_egaux(debutIdx+i, debutIdx+4+i) && this.check_coups_egaux(debutIdx+1+i, debutIdx+5+i)){ // on vérifie les 2 joueurs
-                    compteur++;
-                }
-            }
-            if(compteur == 2) return true; // si les 2 paires correspondent on met nul 
-            //(répétition de 4 coups au lieu de 3 pour éviter que ça se déclenche en début de partie)
-        }
+        //     for(let i=0; i<3; i+=2){ // les 2 paires(décallage de 2 car 2 coups par tour)
+        //         if(this.check_coups_egaux(debutIdx+i, debutIdx+4+i) && this.check_coups_egaux(debutIdx+1+i, debutIdx+5+i)){ // on vérifie les 2 joueurs
+        //             compteur++;
+        //         }
+        //     }
+        //     if(compteur == 2) return true; // si les 2 paires correspondent on met nul 
+        //     //(répétition de 4 coups au lieu de 3 pour éviter que ça se déclenche en début de partie)
+        // }
+        // -> Annulé à cause du système de pointeur de JS qui empêche la comparaison, de plus cela ne correspond pas
+        //    à la règle officielle des echecs car la position de TOUTES les pièces doit être identique 3fois dans 
+        //    TOUTE la partie et non d'affilé comme fait précédemment.
 
         return false;
     }
 
-    check_coups_egaux(idx1, idx2){//meme nom et meme position
-        if(this.coups[idx1].nom == this.coups[idx2].nom){
-            if(this.coups[idx1].x == this.coups[idx2].x){
-                if(this.coups[idx1].y == this.coups[idx2].y){
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
+    // check_coups_egaux(idx1, idx2){//meme nom et meme position -> Non utilisé
+    //     if(this.coups[idx1].nom == this.coups[idx2].nom){
+    //         if(this.coups[idx1].x == this.coups[idx2].x){
+    //             if(this.coups[idx1].y == this.coups[idx2].y){
+    //                 return true;
+    //             }
+    //         }
+    //     }
+    //     return false;
+    // }
     check_CanMovePieces(couleur){
         for(let i = 0; i < 8; i++){                               // On parcourt le plateau
             for(let j = 0; j < 8; j++){                           //
